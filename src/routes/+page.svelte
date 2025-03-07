@@ -1,31 +1,23 @@
 <script lang="ts">
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcomeFallback from '$lib/images/svelte-welcome.png';
 </script>
 
 <svelte:head>
-	<title>Home</title>
+	<title>Jesse's Portfolio Site</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
 <section>
 	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcomeFallback} alt="Welcome" />
-			</picture>
-		</span>
+		<div class="welcome">
+			GET ONTO SHIT
+		</div>
 
 		to your new<br />SvelteKit app
 	</h1>
 
 	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
+		Real Portfolio Page Now! <strong>Jesse Get To Work</strong>
 	</h2>
-
-	<Counter />
 </section>
 
 <style>
@@ -44,6 +36,9 @@
 	.welcome {
 		display: block;
 		position: relative;
+		font-family: 'Times New Roman', Times, serif;
+		font-size: 20vh;
+		outline: dashed;
 		width: 100%;
 		height: 0;
 		padding: 0 0 calc(100% * 495 / 2048) 0;
