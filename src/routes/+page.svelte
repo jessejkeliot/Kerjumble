@@ -12,8 +12,9 @@
 			GET ONTO SHIT
 		</div>
 
-		to your new<br />SvelteKit app
+		to your new<br /> app
 	</h1>
+	<a href="/kerjumble">Kerjumble</a>
 
 	<h2>
 		Real Portfolio Page Now! <strong>Jesse Get To Work</strong>

@@ -6,7 +6,7 @@
 </script>
 
 <div class="app">
-	<Header />
+	<!-- <Header /> -->
 
 	<main>
 		{@render children()}
@@ -14,7 +14,7 @@
 
 	<footer>
 		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
+			Do some work Jesse but first maybe mock up in Figma or Canva?
 		</p>
 	</footer>
 </div>
