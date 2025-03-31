@@ -3,12 +3,15 @@
 let count = 0;
 const operators = ["+", "-"];
 const max = 100;
-let num1 = 1;
-let num2 = 2;
+let num1 = 0;
+let num2 = 0;
 let opnum = 0;
 let operator = "+";
-let userAnswer = "";
+let currentAnswer = 0;
+randomiseQuestion();
+let userInput = "";
 function randomiseQuestion(){
+    do {
     num1 = Math.floor(Math.random() * (max+1));
     num2 = Math.floor(Math.random() * (max+1));
     opnum = Math.floor(Math.random() * (2));
@@ -18,14 +21,16 @@ function randomiseQuestion(){
     if(opnum == 0){
         operator = "-";
     }
+    } while (doOperator(num1, num2, operator) < 1);
+    currentAnswer = doOperator(num1, num2, operator);
 }
 
 function checkifcorrect(){
-    console.log("checking", userAnswer);
-    console.log("Real answer is ", doOperator(num1, num2, operator));
-    if(parseInt(userAnswer, 10) == doOperator(num1, num2, operator)){
+    console.log("checking", userInput);
+    console.log("Real answer is ", currentAnswer);
+    if(parseInt(userInput, 10) == currentAnswer){
         randomiseQuestion();
-        userAnswer = "";
+        userInput = "";
         count++;
     }
 }
@@ -34,7 +39,7 @@ function checkifcorrect(){
 <h3>
 {num1} {operator} {num2}
 </h3>
-<input bind:value={userAnswer} oninput={checkifcorrect} type="text" name="answerbox" id="ab1">
+<input bind:value={userInput} oninput={checkifcorrect} type="text" name="answerbox" id="ab1">
 
 <style>
 
