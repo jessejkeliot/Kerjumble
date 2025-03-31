@@ -18,6 +18,7 @@
 
 	<h2>
 		Real Portfolio Page Now! <strong>Jesse Get To Work</strong>
+		<a href="/arithmetic">Zetamac</a>
 	</h2>
 </section>
 
