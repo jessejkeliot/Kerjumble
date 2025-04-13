@@ -103,6 +103,7 @@
     width: 100%;
     text-align: center;
     font-style: italic;
+    z-index: 5;
     /* margin: var(--boxmarginsmall) 0; */
     padding: var(--boxpaddingsmall) 0;
     font-size: 1.5rem;

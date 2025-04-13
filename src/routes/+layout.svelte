@@ -36,6 +36,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		padding: 0;
 		width: 100%;
 		/* max-width: 70rem; */
