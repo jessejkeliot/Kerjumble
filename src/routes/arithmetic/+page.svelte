@@ -35,15 +35,17 @@ function checkifcorrect(){
     }
 }
 </script>
+<div id="game">
 <span id="time">Time Left: </span>
 <span id="score">{count+1}</span>
 <h1>Arithmetic Test</h1>
 <!-- <h2>Question {count+1}</h2> -->
-<div>
+<div class="question">
 <h3>
-{num1} {operator} {num2}
+{num1} {operator} {num2} = <input bind:value={userInput} oninput={checkifcorrect} type="text" name="answerbox" id="ab1">
 </h3>
-<input bind:value={userInput} oninput={checkifcorrect} type="text" name="answerbox" id="ab1">
+
+</div>
 </div>
 <style>
 #time, #score{
@@ -53,6 +55,17 @@ function checkifcorrect(){
     left: 20px;
 }
 #score{
-    right: 20px;
+    right: 20px;}
+div.question{
+    background-color: lightcyan;
+    margin: 0;
+    padding: 10px 0;
+    text-align: center;
+}
+div {
+    display: block;
+}
+#game {
+    min-height: 300px;
 }
 </style>

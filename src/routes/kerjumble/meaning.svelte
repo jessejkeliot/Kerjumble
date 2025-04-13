@@ -1,3 +1,3 @@
 <script lang="ts">
-        export let meaning : Meaning = {word: "dog", definition: "the best friend of man", type: "noun"};
+        export let meaning : Question = {word: "dog", definition: "the best friend of man", shuffledDefinitions: [], type: "noun"};
 </script>

@@ -12,42 +12,54 @@
 		{@render children()}
 	</main>
 
-	<footer>
+	<!-- <footer>
 		<p>
-			Do some work Jesse but first maybe mock up in Figma or Canva?
+			CC Jesse Eliot
 		</p>
-	</footer>
+	</footer> -->
 </div>
 
 <style>
 	.app {
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		min-height: 99.5vh;
+		/* width: max-content; */
+		/* width: auto; */
+		margin: 0;
+		padding: 0;
+		/* outline: 3px solid green; */
 	}
 
 	main {
+		outline: 2px solid rgb(72, 14, 14);
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
+		padding: 0;
 		width: 100%;
-		max-width: 64rem;
+		/* max-width: 70rem; */
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
 
 	footer {
+		outline: 1px solid lightblue;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		padding: 12px;
+		padding: 0.2rem;
+		margin: 0;
+	}
+	footer p{
+		margin: 0;
+		padding: 0;
 	}
 
-	footer a {
+	/* footer a {
 		font-weight: bold;
-	}
+	} */
 
 	@media (min-width: 480px) {
 		footer {
