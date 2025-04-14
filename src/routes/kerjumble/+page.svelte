@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Question } from "./types";
+  import './style.css';
+  import type { gameState, Question } from "./types";
   import Header from "./header.svelte";
   import { onMount } from "svelte";
   import { cubicInOut } from "svelte/easing";
@@ -7,14 +8,31 @@
   import questionsJson from "$lib/images/Kerjumble/questions.json";
   import { getDaysDifferenceUTC } from "./types";
   import { fade } from "svelte/transition";
+  import { browser } from "$app/environment";
   const questions: Question[] = questionsJson as Question[];
   //   const savedStates = localStorage.getItem("");
   let question: Question;
   let number = getDaysDifferenceUTC("2025-04-13");
   let inputDisabled = false;
-  let inputValue = ""; //same as below
-  let health = 7; //later use the savedStates object;
+  let inputValue: string = ""; //same as below
   const maxHealth = 7;
+  let health = maxHealth; //later use the savedStates object;
+  let won = false;
+  const useCache : boolean = true;
+  let gs: gameState | null = getState();
+  if (gs && useCache) {
+    if (number == gs.number) {
+      health = gs.health;
+      inputValue = gs.currentInput;
+      won = gs.won;
+    } else {
+    }
+  } else {
+    saveState(health, number, inputValue, won);
+  }
+  //get the gameState with getState and then compare the number from
+  //state and number above to see whether the local storage should be cleared or read from
+
   onMount(() => {
     if (window.innerWidth > 480) {
       focusAnswerBox();
@@ -52,25 +70,60 @@
       await delay(50); // wait 500ms before next iteration
     }
   }
-
+  function saveState(
+    health: number,
+    number: number,
+    inputValue: string,
+    won: boolean
+  ) {
+    // localStorage.clear();
+    if (!browser) {
+      return;
+    }
+    const gs: gameState = {
+      health: health,
+      number: number,
+      currentInput: inputValue,
+      won: won,
+    };
+    localStorage.setItem("gameState", JSON.stringify(gs));
+  }
+  function getState() {
+    if (!browser) {
+      return null;
+    }
+    const returnString = localStorage.getItem("gameState");
+    if (returnString) {
+      var returnvalue = JSON.parse(returnString);
+    }
+    return returnvalue;
+  }
+  function lost(){
+    inputValue = "loser";
+    inputDisabled = true;
+  }
   let guessedWord = "";
   question = getQuestionObject();
-  let won = false;
+  $: if (won) {
+    health = 0;
+    console.log("Finiiiii");
+    inputDisabled = true; //change the styling of disabled button
+  }
+  $: if(health==0 && !won){
+    lost();
+  }
+  $: saveState(health, number, inputValue, won);
   $: {
     if (guessedWord == question.word) {
       won = true;
       // runLoopWithDelay();
-      health = 0;
-      console.log("Finiiiii");
-      inputDisabled = true; //change the styling of disabled button
       //   inputValue = "yay!";
     } else if (guessedWord !== "") {
       health--;
       inputValue = "";
-      if(health==0){
-        inputValue="better luck next time";
-        inputDisabled = true;
-      }
+      // if (health == 0) {
+      //   lost();
+      // }
     }
   }
   // transitions.ts
@@ -90,13 +143,13 @@
 
 <title>Kerjumble</title>
 <Header {number}></Header>
-<div class="health-bar" style="background-color:{won ? 'green' : '#d00'}">
+<div class="health-bar" style="background-color:{won ? 'var(--win-green)' : '#d00'}">
   {#each Array.from({ length: health }) as _, index}
     <div
       transition:shrinkFlex
       class="bar"
       style="flex: {index < health ? 1 : 0};
-        background-color: {health == 1 ? 'darkred' : 'var(--primary-color)'}"
+        background-color: {health == 1 ? 'var(--mid-red)' : 'var(--primary-color)'}"
     ></div>
   {/each}
 </div>
@@ -119,6 +172,7 @@
       maxlength="14"
       placeholder="guess"
       autocapitalize="off"
+      
     />
     <!-- <div class="underline"></div> -->
     <div class="typeContainer">{question.type}</div>
@@ -129,31 +183,7 @@
 </div>
 
 <style>
-  :root {
-    --boxmarginmedium: 3rem;
-    --boxmarginsmall: 0.8rem;
-    --boxpaddingmedium: 2rem;
-    --boxpaddingsmall: 0.8rem;
-    --boxpaddingxsmall: 0.5rem;
 
-    --border-width: 0.2rem;
-
-    --text-color: #001;
-    --primary-color: #001;
-    --mid-grey: #ddd;
-    --tertiary-color: #29b;
-    --background-color: #fff;
-
-    --xsmall-text: 0.8rem;
-    --small-text: 1.3rem;
-    --medium-text: 1.7rem;
-    --large-text: 3rem;
-
-    box-sizing: border-box;
-
-    font-family: var(--font-body);
-    font-family: Georgia, "Times New Roman", Times, serif;
-  }
   .guessBox {
     margin: 0;
     padding: 0;
@@ -172,20 +202,6 @@
     /* border-bottom: 0.2rem solid black; */
     /* animation: blink 1s ease infinite; */
   }
-  @keyframes blink {
-    0% {
-      background-color: transparent;
-    }
-    50% {
-      background-color: transparent;
-    }
-    51% {
-      background-color: black;
-    }
-    100% {
-      background-color: black;
-    }
-  }
   div.health-bar {
     margin: 0 0 0 0;
     padding: 0px;
@@ -194,7 +210,7 @@
     /* gap: 10px; */
     height: calc(var(--boxpaddingmedium) / 2);
     width: 100%;
-    background-color: #d00;
+    background-color: var(--lose-red);
   }
 
   .bar {
@@ -242,11 +258,11 @@
   @keyframes blinkText {
     0%,
     100% {
-      color: #ddd;
+      color: var(--mid-grey);
     }
 
     50% {
-      color: #fff;
+      color: var(--background-color);
     }
   }
 
@@ -295,7 +311,7 @@
     font-size: var(--medium-text);
     font-style: italic;
     margin: var(--boxpaddingxsmall) 0;
-    color: #666;
+    color: var(--type-grey);
   }
   div.descriptionContainer {
     font-size: var(--medium-text);
