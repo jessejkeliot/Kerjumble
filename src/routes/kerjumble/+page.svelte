@@ -12,7 +12,9 @@
   const questions: Question[] = questionsJson as Question[];
   //   const savedStates = localStorage.getItem("");
   let question: Question;
-  let number = getDaysDifferenceUTC("2025-04-15");
+  let day = getDaysDifferenceUTC("2025-04-15");
+  console.warn(questionsJson.length);
+  let number = day % (questionsJson.length);
   let inputDisabled = false;
   let inputValue: string = ""; //same as below
   const maxHealth = 7;
@@ -99,10 +101,27 @@
     }
     return returnvalue;
   }
+  let shareButtonText = "Share";
+  let shareButtonColor = "var(--primary-color)";
   function handleShare(){
-    navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
+    console.log("Share Clicked");
+    // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
+    try {
+      navigator.share({text: "Kerjumble", title: "Kerjumble Results"});
+    } catch (error) {
+      navigator.clipboard.writeText("resultRepresentation");
+    }
+    shareButtonText = "Copied!";
   }
-  function createShareText() {}
+  function handleShareMouseDown(){
+    shareButtonColor = "var(--type-grey)";
+  }
+  function handleShareMouseUp(){
+    shareButtonColor = "var(--primary-color)";
+  }
+  function createShareText() {
+
+  }
   function finished() {
     inputDisabled = true;
     document.getElementById("answerBox")?.blur();
@@ -117,11 +136,11 @@
     question.definitions[0] =
       "The person looking at the screen at this moment; you.";
     question.definitions[0] = "A person that does not win a game; you.";
-    console.log("Lost ", number);
+    console.log("Lost ", day);
   }
   function win() {
     finished();
-    console.log("Won ", number);
+    console.log("Won ", day);
   }
   let guessedWord = "";
   question = getQuestionObject();
@@ -131,7 +150,7 @@
   $: if (health == 0 && !won) {
     lost();
   }
-  $: saveState(health, number, inputValue, won);
+  $: saveState(health, day, inputValue, won);
   $: {
     if (guessedWord == question.word) {
       won = true;
@@ -161,7 +180,7 @@
 </script>
 
 <title>Kerjumble</title>
-<Header {number}></Header>
+<Header number = {day}></Header>
 <div
   class="health-bar"
   style="background-color:{won ? 'var(--win-green)' : '#d00'}"
@@ -204,12 +223,18 @@
     </div>
     {#if health == 0}
       <div class="shareButtonContainer">
+        <!-- svelte-ignore a11y_mouse_events_have_key_events -->
         <button
+        style="background-color: {shareButtonColor};"
         on:click={handleShare}
+        on:mousedown={handleShareMouseDown}
+        on:mouseup={handleShareMouseUp}
+        on:mouseout={handleShareMouseUp}
+
           transition:fade={{
-            duration: 650,
-            delay:500
-          }}><em>Share</em></button
+            duration: 500,
+            delay:0
+          }}><em>{shareButtonText}</em></button
         >
       </div>
     {/if}
@@ -219,15 +244,15 @@
 <style>
   .shareButtonContainer {
     width: 100%;
-    margin: var(--boxpaddingxsmall) 0;
+    margin: var(--boxpaddingmedium) 0;
     /* outline: 1px solid blueviolet; */
     display: flex;
-    justify-content: left;
+    justify-content: center;
     position: absolute;
   }
   .shareButtonContainer button {
     margin: 0;
-    padding: var(--boxpaddingxsmall);
+    padding: var(--boxpaddingsmall);
     width: 50%;
 
     background-color: var(--type-grey);
@@ -236,6 +261,7 @@
     border: none;
     font-family: Helvetica, sans-serif;
     font-size: var(--small-text);
+    transition: background-color 0.3s 0.1s;
   }
   .guessBox {
     margin: 0;
@@ -374,7 +400,8 @@
   }
   div.descriptionContainer {
     font-size: var(--medium-text);
-    margin: var(--boxpaddingxsmall) 0;
+    margin: var(--boxpaddingxsmall)0 0 0;
     text-wrap: stable;
+    /* outline: 1px solid black */
   }
 </style>
