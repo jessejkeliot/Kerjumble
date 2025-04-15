@@ -110,4 +110,16 @@
     background-color: var(--background-color);
     border-bottom: var(--border-width) solid var(--primary-color);
   }
+  div.divider {
+    position: relative;
+    width: 100%;
+    background-color: var(--primary-color);
+    height: var(--border-width);
+  }
+  /* for mobile */
+  @media screen and (max-width: 420px) {
+    div.header {
+      padding: var(--boxpaddingxsmall) 0;
+    }
+  }
 </style>

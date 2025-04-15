@@ -7,6 +7,8 @@
 
     --border-width: 0.2rem;
 
+    --health-bar-height:calc(var(--boxpaddingmedium)/2);
+
     --text-color: #001;
     --primary-color: #001;
     --mid-grey: #ddd;

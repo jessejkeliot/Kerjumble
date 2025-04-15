@@ -1,5 +1,5 @@
 <script lang="ts">
-  import './style.css';
+  import "./style.css";
   import type { gameState, Question } from "./types";
   import Header from "./header.svelte";
   import { onMount } from "svelte";
@@ -12,13 +12,13 @@
   const questions: Question[] = questionsJson as Question[];
   //   const savedStates = localStorage.getItem("");
   let question: Question;
-  let number = getDaysDifferenceUTC("2025-04-13");
+  let number = getDaysDifferenceUTC("2025-04-15");
   let inputDisabled = false;
   let inputValue: string = ""; //same as below
   const maxHealth = 7;
   let health = maxHealth; //later use the savedStates object;
   let won = false;
-  const useCache : boolean = true;
+  const useCache: boolean = false;
   let gs: gameState | null = getState();
   if (gs && useCache) {
     if (number == gs.number) {
@@ -98,18 +98,32 @@
     }
     return returnvalue;
   }
-  function lost(){
-    inputValue = "loser";
+  function createShareText() {}
+  function finished() {
     inputDisabled = true;
+    document.getElementById("answerBox")?.blur();
+    createShareText();
+    health=0;
+  }
+  function lost() {
+    finished();
+    inputValue = "loser";
+    question.type = "noun";
+    question.definitions[0] =
+      "The person looking at the screen at this moment; you.";
+    question.definitions[0] = "A person that does not win a game; you.";
+    console.log("Lost ", number);
+  }
+  function win() {
+    finished();
+    console.log("Won ", number);
   }
   let guessedWord = "";
   question = getQuestionObject();
   $: if (won) {
-    health = 0;
-    console.log("Finiiiii");
-    inputDisabled = true; //change the styling of disabled button
+    win();
   }
-  $: if(health==0 && !won){
+  $: if (health == 0 && !won) {
     lost();
   }
   $: saveState(health, number, inputValue, won);
@@ -143,19 +157,26 @@
 
 <title>Kerjumble</title>
 <Header {number}></Header>
-<div class="health-bar" style="background-color:{won ? 'var(--win-green)' : '#d00'}">
+<div
+  class="health-bar"
+  style="background-color:{won ? 'var(--win-green)' : '#d00'}"
+>
   {#each Array.from({ length: health }) as _, index}
     <div
       transition:shrinkFlex
       class="bar"
       style="flex: {index < health ? 1 : 0};
-        background-color: {health == 1 ? 'var(--mid-red)' : 'var(--primary-color)'}"
+        background-color: {health == 1
+        ? 'var(--mid-red)'
+        : 'var(--primary-color)'}"
     ></div>
   {/each}
 </div>
 <div class="questionContainer">
   <div class="wordContainer">
     <input
+      class="guessBox"
+      id="answerBox"
       bind:value={inputValue}
       on:keydown={(e) => {
         if (e.key === "Enter") {
@@ -165,25 +186,46 @@
       on:focus={() => {
         removePlaceholder();
       }}
-      id="answerBox"
       disabled={inputDisabled}
-      class="guessBox"
       type="text"
       maxlength="14"
       placeholder="guess"
       autocapitalize="off"
-      
     />
     <!-- <div class="underline"></div> -->
     <div class="typeContainer">{question.type}</div>
     <div class="descriptionContainer">
-      {question.definition}
+      <p>{question.definitions[Math.max(0, health - 1)]}</p>
     </div>
+    {#if health == 0}
+      <div class="shareButtonContainer">
+        <button transition:fade><em>Share</em></button>
+      </div>
+    {/if}
   </div>
 </div>
 
 <style>
+  .shareButtonContainer {
+    width: 100%;
+    margin: var(--boxpaddingxsmall) 0;
+    /* outline: 1px solid blueviolet; */
+    display: flex;
+    justify-content: left;
+    position: absolute;
+  }
+  .shareButtonContainer button {
+    margin: 0;
+    padding: var(--boxpaddingxsmall);
+    width: 50%;
 
+    background-color: var(--type-grey);
+    color: var(--background-color);
+    border-radius: 0.4em;
+    border: none;
+    font-family: Helvetica, sans-serif;
+    font-size: var(--small-text);
+  }
   .guessBox {
     margin: 0;
     padding: 0;
@@ -241,6 +283,12 @@
     background-color: inherit;
     /* font-weight: bold; */
     color: var(--text-color);
+    opacity: 1;
+    -webkit-text-fill-color: var(--text-color);
+  }
+  .descriptionContainer p {
+    margin: 0;
+    padding: 0;
   }
 
   /* @media screen and (max-width: 480px) {
@@ -303,7 +351,7 @@
     /* outline: 1px dashed salmon; */
     min-width: 10rem;
     max-width: 45rem;
-    margin: 0 auto;
+    margin: 0;
     /* display: block; */
     text-align: left;
   }
@@ -316,6 +364,6 @@
   div.descriptionContainer {
     font-size: var(--medium-text);
     margin: var(--boxpaddingxsmall) 0;
-    text-wrap: pretty;
+    text-wrap: stable;
   }
 </style>

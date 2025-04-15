@@ -40,7 +40,7 @@
 		padding: 0;
 		width: 100%;
 		/* max-width: 70rem; */
-		margin: 0 auto;
+		margin: 0 0;
 		box-sizing: border-box;
 	}
 
