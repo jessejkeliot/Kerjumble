@@ -205,7 +205,7 @@
     {#if health == 0}
       <div class="shareButtonContainer">
         <button
-        on:click={()=>{navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("KERR");}}
+        on:click={handleShare}
           transition:fade={{
             duration: 650,
             delay:500
