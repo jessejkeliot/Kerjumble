@@ -22,7 +22,7 @@
         })
         .join("");
 
-      iterations += 1 / 3 - iterations/30;
+      iterations += 1 / 3 - iterations / 30;
       if (iterations >= text.length) {
         clearInterval(interval);
         display = text;
@@ -36,11 +36,13 @@
   }
   function reloadKeyPress(k: KeyboardEvent) {
     console.log(k.key);
-    if (k.key=="Enter") {
-        location.reload();
+    if (k.key == "Enter") {
+      location.reload();
     }
   }
-  onMount(()=> {jumble();})
+  onMount(() => {
+    jumble();
+  });
 </script>
 
 <div class="header">
@@ -57,11 +59,12 @@
       reloadKeyPress(k);
     }}
   >
-  <span class="sup-placeholder" aria-hidden="true">{number}</span>
-  {display}
-  <sup class="sup">{number}</sup>
+    <span class="sup-placeholder" aria-hidden="true">{number}</span>
+    {display}
+    <sup class="sup">{number}</sup>
     <!-- <span class="day">{number}</span> -->
   </span>
+  <div class="divider"></div>
 </div>
 
 <style>
@@ -70,34 +73,39 @@
     font-size: var(--medium-text);
     user-select: none;
     nav-index: 0;
-    padding: 0 var(--boxpaddingsmall);
+    padding: var(--boxpaddingxsmall);
     display: inline-flex;
     /* outline: 3px solid green; */
     gap: 0.1em;
-
   }
-  .jumble:focus-visible{
+  .jumble:focus-visible {
     outline: 3px solid black;
   }
-  .day{
+  /* for desktop */
+  @media screen and (min-width: 480px) {
+    .jumble {
+      font-size: var(--large-text);
+    }
+  }
+  .day {
     font-family: serif;
     font-size: var(--small-text);
     margin: 0;
     padding: none;
   }
   .sup-placeholder {
-  visibility: hidden;
-  font-size: 0.6em;
-  vertical-align: super;
-  font-family: serif;
-}
+    visibility: hidden;
+    font-size: 0.6em;
+    vertical-align: super;
+    font-family: serif;
+  }
 
-/* Visible superscript */
-.sup {
-  font-size: 0.6em;
-  vertical-align: super;
-  font-family: serif;
-}
+  /* Visible superscript */
+  .sup {
+    font-size: 0.6em;
+    vertical-align: super;
+    font-family: serif;
+  }
 
   div.header {
     width: 100%;
@@ -105,21 +113,16 @@
     font-style: italic;
     z-index: 5;
     /* margin: var(--boxmarginsmall) 0; */
-    padding: var(--boxpaddingsmall) 0;
+    /* outline: 1px solid blue; */
+    padding: 0;
     font-size: 1.5rem;
     background-color: var(--background-color);
-    border-bottom: var(--border-width) solid var(--primary-color);
+    /* border-bottom: var(--border-width) solid var(--primary-color); */
   }
   div.divider {
     position: relative;
     width: 100%;
     background-color: var(--primary-color);
     height: var(--border-width);
-  }
-  /* for mobile */
-  @media screen and (max-width: 420px) {
-    div.header {
-      padding: var(--boxpaddingxsmall) 0;
-    }
   }
 </style>

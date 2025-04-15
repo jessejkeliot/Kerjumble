@@ -7,7 +7,7 @@
   import type { FocusEventHandler } from "svelte/elements";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
   import { getDaysDifferenceUTC } from "./types";
-  import { fade } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   import { browser } from "$app/environment";
   const questions: Question[] = questionsJson as Question[];
   //   const savedStates = localStorage.getItem("");
@@ -17,6 +17,7 @@
   let inputValue: string = ""; //same as below
   const maxHealth = 7;
   let health = maxHealth; //later use the savedStates object;
+  let finalHealth = maxHealth;
   let won = false;
   const useCache: boolean = false;
   let gs: gameState | null = getState();
@@ -98,12 +99,16 @@
     }
     return returnvalue;
   }
+  function handleShare(){
+    navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
+  }
   function createShareText() {}
   function finished() {
     inputDisabled = true;
     document.getElementById("answerBox")?.blur();
     createShareText();
-    health=0;
+    finalHealth = health;
+    health = 0;
   }
   function lost() {
     finished();
@@ -165,7 +170,7 @@
     <div
       transition:shrinkFlex
       class="bar"
-      style="flex: {index < health ? 1 : 0};
+      style="
         background-color: {health == 1
         ? 'var(--mid-red)'
         : 'var(--primary-color)'}"
@@ -199,7 +204,13 @@
     </div>
     {#if health == 0}
       <div class="shareButtonContainer">
-        <button transition:fade><em>Share</em></button>
+        <button
+        on:click={()=>{navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("KERR");}}
+          transition:fade={{
+            duration: 650,
+            delay:500
+          }}><em>Share</em></button
+        >
       </div>
     {/if}
   </div>
