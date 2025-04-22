@@ -1,6 +1,5 @@
 <script lang="ts">
   import { cubicInOut, cubicOut } from "svelte/easing";
-  import { interpolateColor } from "./types";
 
   export let health = 0;
   export let won = false;
