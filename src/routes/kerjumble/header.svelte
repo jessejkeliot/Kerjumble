@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-
   export let text = "Kerjumble";
   export let number = 102;
 
@@ -132,7 +131,7 @@
     }
     .Holder.Icon {
       min-width: var(--large-text);
-      margin: auto auto;
+      /* margin: auto auto; */
     }
     /* img {
       height: var(--large-text);
