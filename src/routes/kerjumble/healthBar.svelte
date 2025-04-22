@@ -67,7 +67,7 @@
     padding: inherit;
     background-color: var(--primary-color);
     background-color: var(--mid-grey);
-    outline: 2px solid var(--background-color);
+    outline: 2px solid var(--background-color) !important;
     /* border: 0px solid white; */
     border-width: 0 2px;
     transition: outline-color 0.5s;
