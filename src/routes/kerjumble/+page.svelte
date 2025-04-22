@@ -325,7 +325,7 @@
     /* height: fit-content; */
     background-color: var(--background-color);
     /* border: 3px solid var(--primary-color); */
-    /* outline: 3px dotted deeppink; */
+    outline: 3px dotted deeppink;
     text-align: center;
     font-size: 3rem;
     display: flex;
