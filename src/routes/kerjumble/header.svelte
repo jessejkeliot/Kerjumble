@@ -46,6 +46,9 @@
 </script>
 
 <div class="header">
+  <div class="itemContainer">
+  <p>h</p>
+  <div class="jumbleHolder">
   <span
     class="jumble"
     data-word="Kerjumble"
@@ -64,18 +67,29 @@
     <sup class="sup">{number}</sup>
     <!-- <span class="day">{number}</span> -->
   </span>
+</div>
+  <p>s</p>
+  </div>
   <div class="divider"></div>
 </div>
 
 <style>
+  .jumbleHolder{
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    outline: 2px solid purple ;
+  }
   .jumble {
     cursor: crosshair;
-    font-size: var(--medium-text);
+    font-size: inherit;
     user-select: none;
     nav-index: 0;
-    padding: var(--boxpaddingxsmall);
+    padding: var(--boxpaddingxsmall) 0;
+    height: fit-content;
     display: inline-flex;
-    /* outline: 3px solid green; */
+    flex-direction: row;
+    outline: 2px solid green;
     gap: 0.1em;
   }
   .jumble:focus-visible {
@@ -106,14 +120,28 @@
     vertical-align: super;
     font-family: serif;
   }
+  p {
+    margin:0;
+    padding: 0;
+    
+  }
+  .itemContainer{
+    width: auto;
+    height: min-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 var(--boxpaddingsmall);
+    outline: 2px solid red;
+  }
 
   div.header {
     width: 100%;
-    text-align: center;
+    /* text-align: center; */
     font-style: italic;
     z-index: 5;
     /* margin: var(--boxmarginsmall) 0; */
-    /* outline: 1px solid blue; */
+    outline: 1px solid blue;
     padding: 0;
     font-size: 1.5rem;
     background-color: var(--background-color);
