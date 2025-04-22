@@ -47,8 +47,10 @@
 
 <div class="header">
   <div class="itemContainer">
-  <p>h</p>
-  <div class="jumbleHolder">
+  <button class="Holder Icon">
+  <img src="src/lib/images/Kerjumble/icons/question_icon_kerjumble.svg" alt="question mark">
+</button>
+  <div class="Holder">
   <span
     class="jumble"
     data-word="Kerjumble"
@@ -68,17 +70,39 @@
     <!-- <span class="day">{number}</span> -->
   </span>
 </div>
-  <p>s</p>
+<button class="Holder Icon">
+  <img src="src/lib/images/Kerjumble/icons/settings_icon_kerjumble.svg" alt="question mark">
+</button>
   </div>
   <div class="divider"></div>
 </div>
 
 <style>
-  .jumbleHolder{
-    justify-content: center;
-    align-items: center;
-    margin: auto;
+  img {
+    display: block;
+    height: var(--medium-text);
+    outline: 3px dashed teal;
+    margin: 3px;
+  }
+  button{
+    border: none;
+    border-radius: 10px;
+    background: var(--mid-grey);
+  }
+  .Holder{
+    /* justify-content: center;
+    align-items: center; */
+    margin: 0 0;
     outline: 2px solid purple ;
+    padding: none;
+  }
+  .Holder.Icon{
+    margin: auto 0;
+    display: flex;
+    justify-content: center;
+    height: 80%;
+    width: 10%;
+    padding:0;
   }
   .jumble {
     cursor: crosshair;
@@ -99,6 +123,15 @@
   @media screen and (min-width: 480px) {
     .jumble {
       font-size: var(--large-text);
+    }
+    img {
+      height: var(--large-text);
+    }
+
+  }
+  @media screen and (max-width: 420px){
+    *{
+      outline: none !important;
     }
   }
   .day {
@@ -143,7 +176,7 @@
     /* margin: var(--boxmarginsmall) 0; */
     outline: 1px solid blue;
     padding: 0;
-    font-size: 1.5rem;
+    font-size: var(--medium-text);
     background-color: var(--background-color);
     /* border-bottom: var(--border-width) solid var(--primary-color); */
   }
