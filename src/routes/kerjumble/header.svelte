@@ -81,12 +81,14 @@
   img {
     display: block;
     height: var(--medium-text);
+    height: 80%;
     outline: 3px dashed teal;
-    margin: 3px;
+    /* margin: 3px; */
+    /* padding: 3px; */
   }
   button{
     border: none;
-    border-radius: 10px;
+    border-radius: var(--classic-border-radius);
     background: var(--mid-grey);
   }
   .Holder{
@@ -97,11 +99,15 @@
     padding: none;
   }
   .Holder.Icon{
+    aspect-ratio: 1;
     margin: auto 0;
     display: flex;
     justify-content: center;
-    height: 80%;
+    align-items: center;
+    width: var(--medium-text);
     width: 10%;
+    min-width: var(--medium-text);
+    max-width: 2.5rem;
     padding:0;
   }
   .jumble {
@@ -124,15 +130,14 @@
     .jumble {
       font-size: var(--large-text);
     }
-    img {
+    .Holder.Icon {
+      min-width: var(--large-text);
+      margin: auto auto;
+    }
+    /* img {
       height: var(--large-text);
-    }
+    } */
 
-  }
-  @media screen and (max-width: 420px){
-    *{
-      outline: none !important;
-    }
   }
   .day {
     font-family: serif;

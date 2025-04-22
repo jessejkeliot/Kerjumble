@@ -244,7 +244,7 @@
     width: calc(100% /3);
     background-color: var(--primary-color);
     color: var(--background-color);
-    border-radius: 0.4em;
+    border-radius: var(--classic-border-radius);
     border: none;
     font-family: Helvetica, sans-serif;
     font-size: var(--small-text);
@@ -262,7 +262,7 @@
     font-family: inherit;
     font-weight: lighter;
     caret-color: #000;
-    /* outline: 1px dotted black; */
+    outline: 1px dotted black;
     outline: none;
     width: 100%;
     transition: font-weight 0.2s ease;
@@ -343,7 +343,7 @@
   div.wordContainer {
     position: relative;
     width: auto;
-    /* outline: 1px dashed salmon; */
+    outline: 1px dashed salmon;
     min-width: 10rem;
     max-width: 45rem;
     margin: 0;
@@ -358,7 +358,7 @@
   }
   div.descriptionContainer {
     font-size: var(--medium-text);
-    margin: var(--boxpaddingxsmall)0 0 0;
+    margin: var(--boxpaddingxsmall) 0 0 0;
     text-wrap: stable;
     /* outline: 1px solid black */
   }

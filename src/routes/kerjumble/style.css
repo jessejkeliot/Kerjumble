@@ -23,9 +23,13 @@
     --small-text: 1.3rem;
     --medium-text: 1.7rem;
     --large-text: 3rem;
+    --classic-border-radius: 0.4rem;
 
     box-sizing: border-box;
 
     font-family: var(--font-body);
     font-family: Georgia, "Times New Roman", Times, serif;
+  }
+  *{
+    outline: none !important;
   }
