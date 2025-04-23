@@ -101,15 +101,6 @@
     finalHealth = health;
     health = 0;
   }
-  function lost() {
-    finished();
-    inputValue = "loser";
-    question.type = "noun";
-    question.definitions[0] =
-      "The person looking at the screen at this moment; you.";
-    question.definitions[0] = "A person that does not win a game; you.";
-    console.log("Lost ", day);
-  }
   function win() {
     finished();
     console.log("Won ", day);
@@ -125,15 +116,10 @@
   $: if (won) {
     win();
   }
-  $: if (health == 0 && !won) {
-    lost();
-  }
   $: saveState(health, day, inputValue, won);
   $: {
     if (guessedWord == question.word) {
       won = true;
-      // runLoopWithDelay();
-      //   inputValue = "yay!";
     } else if (guessedWord !== "") {
       health--;
       inputValue = "";
@@ -172,7 +158,23 @@
       bind:health
       inputDisabled={true}
       inputValue="Kerjumble"
-      display={{word: "Kerjumble", type: "noun", definition:"A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left."}}
+      display={{
+        word: "Kerjumble",
+        type: "noun",
+        definition:
+          "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left.",
+      }}
+    />
+  {:else if health == 0 && !won}
+    <InformationContainer
+      {health}
+      inputDisabled={true}
+      inputValue="loser"
+      display={{
+        word: "loser",
+        type: "noun",
+        definition: "A person that does not win a game; you.",
+      }}
     />
   {:else}
     <InformationContainer

@@ -25,6 +25,7 @@
     dispatch("wordEntered", {word: inputValue});
   }
   onMount(() => {
+    console.log("info mounted");
     if (window.innerWidth > 200) {
       focusAnswerBox();
     }
@@ -75,7 +76,7 @@
         }}>{shareButtonText}</button
       >
       <button>Stats</button>
-      <button>League</button>
+      <button>Reveal</button>
     </div>
   {/if}
 </div>
