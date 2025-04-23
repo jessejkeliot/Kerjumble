@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { fade } from "svelte/transition";
   import type { Definition } from "./types";
   const dispatch = createEventDispatcher();
@@ -24,6 +24,20 @@
   function handleSendEnter(){
     dispatch("wordEntered", {word: inputValue});
   }
+  onMount(() => {
+    if (window.innerWidth > 480) {
+      focusAnswerBox();
+    }
+    
+    // question = getQuestionObject();
+  });
+  export function focusAnswerBox() {
+    const input = document.getElementById("answerBox");
+    if (input) {
+      input.focus();
+    } // Focus on the input
+  }
+//   focusAnswerBox();
 </script>
 
 <div class="wordContainer">
@@ -47,7 +61,7 @@
   <!-- <div class="underline"></div> -->
   <div class="typeContainer">{display.type}</div>
   <div class="descriptionContainer">
-    <p>{display.definition}</p>
+    <p>{health==0 ? display.definition : display.definition.toLowerCase()}</p>
   </div>
   {#if health == 0}
     <div class="shareButtonContainer">
@@ -149,11 +163,11 @@
     }
     div.wordContainer {
     position: relative;
-    width: auto;
+    width: 80%;
     outline: 1px dashed salmon;
     min-width: 10rem;
     max-width: 45rem;
-    margin: 0;
+    margin: 0 auto;
     /* display: block; */
     text-align: left;
   }

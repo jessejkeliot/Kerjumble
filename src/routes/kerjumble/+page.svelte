@@ -145,22 +145,13 @@
   //menus
   let tempGuess = "";
   // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
-  $: if (helpOpen) {
-    tempGuess = inputValue;
-    inputValue = "Kerjumble";
-    inputDisabled = true;
-  } else if (inputValue == "Kerjumble") {
-    inputValue = tempGuess;
-    inputDisabled = false;
-
-    tick().then(() => {
-      focusAnswerBox();
-    });
-  }
-  $: display.type = helpOpen ? "noun" : question.type;
-  $: display.definition = helpOpen
-    ? "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left."
-    : question.definitions[Math.max(0, health - 1)];
+  // $: if (!helpOpen) {
+  //   tick().then(() => {
+  //     focusAnswerBox();
+  //   });
+  // }
+  $: display.type = question.type;
+  $: display.definition = question.definitions[Math.max(0, health - 1)];
 </script>
 
 <title>Kerjumble</title>
@@ -169,6 +160,18 @@
 <div class="questionContainer">
   {#if settingsOpen}
     <SettingsWidget></SettingsWidget>
+  {:else if helpOpen}
+    <InformationContainer
+      bind:health
+      inputDisabled={true}
+      inputValue="Kerjumble"
+      display={{
+        word: "Kerjumble",
+        type: "noun",
+        definition:
+          "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left.",
+      }}
+    />
   {:else}
     <InformationContainer
       bind:health
@@ -191,7 +194,7 @@
     padding: calc(var(--boxpaddingmedium) / 2) var(--boxpaddingmedium);
     position: relative;
     /* top: 30%; */
-    width: auto;
+    width: 100%;
     margin: 0 0;
     aspect-ratio: 1;
     /* height: fit-content; */
