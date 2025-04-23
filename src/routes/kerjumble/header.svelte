@@ -6,7 +6,18 @@
   let display = text;
   let interval: ReturnType<typeof setInterval> | undefined;
   const letters = "abcdefghijklmnopqrstuvwxyz";
-  //   const letters = "[}{]';:%^*()+=_#!~.></";
+  //   const letters = "[}{]';:%^*()+=_#!~.></";]
+  export let settingsOpen = false;
+  function toggleSettings(){
+    helpOpen = false;
+    settingsOpen = !settingsOpen;
+
+  }
+  export let helpOpen = false;
+  function toggleHelp(){
+    settingsOpen = false;
+    helpOpen = !helpOpen;
+  }
 
   function jumble() {
     let iterations = 0;
@@ -46,9 +57,9 @@
 
 <div class="header">
   <div class="itemContainer">
-  <button class="Holder Icon">
+  <button class="Holder Icon" on:click={toggleHelp}>
     <!-- ? -->
-  <img src="src/lib/images/Kerjumble/icons/question_icon_kerjumble.svg" alt="question mark">
+  <img src="src/lib/images/Kerjumble/icons/{helpOpen ? "x_icon_kerjumble.svg" : "question_icon_kerjumble.svg"}" alt="question mark">
 </button>
   <div class="Holder">
   <span
@@ -70,9 +81,9 @@
     <!-- <span class="day">{number}</span> -->
   </span>
 </div>
-<button class="Holder Icon">
+<button class="Holder Icon" on:click={toggleSettings}>
   <!-- ⚙ -->
-  <img src="src/lib/images/Kerjumble/icons/settings_icon_kerjumble.svg" alt="question mark">
+  <img src="src/lib/images/Kerjumble/icons/{settingsOpen ? "x_icon_kerjumble.svg" : "settings_icon_kerjumble.svg"}" alt="question mark">
 </button>
   </div>
   <div class="divider"></div>

@@ -10,19 +10,25 @@
   import { fade, fly } from "svelte/transition";
   import { browser } from "$app/environment";
   import HealthBar from "./healthBar.svelte";
-  const questions: Question[] = questionsJson as Question[];
   //   const savedStates = localStorage.getItem("");
+  const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC("2025-04-15");
-  console.warn(questionsJson.length);
-  let number = day % (questionsJson.length);
+  // console.warn(questionsJson.length);
+  let number = day % questionsJson.length;
+  //input
   let inputDisabled = false;
   let inputValue: string = ""; //same as below
+  //gameState
   const maxHealth = 7;
   let health = maxHealth; //later use the savedStates object;
   let finalHealth = maxHealth;
   let won = false;
-  const useCache: boolean = false;
+  //menus
+  let helpOpen = false;
+  let settingsOpen = false;
+
+  const useCache: boolean = true;
   let gs: gameState | null = getState();
   if (gs && useCache) {
     if (number == gs.number) {
@@ -32,6 +38,7 @@
     } else {
     }
   } else {
+    console.log("First time playing!");
     saveState(health, number, inputValue, won);
   }
   //get the gameState with getState and then compare the number from
@@ -104,25 +111,23 @@
   }
   let shareButtonText = "Share";
   let shareButtonColor = "var(--primary-color)";
-  function handleShare(){
+  function handleShare() {
     console.log("Share Clicked");
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
     try {
-      navigator.share({text: "Kerjumble", title: "Kerjumble Results"});
+      navigator.share({ text: "Kerjumble", title: "Kerjumble Results" });
     } catch (error) {
       navigator.clipboard.writeText("resultRepresentation");
     }
     shareButtonText = "Copied!";
   }
-  function handleShareMouseDown(){
+  function handleShareMouseDown() {
     shareButtonColor = "var(--type-grey)";
   }
-  function handleShareMouseUp(){
+  function handleShareMouseUp() {
     shareButtonColor = "var(--primary-color)";
   }
-  function createShareText() {
-
-  }
+  function createShareText() {}
   function finished() {
     inputDisabled = true;
     document.getElementById("answerBox")?.blur();
@@ -145,6 +150,7 @@
   }
   let guessedWord = "";
   question = getQuestionObject();
+
   $: if (won) {
     win();
   }
@@ -165,6 +171,21 @@
       // }
     }
   }
+  //menus
+  let tempGuess = "";
+  // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
+  $: if(helpOpen){
+    tempGuess = inputValue;
+    inputValue = "Kerjumble";
+  }else if(inputValue=="Kerjumble"){
+    inputValue = tempGuess;
+    focusAnswerBox();
+  }
+  $: displayType = helpOpen ? "noun" : question.type;
+  $: displayDefinition = helpOpen
+    ? "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left."
+    : question.definitions[Math.max(0, health - 1)];
+
   // transitions.ts
   export function shrinkFlex(node: Element, { duration = 700 } = {}) {
     const style = getComputedStyle(node);
@@ -181,7 +202,7 @@
 </script>
 
 <title>Kerjumble</title>
-<Header number = {day}></Header>
+<Header number={day} bind:helpOpen bind:settingsOpen></Header>
 <HealthBar bind:won bind:health></HealthBar>
 <div class="questionContainer">
   <div class="wordContainer">
@@ -201,23 +222,22 @@
       type="text"
       maxlength="14"
       placeholder="guess"
-      autocapitalize="off"
+      autocapitalize="on"
     />
     <!-- <div class="underline"></div> -->
-    <div class="typeContainer">{question.type}</div>
+    <div class="typeContainer">{displayType}</div>
     <div class="descriptionContainer">
-      <p>{question.definitions[Math.max(0, health - 1)]}</p>
+      <p>{displayDefinition}</p>
     </div>
     {#if health == 0}
       <div class="shareButtonContainer">
         <!-- svelte-ignore a11y_mouse_events_have_key_events -->
         <button
-        style="background-color: {shareButtonColor};"
-        on:click={handleShare}
-
+          style="background-color: {shareButtonColor};"
+          on:click={handleShare}
           transition:fade={{
             duration: 500,
-            delay:0
+            delay: 0,
           }}>{shareButtonText}</button
         >
         <button>Stats</button>
@@ -241,7 +261,7 @@
     margin: 0;
     padding: var(--boxpaddingsmall);
     /* width: 50%; */
-    width: calc(100% /3);
+    width: calc(100% / 3);
     background-color: var(--primary-color);
     color: var(--background-color);
     border-radius: var(--classic-border-radius);
