@@ -1,6 +1,6 @@
 <script lang="ts">
   import "./style.css";
-  import type { Definition, gameState, Question } from "./types";
+  import type { Definition, gameState, Question, settingState } from "./types";
   import Header from "./header.svelte";
   import { onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
@@ -36,17 +36,18 @@
   }
 
   const useCache: boolean = false;
-  let gs: gameState | null = getState();
-  if (gs && useCache) {
-    if (number == gs.number) {
-      health = gs.health;
-      inputValue = gs.currentInput;
-      won = gs.won;
+  let ss_: settingState = getSettingState();
+  let gs_: gameState | null = getGameState();
+  if (gs_ && useCache) {
+    if (number == gs_.number) {
+      health = gs_.health;
+      inputValue = gs_.currentInput;
+      won = gs_.won;
     } else {
     }
   } else {
     console.log("First time playing!");
-    saveState(health, number, inputValue, won);
+    saveGameState(health, number, inputValue, won);
   }
   //get the gameState with getState and then compare the number from
   //state and number above to see whether the local storage should be cleared or read from
@@ -73,7 +74,7 @@
     guessedWord = inputValue;
     console.log(guessedWord);
   }
-  function saveState(
+  function saveGameState(
     health: number,
     number: number,
     inputValue: string,
@@ -91,11 +92,21 @@
     };
     localStorage.setItem("gameState", JSON.stringify(gs));
   }
-  function getState() {
+  function getGameState() {
     if (!browser) {
       return null;
     }
     const returnString = localStorage.getItem("gameState");
+    if (returnString) {
+      var returnvalue = JSON.parse(returnString);
+    }
+    return returnvalue;
+  }
+  function getState(name: string) {
+    if (!browser) {
+      return null;
+    }
+    const returnString = localStorage.getItem(name);
     if (returnString) {
       var returnvalue = JSON.parse(returnString);
     }
@@ -124,7 +135,7 @@
   $: if (won) {
     win();
   }
-  $: saveState(health, day, inputValue, won);
+  $: saveGameState(health, day, inputValue, won);
   $: {
     if (guessedWord == question.word) {
       won = true;
