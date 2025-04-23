@@ -155,12 +155,6 @@
     } */
 
   }
-  .day {
-    font-family: serif;
-    font-size: var(--small-text);
-    margin: 0;
-    padding: none;
-  }
   .sup-placeholder {
     visibility: hidden;
     font-size: 0.6em;
@@ -173,11 +167,6 @@
     font-size: 0.6em;
     vertical-align: super;
     font-family: serif;
-  }
-  p {
-    margin:0;
-    padding: 0;
-    
   }
   .itemContainer{
     width: auto;
