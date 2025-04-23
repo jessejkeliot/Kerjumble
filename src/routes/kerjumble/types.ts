@@ -17,6 +17,12 @@ export interface gameState {
     won: boolean;
 }
 
+export interface settingState {
+  sound: boolean; 
+  theme: string;
+  wordset: string;
+}
+
 export const getDaysDifferenceUTC = (startDate: string) => {
   const currentDate = new Date();
   const start = new Date(startDate);

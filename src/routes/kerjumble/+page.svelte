@@ -9,6 +9,7 @@
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
+
   //   const savedStates = localStorage.getItem("");
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
@@ -26,6 +27,13 @@
   //menus
   let helpOpen = false;
   let settingsOpen = false;
+  //sounds
+  function playSound(filename: string) {
+    if (!browser) return;
+    const clickSound = new Audio("/sounds/" + filename);
+    clickSound.volume = 0.4;
+    clickSound.play();
+  }
 
   const useCache: boolean = false;
   let gs: gameState | null = getState();
@@ -120,9 +128,14 @@
   $: {
     if (guessedWord == question.word) {
       won = true;
+      playSound("click3_kerjumble.mp3");
+      // click3.play();
     } else if (guessedWord !== "") {
+      // click4.play();
       health--;
       inputValue = "";
+      health==0 ? playSound('click6_kerjumble.mp3') :
+      playSound("click9_kerjumble.mp3");
       // if (health == 0) {
       //   lost();
       // }

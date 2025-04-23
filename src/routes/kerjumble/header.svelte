@@ -148,7 +148,7 @@
     }
     .Holder.Icon {
       min-width: var(--large-text);
-      /* margin: auto auto; */
+      margin: auto 4.5vw;
     }
     /* img {
       height: var(--large-text);
