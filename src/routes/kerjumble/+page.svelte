@@ -2,7 +2,7 @@
   import "./style.css";
   import type { gameState, Question } from "./types";
   import Header from "./header.svelte";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { cubicInOut } from "svelte/easing";
   import type { FocusEventHandler } from "svelte/elements";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
@@ -177,9 +177,14 @@
   $: if(helpOpen){
     tempGuess = inputValue;
     inputValue = "Kerjumble";
+    inputDisabled = true;
   }else if(inputValue=="Kerjumble"){
     inputValue = tempGuess;
+    inputDisabled = false;
+    
+    tick().then(() => {
     focusAnswerBox();
+  });
   }
   $: displayType = helpOpen ? "noun" : question.type;
   $: displayDefinition = helpOpen
@@ -223,6 +228,8 @@
       maxlength="14"
       placeholder="guess"
       autocapitalize="on"
+      spellcheck="false"
+      autocomplete="off"
     />
     <!-- <div class="underline"></div> -->
     <div class="typeContainer">{displayType}</div>
