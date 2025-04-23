@@ -4,6 +4,12 @@ export interface Question {
   definitions: string[];
 }
 
+export interface Definition {
+  word: string;
+  type: "verb" | "adjective" | "noun" | "adverb";
+  definition: string;
+}
+
 export interface gameState {
     number: number;
     currentInput: string;
