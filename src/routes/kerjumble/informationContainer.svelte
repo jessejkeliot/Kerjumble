@@ -54,7 +54,7 @@
     type="text"
     maxlength="14"
     placeholder="guess"
-    autocapitalize="on"
+    autocapitalize="off"
     spellcheck="false"
     autocomplete="off"
   />
