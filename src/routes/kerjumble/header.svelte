@@ -47,6 +47,7 @@
 <div class="header">
   <div class="itemContainer">
   <button class="Holder Icon">
+    <!-- ? -->
   <img src="src/lib/images/Kerjumble/icons/question_icon_kerjumble.svg" alt="question mark">
 </button>
   <div class="Holder">
@@ -70,6 +71,7 @@
   </span>
 </div>
 <button class="Holder Icon">
+  <!-- ⚙ -->
   <img src="src/lib/images/Kerjumble/icons/settings_icon_kerjumble.svg" alt="question mark">
 </button>
   </div>
@@ -89,6 +91,7 @@
     border: none;
     border-radius: var(--classic-border-radius);
     background: var(--mid-grey);
+    background: none;
   }
   .Holder{
     /* justify-content: center;
@@ -106,6 +109,9 @@
     width: var(--medium-text);
     width: 10%;
     min-width: var(--medium-text);
+    min-height: var(--medium-text);
+    font-family: inherit;
+    font-size: var(--medium-text);
     max-width: 2.5rem;
     padding:0;
   }
