@@ -145,7 +145,14 @@
   //menus
   let tempGuess = "";
   // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
-  // $: if (!helpOpen) {
+  // $: if (helpOpen) {
+  //   tempGuess = inputValue;
+  //   inputValue = "Kerjumble";
+  //   inputDisabled = true;
+  // } else if (inputValue == "Kerjumble") {
+  //   inputValue = tempGuess;
+  //   inputDisabled = false;
+
   //   tick().then(() => {
   //     focusAnswerBox();
   //   });
@@ -165,12 +172,7 @@
       bind:health
       inputDisabled={true}
       inputValue="Kerjumble"
-      display={{
-        word: "Kerjumble",
-        type: "noun",
-        definition:
-          "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left.",
-      }}
+      display={{word: "Kerjumble", type: "noun", definition:"A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left."}}
     />
   {:else}
     <InformationContainer
