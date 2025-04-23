@@ -25,7 +25,7 @@
     dispatch("wordEntered", {word: inputValue});
   }
   onMount(() => {
-    if (window.innerWidth > 480) {
+    if (window.innerWidth > 200) {
       focusAnswerBox();
     }
     
@@ -163,11 +163,11 @@
     }
     div.wordContainer {
     position: relative;
-    width: 80%;
+    width: auto;
     outline: 1px dashed salmon;
     min-width: 10rem;
     max-width: 45rem;
-    margin: 0 auto;
+    margin: 0;
     /* display: block; */
     text-align: left;
   }

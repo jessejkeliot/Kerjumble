@@ -196,7 +196,7 @@
     padding: calc(var(--boxpaddingmedium) / 2) var(--boxpaddingmedium);
     position: relative;
     /* top: 30%; */
-    width: 100%;
+    width: auto;
     margin: 0 0;
     aspect-ratio: 1;
     /* height: fit-content; */
