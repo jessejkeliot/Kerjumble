@@ -8,6 +8,7 @@
   import { browser } from "$app/environment";
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
+  import SettingsWidget from "./settingsWidget.svelte";
   //   const savedStates = localStorage.getItem("");
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
@@ -92,9 +93,7 @@
     }
     return returnvalue;
   }
-  function createShareText() {
-
-  }
+  function createShareText() {}
   function finished() {
     inputDisabled = true;
     document.getElementById("answerBox")?.blur();
@@ -117,7 +116,11 @@
   }
   let guessedWord = "";
   question = getQuestionObject();
-  let display : Definition = {word: inputValue, type: question.type, definition: question.definitions[health - 1]};
+  let display: Definition = {
+    word: inputValue,
+    type: question.type,
+    definition: question.definitions[health - 1],
+  };
 
   $: if (won) {
     win();
@@ -142,17 +145,17 @@
   //menus
   let tempGuess = "";
   // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
-  $: if(helpOpen){
+  $: if (helpOpen) {
     tempGuess = inputValue;
     inputValue = "Kerjumble";
     inputDisabled = true;
-  }else if(inputValue=="Kerjumble"){
+  } else if (inputValue == "Kerjumble") {
     inputValue = tempGuess;
     inputDisabled = false;
-    
+
     tick().then(() => {
-    focusAnswerBox();
-  });
+      focusAnswerBox();
+    });
   }
   $: display.type = helpOpen ? "noun" : question.type;
   $: display.definition = helpOpen
@@ -164,7 +167,17 @@
 <Header number={day} bind:helpOpen bind:settingsOpen></Header>
 <HealthBar bind:won bind:health></HealthBar>
 <div class="questionContainer">
-  <InformationContainer bind:health bind:inputDisabled bind:inputValue bind:display on:wordEntered={handleReceiveEnter}></InformationContainer>
+  {#if settingsOpen}
+    <SettingsWidget></SettingsWidget>
+  {:else}
+    <InformationContainer
+      bind:health
+      bind:inputDisabled
+      bind:inputValue
+      bind:display
+      on:wordEntered={handleReceiveEnter}
+    ></InformationContainer>
+  {/if}
 </div>
 
 <style>
