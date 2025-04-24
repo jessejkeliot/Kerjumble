@@ -150,7 +150,7 @@
   $: {
     if (guessedWord == question.word) {
       won = true;
-      playSound("click3_kerjumble.mp3");
+      playSound("click4_kerjumble.mp3");
       // click3.play();
     } else if (guessedWord !== "") {
       // click4.play();
