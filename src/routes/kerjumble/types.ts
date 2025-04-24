@@ -1,3 +1,5 @@
+import { browser } from "$app/environment";
+
 export interface Question {
   word: string;
   type: "verb" | "adjective" | "noun" | "adverb";
@@ -21,6 +23,13 @@ export interface settingState {
   sound: boolean; 
   theme: string;
   wordset: string;
+}
+
+export function playSound(filename: string) {
+  if (!browser) return;
+  const clickSound = new Audio("/sounds/" + filename);
+  clickSound.volume = 0.4;
+  clickSound.play();
 }
 
 export const getDaysDifferenceUTC = (startDate: string) => {

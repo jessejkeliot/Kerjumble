@@ -4,7 +4,7 @@
   import Header from "./header.svelte";
   import { onDestroy, onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
-  import { getDaysDifferenceUTC } from "./types";
+  import { getDaysDifferenceUTC, playSound } from "./types"; //functions
   import { browser } from "$app/environment";
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
@@ -29,13 +29,6 @@
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
-  function playSound(filename: string) {
-    if (!browser) return;
-    const clickSound = new Audio("/sounds/" + filename);
-    clickSound.volume = 0.4;
-    clickSound.play();
-  }
-
   const useCache: boolean = false;
   // let ss_: settingState = getSettingState();
   let gs_: gameState | null = getGameState();
