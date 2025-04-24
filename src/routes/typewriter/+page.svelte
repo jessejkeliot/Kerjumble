@@ -40,8 +40,8 @@
     <h1>Typewriter</h1>
     <textarea id="box1" bind:value={text} on:input={handleInput}></textarea>
   </div>
-  <div class="floater">{text.slice(0, Math.max(text.length -30, 0))}</div>
-  <div class="imageHolder" style="top:{mouseY}px; left:{mouseX}px;">
+  <div class="floater">{text.slice(0, Math.max(Math.min(text.length -30, 300), 0))}</div>
+  <div class="imageHolder" style="top:{mouseY}px; left:{mouseX /2}px;">
   <img style={"top:;"} alt="daface" src="src/lib/images/Kerjumble/icons/noiseyFace.jpg">
 </div>
   
@@ -75,6 +75,7 @@
         align-items: center;
         justify-content: center;
         animation: blinking 3s ease-in 2s infinite;
+        text-wrap: pretty;
     }
 
     @keyframes blinking {
