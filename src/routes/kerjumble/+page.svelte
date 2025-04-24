@@ -11,9 +11,10 @@
   import SettingsWidget from "./settingsWidget.svelte";
 
   //   const savedStates = localStorage.getItem("");
+  const startDate: string = "2025-04-14";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
-  let day = getDaysDifferenceUTC("2025-04-14");
+  let day = getDaysDifferenceUTC(startDate);
   let checkInterval: number;
   // console.warn(questionsJson.length);
   let number = day % questionsJson.length;
@@ -51,7 +52,7 @@
       focusAnswerBox();
     }
     checkInterval = setInterval(() => {
-      const newDay = getDaysDifferenceUTC("2025-04-15");
+      const newDay = getDaysDifferenceUTC(startDate);
       if (newDay !== day) {
         // the day changed — reload the game state
         location.reload(); // OR update question manually
@@ -211,6 +212,7 @@
       bind:inputDisabled
       bind:inputValue
       bind:display
+      bind:won
       on:wordEntered={handleReceiveEnter}
     ></InformationContainer>
   {/if}
