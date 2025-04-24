@@ -2,7 +2,7 @@
   import "./style.css";
   import type { Definition, gameState, Question, settingState } from "./types";
   import Header from "./header.svelte";
-  import { onMount, tick } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
   import { getDaysDifferenceUTC } from "./types";
   import { browser } from "$app/environment";
@@ -14,6 +14,7 @@
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC("2025-04-14");
+  let checkInterval: number;
   // console.warn(questionsJson.length);
   let number = day % questionsJson.length;
   //input
@@ -36,7 +37,7 @@
   }
 
   const useCache: boolean = false;
-  let ss_: settingState = getSettingState();
+  // let ss_: settingState = getSettingState();
   let gs_: gameState | null = getGameState();
   if (gs_ && useCache) {
     if (number == gs_.number) {
@@ -56,7 +57,17 @@
     if (window.innerWidth > 480) {
       focusAnswerBox();
     }
+    checkInterval = setInterval(() => {
+      const newDay = getDaysDifferenceUTC("2025-04-15");
+      if (newDay !== day) {
+        // the day changed — reload the game state
+        location.reload(); // OR update question manually
+      }
+    }, 60 * 1000); // check every minute
     // question = getQuestionObject();
+  });
+  onDestroy(() => {
+    clearInterval(checkInterval);
   });
   function focusAnswerBox() {
     const input = document.getElementById("answerBox");
@@ -145,8 +156,9 @@
       // click4.play();
       health--;
       inputValue = "";
-      health==0 ? playSound('click6_kerjumble.mp3') :
-      playSound("click9_kerjumble.mp3");
+      health == 0
+        ? playSound("click6_kerjumble.mp3")
+        : playSound("click9_kerjumble.mp3");
       // if (health == 0) {
       //   lost();
       // }
