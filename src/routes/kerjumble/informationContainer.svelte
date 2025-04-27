@@ -177,6 +177,7 @@
   div.typeContainer {
     font-size: var(--medium-text);
     font-style: italic;
+    height: fit-content;
     margin: var(--boxpaddingxsmall) 0;
     color: var(--type-grey);
   }
@@ -184,6 +185,7 @@
     font-size: var(--medium-text);
     margin: var(--boxpaddingxsmall) 0 0 0;
     text-wrap: stable;
+    overflow: hidden;
     /* outline: 1px solid black */
   }
 </style>

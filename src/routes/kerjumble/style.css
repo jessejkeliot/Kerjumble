@@ -30,6 +30,10 @@
     font-family: var(--font-body);
     font-family: Georgia, "Times New Roman", Times, serif;
   }
+  li {
+    list-style-type:lower-roman;
+  }
   *{
     outline: none !important;
+    /* outline: 1px solid maroon !important; */
   }

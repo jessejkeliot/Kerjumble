@@ -21,8 +21,13 @@ export interface gameState {
 
 export interface settingState {
   sound: boolean; 
+  music: boolean
   theme: string;
   wordset: string;
+}
+
+export const defaultSettingState: settingState = {
+    sound: false, music: false, theme:"light", wordset:"easy"
 }
 
 export function playSound(filename: string) {

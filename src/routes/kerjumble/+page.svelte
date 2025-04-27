@@ -9,6 +9,7 @@
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
+  import { get } from "svelte/store";
 
   //   const savedStates = localStorage.getItem("");
   const startDate: string = "2025-04-13";
@@ -22,16 +23,22 @@
   let inputDisabled = false;
   let inputValue: string = ""; //same as below
   //gameState
-  const maxHealth = 7;
+  const maxHealth = 5;
   let health = maxHealth; //later use the savedStates object;
   let finalHealth = maxHealth;
   let won = false;
+  //settingState
+  let configurations: settingState;
+
   //menus
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
-  const useCache: boolean = false;
-  // let ss_: settingState = getSettingState();
+  const useCache: boolean = true;
+  let ss_: settingState | null = getSettingState();
+  if (useCache) {
+    configurations = getSettingState();
+  }
   let gs_: gameState | null = getGameState();
   if (gs_ && useCache) {
     if (number == gs_.number) {
@@ -107,17 +114,19 @@
     };
     localStorage.setItem("gameState", JSON.stringify(gs));
   }
-  function getGameState() {
+  function saveState(
+    name: string, object: any
+  ) {
+    // localStorage.clear();
     if (!browser) {
-      return null;
+      return;
     }
-    const returnString = localStorage.getItem("gameState");
-    if (returnString) {
-      var returnvalue = JSON.parse(returnString);
-    }
-    return returnvalue;
+    localStorage.setItem(name, JSON.stringify(object));
   }
-  function getState(name: string) {
+  function getGameState() {
+    return getItemFromLocalStorage("gameState");
+  }
+  function getItemFromLocalStorage(name: string) {
     if (!browser) {
       return null;
     }
@@ -150,6 +159,7 @@
   $: if (won) {
     win();
   }
+  $: saveState("settingState", configurations);
   $: saveGameState(health, day, inputValue, won);
   $: {
     if (guessedWord == question.word) {
@@ -169,7 +179,6 @@
     }
   }
   //menus
-  let tempGuess = "";
   // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
   // $: if (helpOpen) {
   //   tempGuess = inputValue;
@@ -185,14 +194,20 @@
   // }
   $: display.type = question.type;
   $: display.definition = question.definitions[Math.max(0, health - 1)];
+
+
+  function getSettingState(): settingState {
+    // throw new Error("Function not implemented.");
+    return getItemFromLocalStorage("settingState");
+  }
 </script>
 
 <title>Kerjumble</title>
 <Header number={day} bind:helpOpen bind:settingsOpen></Header>
 <HealthBar bind:won bind:health></HealthBar>
-<div class="questionContainer">
+<div class="MenuContainer">
   {#if settingsOpen}
-    <SettingsWidget></SettingsWidget>
+    <SettingsWidget bind:configurations></SettingsWidget>
   {:else if helpOpen}
     <InformationContainer
       inputDisabled={true}
@@ -209,10 +224,11 @@
     <li>Words are generally short and simple.</li>
     <li>The bars above represent how many guesses you have left.</li>
     <li>A green bar at the top indicates you have won.</li>
+    <li>press the &#9932 in the corner to begin</li>
     </div>
-    <div class="helpCloseHintContainer">
+    <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
-    </div>
+    </div> -->
     <!-- lose -->
   {:else if health == 0 && !won}
     <InformationContainer
@@ -251,18 +267,15 @@
     text-align: left;
     position: relative;
     width: auto;
-    margin: var(--boxpaddingsmall) 0;
+    margin: var(--boxpaddingxsmall)0 0 0;
     padding: none;
     outline: 2px solid burlywood;
     font-size: var(--small-text);
   }
-  li {
-    list-style-type:lower-roman;
-  }
-  div.questionContainer {
+  div.MenuContainer {
     /* top: 20% */
     /* width: 20%; */
-    max-height: 25rem;
+    max-height: 30rem;
     /* min-width: 10rem; */
     /* margin-top: var(--boxmarginmedium); */
     /* max-width: 50rem; */
@@ -284,9 +297,11 @@
     align-items: center;
   }
   @media screen and (min-width: 480px) {
-    div.questionContainer {
-      flex-direction: row;
-      padding: 0 var(--boxpaddingmedium);
+    div.MenuContainer {
+      /* outline: 4px solid blue; */
+      justify-content: center;
+      /* flex-direction: row; */
+      /* padding: 5rem 0 ; */
     }
   }
 </style>

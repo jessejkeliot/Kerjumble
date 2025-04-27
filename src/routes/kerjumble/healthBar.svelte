@@ -41,7 +41,7 @@
 
 <style>
   div.health-bar {
-    margin: 0 0 0 0;
+    margin: 0 0 1px 0;
     padding: 0px;
     display: flex;
     flex-direction: row;
