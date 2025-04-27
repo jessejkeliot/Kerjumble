@@ -31,5 +31,5 @@
     font-family: Georgia, "Times New Roman", Times, serif;
   }
   *{
-    outline: none !important;
+    /* outline: none !important; */
   }

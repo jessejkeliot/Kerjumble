@@ -4,22 +4,17 @@
   import type { Definition } from "./types";
   const dispatch = createEventDispatcher();
 
-  export let health = 0;
+  export let showButtons = false;
+  export let capitalise = false;
+  export let showReveal = false;
   export let display: Definition;
   export let inputDisabled: boolean;
   export let inputValue: string;
-  export let won: boolean = false;
   let shareButtonText = "Share";
 
   //whether to show buttons
-  function handleShare() {
-    console.log("Share Clicked");
-    // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
-    try {
-      navigator.share({ text: "Kerjumble", title: "Kerjumble Results" });
-    } catch (error) {
-      navigator.clipboard.writeText("resultRepresentation");
-    }
+  function handleSendShare() {
+    dispatch("shareButtonClicked");
     shareButtonText = "Copied!";
   }
   function handleSendEnter() {
@@ -46,6 +41,7 @@
   <input
     class="guessBox"
     id="answerBox"
+    style="text-transform: {capitalise ? "none": "lowercase"};"
     bind:value={inputValue}
     on:keydown={(e) => {
       if (e.key === "Enter") {
@@ -63,19 +59,19 @@
   <!-- <div class="underline"></div> -->
   <div class="typeContainer">{display.type}</div>
   <div class="descriptionContainer">
-    <p>{health == 0 ? display.definition : display.definition.toLowerCase()}</p>
+    <p>{capitalise ? display.definition : display.definition.toLowerCase()}</p>
   </div>
-  {#if health == 0}
+  {#if showButtons}
     <div class="buttonContainer">
       <!-- svelte-ignore a11y_mouse_events_have_key_events -->
       <button
         id="share"
         style="background-color: var(--primary-color);"
-        on:click={handleShare}
+        on:click={handleSendShare}
         transition:fade>{shareButtonText}</button
       >
       <button id="statistics" transition:fade={{delay: 100}}>Stats</button>
-      {#if !won}
+      {#if showReveal}
         <button id="reveal">Reveal</button>
       {/if}
     </div>
@@ -118,7 +114,6 @@
     border: none;
     height: calc(var(--large-text) + 0.2em);
     overflow: visible;
-    text-transform: lowercase;
     font-size: var(--large-text);
     font-family: inherit;
     font-weight: lighter;

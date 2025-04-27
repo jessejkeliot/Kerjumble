@@ -125,6 +125,7 @@
     font-size: var(--medium-text);
     max-width: 2.5rem;
     padding:0;
+    background-color: var(--mid-grey);
   }
   .jumble {
     cursor: crosshair;
@@ -142,13 +143,14 @@
     outline: 3px solid black;
   }
   /* for desktop */
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: 590px) {
     .jumble {
       font-size: var(--large-text);
     }
     .Holder.Icon {
       min-width: var(--large-text);
-      margin: auto 4.5vw;
+      margin: auto 2rem;
+      outline: 1px solid red;
     }
     /* img {
       height: var(--large-text);

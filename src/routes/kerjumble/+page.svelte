@@ -11,7 +11,7 @@
   import SettingsWidget from "./settingsWidget.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-04-14";
+  const startDate: string = "2025-04-13";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
@@ -42,6 +42,7 @@
     }
   } else {
     console.log("First time playing!");
+    helpOpen = true;
     saveGameState(health, number, inputValue, won);
   }
   //get the gameState with getState and then compare the number from
@@ -78,6 +79,15 @@
   function handleReceiveEnter() {
     guessedWord = inputValue;
     console.log(guessedWord);
+  }
+  function handleShare() {
+    console.log("Share Clicked");
+    // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
+    try {
+      navigator.share({ text: "Kerjumble", title: "Kerjumble Results" });
+    } catch (error) {
+      navigator.clipboard.writeText("resultRepresentation");
+    }
   }
   function saveGameState(
     health: number,
@@ -185,7 +195,6 @@
     <SettingsWidget></SettingsWidget>
   {:else if helpOpen}
     <InformationContainer
-      bind:health
       inputDisabled={true}
       inputValue="Kerjumble"
       display={{
@@ -194,10 +203,17 @@
         definition:
           "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left.",
       }}
+      capitalise
     />
+    <div class="hints"><li>There are no plurals</li>
+    <li>Words are generally short and simple</li>
+    </div>
+    <div class="helpCloseHintContainer">
+      press the &#9932 in the corner to begin
+    </div>
+    <!-- lose -->
   {:else if health == 0 && !won}
     <InformationContainer
-      {health}
       inputDisabled={true}
       inputValue="loser"
       display={{
@@ -205,20 +221,42 @@
         type: "noun",
         definition: "A person that does not win a game; you.",
       }}
+      showButtons
+      on:shareButtonClicked={handleShare}
+      showReveal
     />
+    <!-- currently playing OR win -->
   {:else}
     <InformationContainer
-      bind:health
       bind:inputDisabled
       bind:inputValue
       bind:display
-      bind:won
+      showButtons={won}
+      on:shareButtonClicked={handleShare}
       on:wordEntered={handleReceiveEnter}
     ></InformationContainer>
   {/if}
 </div>
 
 <style>
+  div.helpCloseHintContainer {
+    margin: var(--boxpaddingsmall);
+    padding: none;
+    outline: 2px solid burlywood;
+    font-size: var(--small-text);
+  }
+  div.hints {
+    text-align: left;
+    position: relative;
+    width: auto;
+    margin: var(--boxpaddingsmall) 0;
+    padding: none;
+    outline: 2px solid burlywood;
+    font-size: var(--small-text);
+  }
+  li {
+    list-style-type:lower-roman;
+  }
   div.questionContainer {
     /* top: 20% */
     /* width: 20%; */
