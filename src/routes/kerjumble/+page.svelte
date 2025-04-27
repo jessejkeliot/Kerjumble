@@ -34,8 +34,11 @@
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
-  const useCache: boolean = true;
-  let ss_: settingState | null = getSettingState();
+  const useCache: boolean = false;
+  if(!useCache && browser){
+    localStorage.clear();
+  }
+  // let ss_: settingState | null = getSettingState();
   if (useCache) {
     configurations = getSettingState();
   }
@@ -122,6 +125,7 @@
       return;
     }
     localStorage.setItem(name, JSON.stringify(object));
+    console.log("saved ", object, "to localStorage: ", name);
   }
   function getGameState() {
     return getItemFromLocalStorage("gameState");
@@ -132,7 +136,11 @@
     }
     const returnString = localStorage.getItem(name);
     if (returnString) {
+      console.log("Got ", name, "from local Storage");
       var returnvalue = JSON.parse(returnString);
+    }
+    else{
+      console.log("Failed to get ", name, "from local Storage");
     }
     return returnvalue;
   }
