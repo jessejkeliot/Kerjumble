@@ -201,12 +201,14 @@
         word: "Kerjumble",
         type: "noun",
         definition:
-          "A game where you have to guess a word from a jumbled definition: the bars above represent how many guesses you have left.",
+          "A game where you have to guess a word from a jumbled definition.",
       }}
       capitalise
     />
-    <div class="hints"><li>There are no plurals</li>
-    <li>Words are generally short and simple</li>
+    <div class="hints"><li>There are no plurals.</li>
+    <li>Words are generally short and simple.</li>
+    <li>The bars above represent how many guesses you have left.</li>
+    <li>A green bar at the top indicates you have won.</li>
     </div>
     <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
