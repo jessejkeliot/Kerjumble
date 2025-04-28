@@ -166,11 +166,12 @@
   }
   div.wordContainer {
     position: relative;
-    width: auto;
+    width: 100%;
     outline: 1px dashed salmon;
     min-width: 10rem;
     max-width: 45rem;
     margin: 0;
+    padding: none;
     /* display: block; */
     text-align: left;
   }

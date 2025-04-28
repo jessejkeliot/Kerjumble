@@ -26,12 +26,24 @@ export interface settingState {
   wordset: string;
 }
 
+export function saveState(
+  name: string, object: any
+) {
+  // localStorage.clear();
+  if (!browser) {
+    return;
+  }
+  localStorage.setItem(name, JSON.stringify(object));
+  console.log("saved ", object, "to localStorage: ", name);
+}
+
 export const defaultSettingState: settingState = {
     sound: false, music: false, theme:"light", wordset:"easy"
 }
 
-export function playSound(filename: string) {
+export function playSound(filename: string, bypass: boolean) {
   if (!browser) return;
+  if (!bypass) return;
   const clickSound = new Audio("/sounds/" + filename);
   clickSound.volume = 0.4;
   clickSound.play();

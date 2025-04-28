@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
   // Define the settingState interface
-  import type { settingState } from "./types";
+  import { saveState, type settingState } from "./types";
 
   // Default settings state
   export const defaultSettingState: settingState = {
@@ -19,82 +20,92 @@
   // Update handlers for each setting
   function toggleMusic() {
     configurations.music = !configurations.music;
+    saveState("settingState", configurations);
   }
 
   function toggleSounds() {
     configurations.sound = !configurations.sound;
+    saveState("settingState", configurations);
   }
 
   function changeTheme(event: Event) {
     const target = event.target as HTMLSelectElement;
     configurations.theme = target.value;
+    saveState("settingState", configurations);
   }
 
   function changeWordset(event: Event) {
     const target = event.target as HTMLSelectElement;
     configurations.wordset = target.value;
+    saveState("settingState", configurations);
   }
 </script>
 
 <div class="settings">
-  <h1>Settings</h1>
+  <div class="switches">
+    <!-- Music Setting -->
+    <div class="setting">
+      <span>Music:</span>
+      <button on:click={toggleMusic}>
+        {configurations.music ? "On" : "Off"}
+      </button>
+    </div>
 
-  <!-- Music Setting -->
-  <div class="setting">
-    <span>Music:</span>
-    <button on:click={toggleMusic}>
-      {configurations.music ? "On" : "Off"}
-    </button>
-  </div>
+    <!-- Sound Setting -->
+    <div class="setting">
+      <span>Sounds:</span>
+      <button on:click={toggleSounds}>
+        {configurations.sound ? "On" : "Off"}
+      </button>
+    </div>
 
-  <!-- Sound Setting -->
-  <div class="setting">
-    <span>Sounds:</span>
-    <button on:click={toggleSounds}>
-      {configurations.sound ? "On" : "Off"}
-    </button>
-  </div>
+    <!-- Theme Dropdown -->
+    <div class="setting">
+      <span>Theme:</span>
+      <select bind:value={configurations.theme} on:change={changeTheme}>
+        {#each themes as theme}
+          <option value={theme}>{theme}</option>
+        {/each}
+      </select>
+    </div>
 
-  <!-- Theme Dropdown -->
-  <div class="setting">
-    <span>Theme:</span>
-    <select bind:value={configurations.theme} on:change={changeTheme}>
-      {#each themes as theme}
-        <option value={theme}>{theme}</option>
-      {/each}
-    </select>
-  </div>
-
-  <!-- Wordset Dropdown -->
-  <div class="setting">
-    <span>Wordset:</span>
-    <select bind:value={configurations.wordset} on:change={changeWordset}>
-      <option value="easy">Easy</option>
-      <option value="medium">Medium</option>
-      <option value="hard">Hard</option>
-    </select>
+    <!-- Wordset Dropdown -->
+    <div class="setting">
+      <span>Wordset:</span>
+      <select bind:value={configurations.wordset} on:change={changeWordset}>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
   </div>
 </div>
 
 <style>
-  .settings {
-    padding: var(--boxpaddingmedium);
-    max-width: 30rem;
-    margin: 0 auto;
-    background: #fff;
-    /* border-radius: 12px; */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  div.switches {
+    margin: var(--boxpaddingsmall);
+  }
+  div.settings {
+    min-width: 10rem;
+    max-width: 45rem;
+    width: 100%;
+    position: relative;
+    margin: var(--boxpaddingmedium) 0 0 0;
+    display: flex;
+    flex-direction: column;
+    outline: 2px solid var(--primary-color) !important;
     text-align: left;
   }
   .settings h1 {
     font-size: 4rem;
-    margin: 0 0 var(--boxpaddingmedium) 0 ;
+    margin: 0 0 var(--boxpaddingmedium) 0;
   }
 
   .setting {
     display: flex;
     align-items: center;
     margin-bottom: 12px;
+    width: 100%;
   }
 
   .setting span {
@@ -104,18 +115,19 @@
   }
 
   button {
-    padding: 5px 10px;
+    padding: var(--boxpaddingxsmall);
     background-color: #007bff;
     border: none;
     color: white;
     border-radius: var(--classic-border-radius);
+    font-weight: bold;
     cursor: pointer;
   }
 
   button:hover {
     background-color: #0056b3;
   }
-  button:focus{
+  button:focus {
     background-color: #007bff;
   }
 

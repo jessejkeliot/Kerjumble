@@ -4,12 +4,16 @@
   import Header from "./header.svelte";
   import { onDestroy, onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
-  import { getDaysDifferenceUTC, playSound } from "./types"; //functions
+  import {
+    defaultSettingState,
+    getDaysDifferenceUTC,
+    playSound,
+  } from "./types"; //functions
   import { browser } from "$app/environment";
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
-  import { get } from "svelte/store";
+  import { saveState } from "./types";
 
   //   const savedStates = localStorage.getItem("");
   const startDate: string = "2025-04-13";
@@ -28,20 +32,23 @@
   let finalHealth = maxHealth;
   let won = false;
   //settingState
-  let configurations: settingState;
+  let configurations: settingState = defaultSettingState;
 
   //menus
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
   const useCache: boolean = false;
-  if(!useCache && browser){
-    localStorage.clear();
+  if (browser && useCache) {
+    const loadedSettings = getSettingState();
+    if (loadedSettings) {
+      configurations = loadedSettings;
+    } else {
+      // no settings saved yet
+      saveState("settingState", configurations);
+    }
   }
   // let ss_: settingState | null = getSettingState();
-  if (useCache) {
-    configurations = getSettingState();
-  }
   let gs_: gameState | null = getGameState();
   if (gs_ && useCache) {
     if (number == gs_.number) {
@@ -117,16 +124,6 @@
     };
     localStorage.setItem("gameState", JSON.stringify(gs));
   }
-  function saveState(
-    name: string, object: any
-  ) {
-    // localStorage.clear();
-    if (!browser) {
-      return;
-    }
-    localStorage.setItem(name, JSON.stringify(object));
-    console.log("saved ", object, "to localStorage: ", name);
-  }
   function getGameState() {
     return getItemFromLocalStorage("gameState");
   }
@@ -138,8 +135,7 @@
     if (returnString) {
       console.log("Got ", name, "from local Storage");
       var returnvalue = JSON.parse(returnString);
-    }
-    else{
+    } else {
       console.log("Failed to get ", name, "from local Storage");
     }
     return returnvalue;
@@ -167,20 +163,20 @@
   $: if (won) {
     win();
   }
-  $: saveState("settingState", configurations);
+
   $: saveGameState(health, day, inputValue, won);
   $: {
     if (guessedWord == question.word) {
       won = true;
-      playSound("click4_kerjumble.mp3");
+      playSound("click4_kerjumble.mp3", configurations.sound);
       // click3.play();
     } else if (guessedWord !== "") {
       // click4.play();
       health--;
       inputValue = "";
       health == 0
-        ? playSound("click6_kerjumble.mp3")
-        : playSound("click9_kerjumble.mp3");
+        ? playSound("click6_kerjumble.mp3", configurations.sound)
+        : playSound("click9_kerjumble.mp3", configurations.sound);
       // if (health == 0) {
       //   lost();
       // }
@@ -203,7 +199,6 @@
   $: display.type = question.type;
   $: display.definition = question.definitions[Math.max(0, health - 1)];
 
-
   function getSettingState(): settingState {
     // throw new Error("Function not implemented.");
     return getItemFromLocalStorage("settingState");
@@ -215,6 +210,18 @@
 <HealthBar bind:won bind:health></HealthBar>
 <div class="MenuContainer">
   {#if settingsOpen}
+    <!-- <SettingsWidget bind:configurations></SettingsWidget> -->
+    <InformationContainer
+      inputDisabled={true}
+      inputValue="Settings"
+      display={{
+        word: "Settings",
+        type: "noun",
+        definition:
+          "A place to customise and configure an experience.",
+      }}
+      capitalise
+    />
     <SettingsWidget bind:configurations></SettingsWidget>
   {:else if helpOpen}
     <InformationContainer
@@ -228,11 +235,12 @@
       }}
       capitalise
     />
-    <div class="hints"><li>There are no plurals.</li>
-    <li>Words are generally short and simple.</li>
-    <li>The bars above represent how many guesses you have left.</li>
-    <li>A green bar at the top indicates you have won.</li>
-    <li>press the &#9932 in the corner to begin</li>
+    <div class="hints">
+      <li>There are no plurals.</li>
+      <li>Words are generally short and simple.</li>
+      <li>The bars above represent how many guesses you have left.</li>
+      <li>A green bar at the top indicates you have won.</li>
+      <li>Press the &#9932 in the corner to begin</li>
     </div>
     <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
@@ -252,7 +260,16 @@
       showReveal
     />
     <!-- currently playing OR win -->
-  {:else}
+  {:else if won}
+    <InformationContainer
+      bind:inputDisabled
+      bind:inputValue
+      display={{word: display.word, type: display.type, definition: question.definitions[0]}}
+      showButtons={won}
+      on:shareButtonClicked={handleShare}
+      on:wordEntered={handleReceiveEnter}
+    ></InformationContainer>
+  {:else if !won}
     <InformationContainer
       bind:inputDisabled
       bind:inputValue
@@ -275,7 +292,7 @@
     text-align: left;
     position: relative;
     width: auto;
-    margin: var(--boxpaddingxsmall)0 0 0;
+    margin: var(--boxpaddingxsmall) 0 0 0;
     padding: none;
     outline: 2px solid burlywood;
     font-size: var(--small-text);
