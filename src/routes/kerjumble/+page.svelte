@@ -296,7 +296,8 @@
 
 <style>
   div.helpCloseHintContainer {
-    margin: var(--boxpaddingsmall);
+    margin: var(--boxpaddingsmall) 0 0 0;
+    /* height: 100px; */
     padding: none;
     display: flex;
     flex-direction: column;
@@ -325,7 +326,7 @@
     /* top: 30%; */
     width: auto;
     max-height: 30rem;
-    min-width: 10rem; 
+    min-width: none; 
     margin: 0 0;
     aspect-ratio: 1;
     /* height: fit-content; */
@@ -370,18 +371,17 @@
   }
   .Holder.Icon{
     aspect-ratio: 1;
-    margin: auto 0;
     display: flex;
     justify-content: center;
     align-items: center;
     width: var(--medium-text);
-    width: 10%;
+    width: 100%;
     min-width: var(--medium-text);
     min-height: var(--medium-text);
     font-family: inherit;
     font-size: var(--medium-text);
     max-width: 2.5rem;
-    padding:0;
+    padding: 0;
     background-color: var(--secondary-color);
   }
 </style>
