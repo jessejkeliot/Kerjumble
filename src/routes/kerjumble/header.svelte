@@ -137,6 +137,7 @@
     display: inline-flex;
     flex-direction: row;
     outline: 2px solid green;
+    color: var(--text-color);
     gap: 0.1em;
   }
   .jumble:focus-visible {
