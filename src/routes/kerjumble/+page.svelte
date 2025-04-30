@@ -166,7 +166,7 @@
   }
   function win() {
     finished();
-    console.log("Won ", day);
+    console.log("Won ", day, question.word);
   }
   let guessedWord = "";
   question = getQuestionObject();
@@ -239,22 +239,22 @@
         word: "Kerjumble",
         type: "noun",
         definition:
-          "A game where you have to guess a word from a jumbled definition.",
+          "A game where you have to guess the day's word from a shuffled definition.",
       }}
       capitalise
     />
-    <div class="hints">
-      <li>There are no plurals.</li>
+    
+      <!-- <li>There are no plurals.</li>
       <li>Words are generally short and simple.</li>
       <li>The bars above represent how many guesses you have left.</li>
-      <li>A green bar at the top indicates you have won.</li>
+      <li>A green bar at the top indicates you have won.</li> -->
       <div class="helpCloseHintContainer">
       <button class="Holder Icon" on:click={() =>{helpOpen = !helpOpen}}>
         <!-- ? -->
       <img src="src/lib/images/Kerjumble/icons/{helpOpen ? "x_icon_kerjumble.svg" : "question_icon_kerjumble.svg"}" alt="question mark">
     </button></div>
       <!-- <li>Press the &#9932 in the corner to begin</li> -->
-    </div>
+   
     <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
     </div> -->
@@ -305,7 +305,6 @@
     font-size: var(--small-text);
   }
   div.hints {
-
     position: relative;
     width: auto;
     text-align: left;

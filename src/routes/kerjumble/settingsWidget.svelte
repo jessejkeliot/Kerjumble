@@ -126,7 +126,7 @@
     border: none;
     color: var(--text-color);
     border-radius: var(--classic-border-radius);
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--primary-color);
     width: 30%;
     font-weight: bold;
     font-size: var(--xsmall-text);
@@ -136,7 +136,7 @@
   select {
     padding: var(--boxpaddingxsmall);
     border-radius: var(--classic-border-radius);
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--primary-color);
     color:var(--text-color);
     background-color: var(--secondary-color);
     width: 30%;

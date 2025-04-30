@@ -9,12 +9,12 @@
 <section>
 	<h1>
 		<div class="welcome">
-			GET ONTO SHIT
+			GET ONTO It
 		</div>
 
 		to your new<br /> app
 	</h1>
-	<a href="/kerjumble">Kerjumble</a>
+	<a href="/kerjumble">Kerjumble      </a>
 	<a href="/typewriter">Typewriter Clicky</a>
 
 	<h2>
