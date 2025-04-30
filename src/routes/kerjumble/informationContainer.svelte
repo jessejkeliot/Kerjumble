@@ -66,7 +66,6 @@
       <!-- svelte-ignore a11y_mouse_events_have_key_events -->
       <button
         id="share"
-        style="background-color: var(--primary-color);"
         on:click={handleSendShare}
         transition:fade>{shareButtonText}</button
       >
@@ -97,6 +96,8 @@
     /* width: calc(100% / 3); */
     background-color: var(--primary-color);
     color: var(--background-color);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
     border-radius: var(--classic-border-radius);
     border: none;
     font-family: Helvetica, sans-serif;
