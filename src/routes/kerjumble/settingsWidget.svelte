@@ -115,12 +115,14 @@
   }
 
   button {
-    padding: var(--boxpaddingxsmall);
+    padding: var(--boxpaddingxsmall) var(--boxpaddingsmall);
     background-color: #007bff;
     border: none;
     color: white;
     border-radius: var(--classic-border-radius);
+    width: 30%;
     font-weight: bold;
+    font-size: var(--xsmall-text);
     cursor: pointer;
   }
 
@@ -132,9 +134,13 @@
   }
 
   select {
-    padding: 5px;
+    padding: var(--boxpaddingxsmall);
     border-radius: var(--classic-border-radius);
     border: 1px solid #ccc;
     background-color: #f9f9f9;
+    width: 30%;
+
+    font-weight: bold;
+    font-size: var(--xsmall-text);
   }
 </style>

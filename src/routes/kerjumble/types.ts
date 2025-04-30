@@ -26,6 +26,12 @@ export interface settingState {
   wordset: string;
 }
 
+export interface theme {
+  text_color: string; 
+  primary_color:  string;
+  background_color: string;
+}
+
 export function saveState(
   name: string, object: any
 ) {
@@ -35,6 +41,17 @@ export function saveState(
   }
   localStorage.setItem(name, JSON.stringify(object));
   console.log("saved ", object, "to localStorage: ", name);
+}
+export const lightTheme: theme = {
+  text_color: "#001",
+  primary_color: "#001",
+  background_color: "#FFF"
+}
+
+export const partyTheme: theme = {
+  text_color: "#04020D",
+  primary_color: "#220B37",
+  background_color: "#AA505C"
 }
 
 export const defaultSettingState: settingState = {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import "./style.css";
-  import type { Definition, gameState, Question, settingState } from "./types";
+  import type { Definition, gameState, Question, settingState, theme } from "./types";
   import Header from "./header.svelte";
   import { onDestroy, onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
@@ -38,7 +38,7 @@
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
-  const useCache: boolean = false;
+  const useCache: boolean = true;
   if (browser && useCache) {
     const loadedSettings = getSettingState();
     if (loadedSettings) {
@@ -159,12 +159,18 @@
     type: question.type,
     definition: question.definitions[health - 1],
   };
-
+  function setTheme(t: theme){ //NOW make this correspond to the things.
+    const root = document.documentElement;
+    root.style.setProperty('--background-color', t.background_color);
+    root.style.setProperty('--text-color', t.text_color);
+    root.style.setProperty('--primary-color', t.primary_color);
+  }
   $: if (won) {
     win();
   }
 
   $: saveGameState(health, day, inputValue, won);
+  // $: setTheme(configurations.theme);
   $: {
     if (guessedWord == question.word) {
       won = true;
@@ -240,7 +246,12 @@
       <li>Words are generally short and simple.</li>
       <li>The bars above represent how many guesses you have left.</li>
       <li>A green bar at the top indicates you have won.</li>
-      <li>Press the &#9932 in the corner to begin</li>
+      <div class="helpCloseHintContainer">
+      <button class="Holder Icon" on:click={() =>{helpOpen = !helpOpen}}>
+        <!-- ? -->
+      <img src="src/lib/images/Kerjumble/icons/{helpOpen ? "x_icon_kerjumble.svg" : "question_icon_kerjumble.svg"}" alt="question mark">
+    </button></div>
+      <!-- <li>Press the &#9932 in the corner to begin</li> -->
     </div>
     <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
@@ -285,13 +296,17 @@
   div.helpCloseHintContainer {
     margin: var(--boxpaddingsmall);
     padding: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     outline: 2px solid burlywood;
     font-size: var(--small-text);
   }
   div.hints {
-    text-align: left;
+
     position: relative;
     width: auto;
+    text-align: left;
     margin: var(--boxpaddingxsmall) 0 0 0;
     padding: none;
     outline: 2px solid burlywood;
@@ -300,20 +315,21 @@
   div.MenuContainer {
     /* top: 20% */
     /* width: 20%; */
-    max-height: 30rem;
-    /* min-width: 10rem; */
+
     /* margin-top: var(--boxmarginmedium); */
     /* max-width: 50rem; */
     padding: calc(var(--boxpaddingmedium) / 2) var(--boxpaddingmedium);
     position: relative;
     /* top: 30%; */
     width: auto;
+    max-height: 30rem;
+    min-width: 10rem; 
     margin: 0 0;
     aspect-ratio: 1;
     /* height: fit-content; */
     background-color: var(--background-color);
     /* border: 3px solid var(--primary-color); */
-    outline: 3px dotted deeppink;
+    outline: 3px dotted rgb(148, 64, 109);
     text-align: center;
     font-size: 3rem;
     display: flex;
@@ -328,5 +344,42 @@
       /* flex-direction: row; */
       /* padding: 5rem 0 ; */
     }
+  }
+  img {
+    display: block;
+    height: var(--medium-text);
+    height: 80%;
+    outline: 3px dashed teal;
+    /* margin: 3px; */
+    /* padding: 3px; */
+  }
+  button{
+    border: none;
+    border-radius: var(--classic-border-radius);
+    background: var(--mid-grey);
+    background: none;
+  }
+  .Holder{
+    /* justify-content: center;
+    align-items: center; */
+    margin: 0 0;
+    outline: 2px solid purple ;
+    padding: none;
+  }
+  .Holder.Icon{
+    aspect-ratio: 1;
+    margin: auto 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--medium-text);
+    width: 10%;
+    min-width: var(--medium-text);
+    min-height: var(--medium-text);
+    font-family: inherit;
+    font-size: var(--medium-text);
+    max-width: 2.5rem;
+    padding:0;
+    background-color: var(--mid-grey);
   }
 </style>
