@@ -30,6 +30,7 @@ export interface theme {
   name: string;
   text_color: string; 
   primary_color:  string;
+  secondary_color: string;
   background_color: string;
 }
 
