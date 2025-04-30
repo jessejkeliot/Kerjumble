@@ -117,7 +117,9 @@
     font-size: var(--large-text);
     font-family: inherit;
     font-weight: lighter;
-    caret-color: #000;
+    caret-color: var(--text-color);
+    color: var(--text-color);
+    background-color: transparent;
     outline: 1px dotted black;
     outline: none;
     width: 100%;
@@ -168,6 +170,7 @@
     position: relative;
     width: 100%;
     outline: 1px dashed salmon;
+    color: var(--text-color);
     min-width: 10rem;
     max-width: 45rem;
     margin: 0;
@@ -185,6 +188,7 @@
   div.descriptionContainer {
     font-size: var(--medium-text);
     margin: var(--boxpaddingxsmall) 0 0 0;
+    color: inherit;
     text-wrap: stable;
     overflow: hidden;
     /* outline: 1px solid black */

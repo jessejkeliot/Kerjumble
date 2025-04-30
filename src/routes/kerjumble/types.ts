@@ -61,8 +61,8 @@ const partyTheme: theme = {
   text_color: "#FFF",
   primary_color: "#220B37",
   secondary_color: '#505CAA',
-  type_color: "#505CAA",
-  background_color: "#AA505C"
+  type_color: "#999",
+  background_color: "#335089"
 }
 
 export const themes : theme[] = [lightTheme, partyTheme];
