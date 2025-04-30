@@ -180,7 +180,7 @@
     font-style: italic;
     height: fit-content;
     margin: var(--boxpaddingxsmall) 0;
-    color: var(--type-grey);
+    color: var(--type-color);
   }
   div.descriptionContainer {
     font-size: var(--medium-text);

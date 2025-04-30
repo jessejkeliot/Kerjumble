@@ -182,6 +182,7 @@
     root.style.setProperty('--text-color', t.text_color);
     root.style.setProperty('--primary-color', t.primary_color);
     root.style.setProperty('--secondary-color', t.secondary_color);
+    root.style.setProperty('--type-color', t.type_color);
   }
   $: if (won) {
     win();

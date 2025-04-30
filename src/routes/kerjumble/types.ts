@@ -31,6 +31,7 @@ export interface theme {
   text_color: string; 
   primary_color:  string;
   secondary_color: string;
+  type_color: string;
   background_color: string;
 }
 
@@ -46,19 +47,21 @@ export function saveState(
   localStorage.setItem(name, JSON.stringify(object));
   console.log("saved ", object, "to localStorage: ", name);
 }
-export const lightTheme: theme = {
+const lightTheme: theme = {
   name: "light",
   text_color: "#001",
   primary_color: "#001",
   secondary_color: "#EEE",
+  type_color: "#666",
   background_color: "#FFF"
 }
 
-export const partyTheme: theme = {
+const partyTheme: theme = {
   name: "party",
   text_color: "#FFF",
   primary_color: "#220B37",
   secondary_color: '#505CAA',
+  type_color: "#505CAA",
   background_color: "#AA505C"
 }
 
