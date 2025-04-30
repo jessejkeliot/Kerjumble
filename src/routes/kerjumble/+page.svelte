@@ -39,6 +39,8 @@
   let health = maxHealth; //later use the savedStates object;
   let finalHealth = maxHealth;
   let won = false;
+  //sharing
+  let shareText = "Nully";
   //settingState
   let configurations: settingState = defaultSettingState;
 
@@ -123,11 +125,12 @@
   }
   function handleShare() {
     console.log("Share Clicked");
+    //shareText is made pre-emptively when the game is finished to avoid lag.
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
     try {
-      navigator.share({ text: "Kerjumble", title: "Kerjumble Results" });
+      navigator.share({ text: shareText, title: "Kerjumble Results" });
     } catch (error) {
-      navigator.clipboard.writeText("resultRepresentation");
+      navigator.clipboard.writeText(shareText);
     }
   }
   function saveGameState(
@@ -151,12 +154,18 @@
   function getGameState() {
     return getItemFromLocalStorage("gameState");
   }
-
-  function createShareText() {}
+  function createShareText(gs: gameState): string {
+    //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
+    // Kerjumble 5 3*
+    // Kerjumble 5, ✅, 3*
+    let temp = "Kerjumble No." + gs.number +": " + health +"⭐️\n";
+    return temp;
+  }
   function finished() {
     inputDisabled = true;
     document.getElementById("answerBox")?.blur();
-    createShareText();
+    console.log("finished");
+    shareText = createShareText(getGameState());
     finalHealth = health;
     health = 0;
   }
@@ -328,6 +337,7 @@
     /* top: 30%; */
     width: auto;
     max-height: 30rem;
+    max-width: 30rem;
     min-width: none;
     margin: 0 0;
     aspect-ratio: 1;
@@ -345,7 +355,10 @@
   @media screen and (min-width: 480px) {
     div.MenuContainer {
       /* outline: 4px solid blue; */
-      justify-content: center;
+      /* justify-content: center; */
+      top: 100%;
+      vertical-align: middle;
+      margin: auto 0;
       /* flex-direction: row; */
       /* padding: 5rem 0 ; */
     }
