@@ -114,15 +114,16 @@
   .setting span {
     flex: 1;
     font-size: var(--small-text);
-    color: #333;
+    color: var(--text-color);
   }
 
   button {
     padding: var(--boxpaddingxsmall) var(--boxpaddingsmall);
-    background-color: var(--primary-color);
+    background-color: var(--secondary-color);
     border: none;
     color: var(--text-color);
     border-radius: var(--classic-border-radius);
+    border: 1px solid var(--text-color);
     width: 30%;
     font-weight: bold;
     font-size: var(--xsmall-text);
@@ -134,7 +135,7 @@
     border-radius: var(--classic-border-radius);
     border: 1px solid var(--text-color);
     color:var(--text-color);
-    background-color: var(--primary-color);
+    background-color: var(--secondary-color);
     width: 30%;
 
     font-weight: bold;

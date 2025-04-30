@@ -50,6 +50,7 @@ export const lightTheme: theme = {
   name: "light",
   text_color: "#001",
   primary_color: "#001",
+  secondary_color: "#EEE",
   background_color: "#FFF"
 }
 
@@ -57,6 +58,7 @@ export const partyTheme: theme = {
   name: "party",
   text_color: "#FFF",
   primary_color: "#220B37",
+  secondary_color: '#505CAA',
   background_color: "#AA505C"
 }
 
