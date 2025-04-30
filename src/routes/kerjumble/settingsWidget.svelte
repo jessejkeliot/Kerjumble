@@ -133,6 +133,7 @@
     padding: var(--boxpaddingxsmall);
     border-radius: var(--classic-border-radius);
     border: 1px solid var(--text-color);
+    color:var(--text-color);
     background-color: var(--primary-color);
     width: 30%;
 
