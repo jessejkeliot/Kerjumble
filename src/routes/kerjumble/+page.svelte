@@ -1,6 +1,12 @@
 <script lang="ts">
   import "./style.css";
-  import type { Definition, gameState, Question, settingState, theme } from "./types";
+  import type {
+    Definition,
+    gameState,
+    Question,
+    settingState,
+    theme,
+  } from "./types";
   import Header from "./header.svelte";
   import { onDestroy, onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
@@ -8,12 +14,14 @@
     defaultSettingState,
     getDaysDifferenceUTC,
     playSound,
+    setTheme,
+    saveState,
+    getItemFromLocalStorage,
   } from "./types"; //functions
   import { browser } from "$app/environment";
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
-  import { saveState } from "./types";
 
   //   const savedStates = localStorage.getItem("");
   const startDate: string = "2025-04-13";
@@ -143,19 +151,7 @@
   function getGameState() {
     return getItemFromLocalStorage("gameState");
   }
-  function getItemFromLocalStorage(name: string) {
-    if (!browser) {
-      return null;
-    }
-    const returnString = localStorage.getItem(name);
-    if (returnString) {
-      console.log("Got ", name, "from local Storage");
-      var returnvalue = JSON.parse(returnString);
-    } else {
-      console.log("Failed to get ", name, "from local Storage");
-    }
-    return returnvalue;
-  }
+
   function createShareText() {}
   function finished() {
     inputDisabled = true;
@@ -175,15 +171,7 @@
     type: question.type,
     definition: question.definitions[health - 1],
   };
-  function setTheme(t: theme){ //NOW make this correspond to the things.
-    console.log("Setting theme to ",  t.name, t);
-    const root = document.documentElement;
-    root.style.setProperty('--background-color', t.background_color);
-    root.style.setProperty('--text-color', t.text_color);
-    root.style.setProperty('--primary-color', t.primary_color);
-    root.style.setProperty('--secondary-color', t.secondary_color);
-    root.style.setProperty('--type-color', t.type_color);
-  }
+
   $: if (won) {
     win();
   }
@@ -225,8 +213,7 @@
       display={{
         word: "Settings",
         type: "noun",
-        definition:
-          "A place to customise and configure an experience.",
+        definition: "A place to customise and configure an experience.",
       }}
       capitalise
     />
@@ -243,18 +230,29 @@
       }}
       capitalise
     />
-    
-      <!-- <li>There are no plurals.</li>
+
+    <!-- <li>There are no plurals.</li>
       <li>Words are generally short and simple.</li>
       <li>The bars above represent how many guesses you have left.</li>
       <li>A green bar at the top indicates you have won.</li> -->
-      <div class="helpCloseHintContainer">
-      <button class="Holder Icon" on:click={() =>{helpOpen = !helpOpen}}>
+    <div class="helpCloseHintContainer">
+      <button
+        class="Holder Icon"
+        on:click={() => {
+          helpOpen = !helpOpen;
+        }}
+      >
         <!-- ? -->
-      <img src="src/lib/images/Kerjumble/icons/{helpOpen ? "x_icon_kerjumble.svg" : "question_icon_kerjumble.svg"}" alt="question mark">
-    </button></div>
-      <!-- <li>Press the &#9932 in the corner to begin</li> -->
-   
+        <img
+          src="src/lib/images/Kerjumble/icons/{helpOpen
+            ? 'x_icon_kerjumble.svg'
+            : 'question_icon_kerjumble.svg'}"
+          alt="question mark"
+        />
+      </button>
+    </div>
+    <!-- <li>Press the &#9932 in the corner to begin</li> -->
+
     <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
     </div> -->
@@ -277,7 +275,11 @@
     <InformationContainer
       bind:inputDisabled
       bind:inputValue
-      display={{word: display.word, type: display.type, definition: question.definitions[0]}}
+      display={{
+        word: display.word,
+        type: display.type,
+        definition: question.definitions[0],
+      }}
       showButtons={won}
       on:shareButtonClicked={handleShare}
       on:wordEntered={handleReceiveEnter}
@@ -326,7 +328,7 @@
     /* top: 30%; */
     width: auto;
     max-height: 30rem;
-    min-width: none; 
+    min-width: none;
     margin: 0 0;
     aspect-ratio: 1;
     /* height: fit-content; */
@@ -356,20 +358,20 @@
     /* margin: 3px; */
     /* padding: 3px; */
   }
-  button{
+  button {
     border: none;
     border-radius: var(--classic-border-radius);
     background: var(--secondary-color);
     background: none;
   }
-  .Holder{
+  .Holder {
     /* justify-content: center;
     align-items: center; */
     margin: 0 0;
-    outline: 2px solid purple ;
+    outline: 2px solid purple;
     padding: none;
   }
-  .Holder.Icon{
+  .Holder.Icon {
     aspect-ratio: 1;
     display: flex;
     justify-content: center;

@@ -35,7 +35,19 @@ export interface theme {
   background_color: string;
 }
 
-
+export function getItemFromLocalStorage(name: string) {
+  if (!browser) {
+    return null;
+  }
+  const returnString = localStorage.getItem(name);
+  if (returnString) {
+    console.log("Got ", name, "from local Storage");
+    var returnvalue = JSON.parse(returnString);
+  } else {
+    console.log("Failed to get ", name, "from local Storage");
+  }
+  return returnvalue;
+}
 
 export function saveState(
   name: string, object: any
@@ -66,6 +78,16 @@ const partyTheme: theme = {
 }
 
 export const themes : theme[] = [lightTheme, partyTheme];
+
+export function setTheme(t: theme){ //NOW make this correspond to the things.
+  console.log("Setting theme to ",  t.name, t);
+  const root = document.documentElement;
+  root.style.setProperty('--background-color', t.background_color);
+  root.style.setProperty('--text-color', t.text_color);
+  root.style.setProperty('--primary-color', t.primary_color);
+  root.style.setProperty('--secondary-color', t.secondary_color);
+  root.style.setProperty('--type-color', t.type_color);
+}
 
 export const defaultSettingState: settingState = {
     sound: false, music: false, theme:lightTheme, wordset:"easy"
