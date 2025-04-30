@@ -38,7 +38,7 @@
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
-  const useCache: boolean = true;
+  const useCache: boolean = false;
   if (browser && useCache) {
     const loadedSettings = getSettingState();
     if (loadedSettings) {
@@ -48,6 +48,7 @@
       saveState("settingState", configurations);
     }
   }
+  $: setTheme(configurations.theme);
   // let ss_: settingState | null = getSettingState();
   let gs_: gameState | null = getGameState();
   if (gs_ && useCache) {
@@ -95,6 +96,21 @@
   }
   function handleReceiveEnter() {
     guessedWord = inputValue;
+    if (guessedWord == question.word) {
+      won = true;
+      playSound("click4_kerjumble.mp3", configurations.sound);
+      // click3.play();
+    } else if (guessedWord !== "") {
+      // click4.play();
+      health--;
+      inputValue = "";
+      health == 0
+        ? playSound("click6_kerjumble.mp3", configurations.sound)
+        : playSound("click9_kerjumble.mp3", configurations.sound);
+      // if (health == 0) {
+      //   lost();
+      // }
+    }
     console.log(guessedWord);
   }
   function handleShare() {
@@ -160,6 +176,7 @@
     definition: question.definitions[health - 1],
   };
   function setTheme(t: theme){ //NOW make this correspond to the things.
+    console.log("Setting theme to ",  t.name, t);
     const root = document.documentElement;
     root.style.setProperty('--background-color', t.background_color);
     root.style.setProperty('--text-color', t.text_color);
@@ -171,23 +188,6 @@
 
   $: saveGameState(health, day, inputValue, won);
   // $: setTheme(configurations.theme);
-  $: {
-    if (guessedWord == question.word) {
-      won = true;
-      playSound("click4_kerjumble.mp3", configurations.sound);
-      // click3.play();
-    } else if (guessedWord !== "") {
-      // click4.play();
-      health--;
-      inputValue = "";
-      health == 0
-        ? playSound("click6_kerjumble.mp3", configurations.sound)
-        : playSound("click9_kerjumble.mp3", configurations.sound);
-      // if (health == 0) {
-      //   lost();
-      // }
-    }
-  }
   //menus
   // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
   // $: if (helpOpen) {

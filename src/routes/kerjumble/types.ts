@@ -22,15 +22,18 @@ export interface gameState {
 export interface settingState {
   sound: boolean; 
   music: boolean
-  theme: string;
+  theme: theme;
   wordset: string;
 }
 
 export interface theme {
+  name: string;
   text_color: string; 
   primary_color:  string;
   background_color: string;
 }
+
+
 
 export function saveState(
   name: string, object: any
@@ -43,24 +46,29 @@ export function saveState(
   console.log("saved ", object, "to localStorage: ", name);
 }
 export const lightTheme: theme = {
+  name: "light",
   text_color: "#001",
   primary_color: "#001",
   background_color: "#FFF"
 }
 
 export const partyTheme: theme = {
+  name: "party",
   text_color: "#04020D",
   primary_color: "#220B37",
   background_color: "#AA505C"
 }
 
+export const themes : theme[] = [lightTheme, partyTheme];
+
 export const defaultSettingState: settingState = {
-    sound: false, music: false, theme:"light", wordset:"easy"
+    sound: false, music: false, theme:lightTheme, wordset:"easy"
 }
 
 export function playSound(filename: string, bypass: boolean) {
   if (!browser) return;
   if (!bypass) return;
+
   const clickSound = new Audio("/sounds/" + filename);
   clickSound.volume = 0.4;
   clickSound.play();

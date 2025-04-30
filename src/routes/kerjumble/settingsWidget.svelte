@@ -2,20 +2,18 @@
   import { browser } from "$app/environment";
   // Define the settingState interface
   import { saveState, type settingState } from "./types";
-
+  import { defaultSettingState } from "./types";
+  import {themes} from "./types";
   // Default settings state
-  export const defaultSettingState: settingState = {
-    sound: false,
-    music: false,
-    theme: "light",
-    wordset: "easy",
-  };
 
   // Prop for the settings state
   export let configurations: settingState = defaultSettingState;
 
+
   // List of available themes
-  const themes = ["light", "dark", "forest", "ocean"];
+  // const themes = ["light", "dark", "party", "ocean"];
+
+  const difficulties = ["easy", "medium", "hard"];
 
   // Update handlers for each setting
   function toggleMusic() {
