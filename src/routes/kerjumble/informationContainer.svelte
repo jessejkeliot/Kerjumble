@@ -126,7 +126,7 @@
     /* animation: blink 1s ease infinite; */
   }
   .guessBox::placeholder {
-    color: var(--mid-grey);
+    color: var(--secondary-color);
     animation: blinkText 2.5s infinite reverse;
     animation-delay: 2.5s;
   }
@@ -157,7 +157,7 @@
   @keyframes blinkText {
     0%,
     100% {
-      color: var(--mid-grey);
+      color: var(--secondary-color);
     }
 
     50% {

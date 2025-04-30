@@ -28,7 +28,12 @@
 
   function changeTheme(event: Event) {
     const target = event.target as HTMLSelectElement;
-    configurations.theme = target.value;
+    themes.forEach(element => {
+      if(element.name == target.value){
+        configurations.theme = element;
+      }
+    });
+    configurations = {... configurations};
     saveState("settingState", configurations);
   }
 
@@ -61,8 +66,8 @@
     <div class="setting">
       <span>Theme:</span>
       <select bind:value={configurations.theme} on:change={changeTheme}>
-        {#each themes as theme}
-          <option value={theme}>{theme}</option>
+        {#each themes as theme (theme.name)}
+          <option value={theme}>{theme.name}</option>
         {/each}
       </select>
     </div>
@@ -114,9 +119,9 @@
 
   button {
     padding: var(--boxpaddingxsmall) var(--boxpaddingsmall);
-    background-color: #007bff;
+    background-color: var(--primary-color);
     border: none;
-    color: white;
+    color: var(--text-color);
     border-radius: var(--classic-border-radius);
     width: 30%;
     font-weight: bold;
@@ -124,18 +129,11 @@
     cursor: pointer;
   }
 
-  button:hover {
-    background-color: #0056b3;
-  }
-  button:focus {
-    background-color: #007bff;
-  }
-
   select {
     padding: var(--boxpaddingxsmall);
     border-radius: var(--classic-border-radius);
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+    border: 1px solid var(--text-color);
+    background-color: var(--primary-color);
     width: 30%;
 
     font-weight: bold;

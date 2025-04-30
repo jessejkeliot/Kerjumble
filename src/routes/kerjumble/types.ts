@@ -54,7 +54,7 @@ export const lightTheme: theme = {
 
 export const partyTheme: theme = {
   name: "party",
-  text_color: "#04020D",
+  text_color: "#FFF",
   primary_color: "#220B37",
   background_color: "#AA505C"
 }

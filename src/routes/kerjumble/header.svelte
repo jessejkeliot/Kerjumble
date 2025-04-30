@@ -101,7 +101,7 @@
   button{
     border: none;
     border-radius: var(--classic-border-radius);
-    background: var(--mid-grey);
+    background: var(--secondary-color);
     background: none;
   }
   .Holder{
@@ -125,7 +125,7 @@
     font-size: var(--medium-text);
     max-width: 2.5rem;
     padding:0;
-    background-color: var(--mid-grey);
+    background-color: var(--secondary-color);
   }
   .jumble {
     cursor: crosshair;

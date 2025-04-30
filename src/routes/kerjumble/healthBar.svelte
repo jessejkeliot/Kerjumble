@@ -66,7 +66,7 @@
     flex: 1;
     padding: inherit;
     background-color: var(--primary-color);
-    background-color: var(--mid-grey);
+    background-color: var(--secondary-color);
     outline: 2px solid var(--background-color) !important;
     /* border: 0px solid white; */
     border-width: 0 2px;
