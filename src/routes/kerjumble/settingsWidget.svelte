@@ -73,7 +73,7 @@
     </div>
 
     <!-- Wordset Dropdown -->
-    <div class="setting">
+    <div class="setting" id="wordsetSetting">
       <span>Wordset:</span>
       <select bind:value={configurations.wordset} on:change={changeWordset}>
         <option value="easy">Easy</option>
@@ -109,6 +109,9 @@
     align-items: center;
     margin-bottom: 12px;
     width: 100%;
+  }
+  #wordsetSetting {
+    margin-bottom: 0;
   }
 
   .setting span {
