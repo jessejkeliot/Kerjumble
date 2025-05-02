@@ -42,6 +42,8 @@
   let won = false;
   //sharing
   let shareText = "Nully";
+  //reveal
+  let showReveal = true;
   //settingState
   let configurations: settingState = defaultSettingState;
 
@@ -159,7 +161,7 @@
     //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
     // Kerjumble 5 3*
     // Kerjumble 5, ✅, 3*
-    let temp = "Kerjumble No." + gs.number +": " + health +"⭐️\n";
+    let temp = "Kerjumble No." + gs.number + ": " + health + "⭐️\n";
     return temp;
   }
   function finished() {
@@ -216,95 +218,108 @@
 <HealthBar bind:won bind:health></HealthBar>
 <div class="MenuContainer">
   <div class="wordContainer">
-  {#if settingsOpen}
-    <!-- <SettingsWidget bind:configurations></SettingsWidget> -->
-    <InformationContainer
-      inputDisabled={true}
-      inputValue="Settings"
-      display={{
-        word: "Settings",
-        type: "noun",
-        definition: "A place to customise and configure an experience.",
-      }}
-      capitalise
-    />
-    <SettingsWidget bind:configurations></SettingsWidget>
-  {:else if helpOpen}
-    <InformationContainer
-      inputDisabled={true}
-      inputValue="Kerjumble"
-      display={{
-        word: "Kerjumble",
-        type: "noun",
-        definition:
-          "A game where you have to guess the day's word from a shuffled definition.",
-      }}
-      capitalise
-    />
+    {#if settingsOpen}
+      <!-- <SettingsWidget bind:configurations></SettingsWidget> -->
+      <InformationContainer
+        inputDisabled={true}
+        inputValue="Settings"
+        display={{
+          word: "Settings",
+          type: "noun",
+          definition: "A place to customise and configure an experience.",
+        }}
+        capitalise
+      />
+      <SettingsWidget bind:configurations></SettingsWidget>
+    {:else if helpOpen}
+      <InformationContainer
+        inputDisabled={true}
+        inputValue="Kerjumble"
+        display={{
+          word: "Kerjumble",
+          type: "noun",
+          definition:
+            "A game where you have to guess the day's word from a shuffled definition.",
+        }}
+        capitalise
+      />
 
-    <!-- <li>There are no plurals.</li>
+      <!-- <li>There are no plurals.</li>
       <li>Words are generally short and simple.</li>
       <li>The bars above represent how many guesses you have left.</li>
       <li>A green bar at the top indicates you have won.</li> -->
-    <div class="helpCloseHintContainer">
-      <button
-        class="Holder Icon"
-        on:click={() => {
-          helpOpen = !helpOpen;
-        }}
-      >
-        <!-- ? -->
-        <img
-          src="src/lib/images/Kerjumble/icons/{helpOpen
-            ? 'x_icon_kerjumble.svg'
-            : 'question_icon_kerjumble.svg'}"
-          alt="question mark"
-        />
-      </button>
-    </div>
-    <!-- <li>Press the &#9932 in the corner to begin</li> -->
+      <div class="helpCloseHintContainer">
+        <button
+          class="Holder Icon"
+          on:click={() => {
+            helpOpen = !helpOpen;
+          }}
+        >
+          <!-- ? -->
+          <img
+            src="src/lib/images/Kerjumble/icons/{helpOpen
+              ? 'x_icon_kerjumble.svg'
+              : 'question_icon_kerjumble.svg'}"
+            alt="question mark"
+          />
+        </button>
+      </div>
+      <!-- <li>Press the &#9932 in the corner to begin</li> -->
 
-    <!-- <div class="helpCloseHintContainer">
+      <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
     </div> -->
-    <!-- lost -->
-  {:else if health == 0 && !won}
-    <InformationContainer
+      <!-- lost -->
+    {:else if health == 0 && !won}
+      {#if showReveal}
+        <InformationContainer
+          inputDisabled={true}
+          inputValue="loser"
+          display={{
+            word: "loser",
+            type: "noun",
+            definition: "A person that does not win a game; you.",
+          }}
+        />
+      {:else}
+      <InformationContainer
       inputDisabled={true}
-      inputValue="loser"
+      inputValue={question.word}
       display={{
-        word: "loser",
-        type: "noun",
-        definition: "A person that does not win a game; you.",
-      }}
-    />
-    <EndGameButtons showReveal on:shareButtonClicked={handleShare}></EndGameButtons>
-    <!-- won -->
-  {:else if won}
-    <InformationContainer
-      bind:inputDisabled
-      bind:inputValue
-      display={{
-        word: display.word,
-        type: display.type,
+        word: question.word,
+        type: question.type,
         definition: question.definitions[0],
       }}
-    ></InformationContainer>
-    <EndGameButtons on:shareButtonClicked={handleShare}></EndGameButtons>
-    <!-- still playing -->
-  {:else if !won}
-    <InformationContainer
-      bind:inputDisabled
-      bind:inputValue
-      bind:display
-      on:wordEntered={handleReceiveEnter}
-    ></InformationContainer>
-  {/if}
+    />
+      {/if}
+      <EndGameButtons bind:showReveal on:shareButtonClicked={handleShare}
+      />
+      <!-- won -->
+    {:else if won}
+      <InformationContainer
+        bind:inputDisabled
+        bind:inputValue
+        display={{
+          word: display.word,
+          type: display.type,
+          definition: question.definitions[0],
+        }}
+      ></InformationContainer>
+      <EndGameButtons on:shareButtonClicked={handleShare}></EndGameButtons>
+      <!-- still playing -->
+    {:else if !won}
+      <InformationContainer
+        bind:inputDisabled
+        bind:inputValue
+        bind:display
+        on:wordEntered={handleReceiveEnter}
+      ></InformationContainer>
+    {/if}
   </div>
 </div>
 
 <style>
-    div.wordContainer {
+  div.wordContainer {
     position: relative;
     width: 100%;
     outline: 1px dashed salmon;

@@ -12,7 +12,7 @@
   }
   function handleSendReveal() {
     dispatch("revealButtonClicked");
-    // showReveal = false;
+    showReveal = false;
   }
 </script>
 
