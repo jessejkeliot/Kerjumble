@@ -22,6 +22,7 @@
   import HealthBar from "./healthBar.svelte";
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
+  import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
   const startDate: string = "2025-04-13";
@@ -266,7 +267,7 @@
     <!-- <div class="helpCloseHintContainer">
       press the &#9932 in the corner to begin
     </div> -->
-    <!-- lose -->
+    <!-- lost -->
   {:else if health == 0 && !won}
     <InformationContainer
       inputDisabled={true}
@@ -276,11 +277,9 @@
         type: "noun",
         definition: "A person that does not win a game; you.",
       }}
-      showButtons
-      on:shareButtonClicked={handleShare}
-      showReveal
     />
-    <!-- currently playing OR win -->
+    <EndGameButtons showReveal on:shareButtonClicked={handleShare}></EndGameButtons>
+    <!-- won -->
   {:else if won}
     <InformationContainer
       bind:inputDisabled
@@ -290,17 +289,14 @@
         type: display.type,
         definition: question.definitions[0],
       }}
-      showButtons={won}
-      on:shareButtonClicked={handleShare}
-      on:wordEntered={handleReceiveEnter}
     ></InformationContainer>
+    <EndGameButtons on:shareButtonClicked={handleShare}></EndGameButtons>
+    <!-- still playing -->
   {:else if !won}
     <InformationContainer
       bind:inputDisabled
       bind:inputValue
       bind:display
-      showButtons={won}
-      on:shareButtonClicked={handleShare}
       on:wordEntered={handleReceiveEnter}
     ></InformationContainer>
   {/if}
