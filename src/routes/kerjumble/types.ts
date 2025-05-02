@@ -1,4 +1,5 @@
 import { browser } from "$app/environment";
+import { cubicInOut } from "svelte/easing";
 
 export interface Question {
   word: string;
@@ -124,3 +125,58 @@ export const getDaysDifferenceUTC = (startDate: string) => {
 
   return daysDifference;
 };
+function normalize(min: number, max:number) {
+  var delta = max - min;
+  return function (val: number) {
+      return (val - min) / delta;
+  };
+}
+
+export function shrinkFlex2(node: Element, { duration = 2500 } = {}) {
+  const style = getComputedStyle(node);
+  const initialFlex = parseFloat(style.flexGrow);
+  const endOutlineColour = "black";
+  const startOutlineColour = "white";
+  // if (won) {
+  //   return {};
+  // }
+  return {
+    duration,
+    css: (t: number) => {
+      const eased = cubicInOut(t);
+      let easedOpacity = 1;
+      if (t < 0.5) {
+        easedOpacity = t;
+      }
+      const flex = eased * initialFlex;
+      return `flex-grow: ${eased * initialFlex};
+      opacity: ${easedOpacity};
+      `;
+    },
+  };
+}
+
+export function shrinkFlex(node: Element, { duration = 700 } = {}) {
+  const style = getComputedStyle(node);
+  const initialFlex = parseFloat(style.flexGrow);
+
+  return {
+    duration,
+    css: (t: number) => {
+      const eased = cubicInOut(t); // t goes from 1 → 0 during out transition
+      const flex = eased * initialFlex;
+
+      const progress = 1 - t; // 0 → 1 during out transition
+      let opacity = 1;
+
+      if (progress > 0.75) {
+        opacity = 1 - ((progress - 0.75) / 0.25); // fade from 1 → 0 in last 25%
+      }
+
+      return `
+        flex-grow: ${flex};
+        opacity: ${opacity};
+      `;
+    },
+  };
+}

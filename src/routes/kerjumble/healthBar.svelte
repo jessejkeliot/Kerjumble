@@ -1,30 +1,14 @@
 <script lang="ts">
   import { cubicInOut, cubicOut } from "svelte/easing";
+  import { shrinkFlex } from "./types";
 
   export let health = 0;
   export let won = false;
-  function shrinkFlex(node: Element, { duration = 700 } = {}) {
-    const style = getComputedStyle(node);
-    const initialFlex = parseFloat(style.flexGrow);
-    const endOutlineColour = "black";
-    const startOutlineColour = "white";
-    if (won) {
-      return {};
-    }
-    return {
-      duration,
-      css: (t: number) => {
-        const eased = cubicInOut(t);
-        const flex = eased * initialFlex;
-        return `flex-grow: ${eased * initialFlex};
-        `;
-      },
-    };
-  }
+  
 </script>
 
 <div
-  class="health-bar won{won}"
+  class="health-bar won{won} {"health" + health}"
 >
   {#each Array.from({ length: health }) as _, index}
     <div
@@ -49,13 +33,13 @@
     /* gap: 10px; */
     height: calc(var(--boxpaddingmedium) / 2);
     width: 100%;
-    background-color: var(--lose-red);
+    background-color: transparent;
     /* transition: background-color 0.5s; */
   }
   div.health-bar.wontrue {
     background-color: var(--win-green);
   }
-  div.health-bar.wonfalse {
+  div.health-bar.wonfalse.health0 {
     background-color: var(--lose-red);
   }
 
@@ -71,6 +55,7 @@
     /* border: 0px solid white; */
     border-width: 0 2px;
     transition: outline-color 0.5s;
+    fill-opacity: 1;
     /* transition:
       flex 0.5s ease,
       background-color 1s ease; */
