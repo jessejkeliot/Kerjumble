@@ -37,7 +37,6 @@
   //   focusAnswerBox();
 </script>
 
-<div class="wordContainer">
   <input
     class="guessBox"
     id="answerBox"
@@ -75,7 +74,7 @@
       {/if}
     </div>
   {/if}
-</div>
+
 
 <style>
   .buttonContainer {
@@ -166,18 +165,6 @@
     50% {
       color: var(--background-color);
     }
-  }
-  div.wordContainer {
-    position: relative;
-    width: 100%;
-    outline: 1px dashed salmon;
-    color: var(--text-color);
-    min-width: 10rem;
-    max-width: 45rem;
-    margin: 0;
-    padding: none;
-    /* display: block; */
-    text-align: left;
   }
   div.typeContainer {
     font-size: var(--medium-text);

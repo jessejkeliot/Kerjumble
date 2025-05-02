@@ -214,6 +214,7 @@
 <Header number={day} bind:helpOpen bind:settingsOpen></Header>
 <HealthBar bind:won bind:health></HealthBar>
 <div class="MenuContainer">
+  <div class="wordContainer">
   {#if settingsOpen}
     <!-- <SettingsWidget bind:configurations></SettingsWidget> -->
     <InformationContainer
@@ -303,11 +304,24 @@
       on:wordEntered={handleReceiveEnter}
     ></InformationContainer>
   {/if}
+  </div>
 </div>
 
 <style>
+    div.wordContainer {
+    position: relative;
+    width: 100%;
+    outline: 1px dashed salmon;
+    color: var(--text-color);
+    min-width: 10rem;
+    max-width: 45rem;
+    margin: 0;
+    padding: none;
+    /* display: block; */
+    text-align: left;
+  }
   div.helpCloseHintContainer {
-    margin: var(--boxpaddingsmall) 0 0 0;
+    margin: var(--boxpaddingmedium) 0 0 0;
     /* height: 100px; */
     padding: none;
     display: flex;
