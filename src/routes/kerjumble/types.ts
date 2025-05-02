@@ -13,6 +13,21 @@ export interface Definition {
   definition: string;
 }
 
+export interface localStats {
+  games: gameState[];
+  meanAverageFinalHealth: number;
+  streak: number;
+}
+
+interface globalStats {
+  dayStats: dayStat[];
+
+}
+interface dayStat {
+  numberOfPlayers: number;
+  finalHealthList: number[];
+}
+
 export interface gameState {
     number: number;
     currentInput: string;
@@ -46,6 +61,7 @@ export function getItemFromLocalStorage(name: string) {
     var returnvalue = JSON.parse(returnString);
   } else {
     console.log("Failed to get ", name, "from local Storage");
+    return undefined;
   }
   return returnvalue;
 }

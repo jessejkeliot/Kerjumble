@@ -3,6 +3,7 @@
   import type {
     Definition,
     gameState,
+    localStats,
     Question,
     settingState,
     theme,
@@ -25,7 +26,7 @@
   import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-04-13";
+  const startDate: string = "2025-03-15";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
@@ -51,7 +52,7 @@
   let helpOpen = false;
   let settingsOpen = false;
   //sounds
-  const useCache: boolean = false;
+  const useCache: boolean = true;
   if (browser && useCache) {
     const loadedSettings = getSettingState();
     if (loadedSettings) {
@@ -63,7 +64,7 @@
   }
   $: setTheme(configurations.theme);
   // let ss_: settingState | null = getSettingState();
-  let gs_: gameState | null = getGameState();
+  let gs_: gameState | undefined = getGameState();
   if (gs_ && useCache) {
     if (number == gs_.number) {
       health = gs_.health;
@@ -110,7 +111,7 @@
   function handleReceiveEnter() {
     guessedWord = inputValue;
     if (guessedWord == question.word) {
-      won = true;
+      win();
       playSound("click4_kerjumble.mp3", configurations.sound);
       // click3.play();
     } else if (guessedWord !== "") {
@@ -120,9 +121,10 @@
       health == 0
         ? playSound("click6_kerjumble.mp3", configurations.sound)
         : playSound("click9_kerjumble.mp3", configurations.sound);
-      // if (health == 0) {
-      //   lost();
-      // }
+      if (health == 0) {
+        saveGameState(health, day, inputValue, won);
+        finished();
+      }
     }
     console.log(guessedWord);
   }
@@ -153,9 +155,61 @@
       won: won,
     };
     localStorage.setItem("gameState", JSON.stringify(gs));
+    gs_ = gs;
   }
   function getGameState() {
     return getItemFromLocalStorage("gameState");
+  }
+
+  function saveGameToStats() {
+    const saves: localStats | undefined = getItemFromLocalStorage("localStats");
+    console.log("save Game to local Stats");
+    if (saves == undefined) {
+      console.log("stats was undefined in local storage");
+      //if first game ever.
+      if (gs_) {
+        console.log("first Game save");
+        const firstSave: localStats = {
+          games: [gs_],
+          meanAverageFinalHealth: health,
+          streak: 0,
+        };
+        localStorage.setItem("localStats", JSON.stringify(firstSave));
+      }
+    } else {
+      //add to the gamestate list and update the mean final health
+      //go through games to see if already saved one today.
+      const alreadySaved = saves.games.some((g) => g.number === number);
+      if (alreadySaved) return;
+      if (gs_) {
+        const newGsList: gameState[] = [...saves.games, gs_];
+        const newAverage =
+          newGsList.reduce((total, num) => {
+            return total + num.health;
+          }, 0) / newGsList.length;
+        //streaks
+        let newStreak = 0;
+        if (gs_.won) {
+          let foundFail = false;
+          newStreak = 1;
+          while (!foundFail) {
+            const current = saves.games[saves.games.length - newStreak];
+            if (current.won && current.number == gs_.number - newStreak) {
+              newStreak++;
+            } else {
+              foundFail = true;
+            }
+          }
+        }
+        newStreak = newStreak >= 2 ? newStreak : 0;
+        const tempSave: localStats = {
+          games: newGsList,
+          meanAverageFinalHealth: newAverage,
+          streak: newStreak,
+        };
+        localStorage.setItem("localStats", JSON.stringify(tempSave));
+      }
+    }
   }
   function createShareText(gs: gameState): string {
     //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
@@ -169,13 +223,17 @@
     document.getElementById("answerBox")?.blur();
     console.log("finished");
     shareText = createShareText(getGameState());
+    saveGameToStats();
     finalHealth = health;
     health = 0;
   }
   function win() {
+    won = true;
+    saveGameState(health, day, inputValue, won);
     finished();
     console.log("Won ", day, question.word);
   }
+
   let guessedWord = "";
   question = getQuestionObject();
   let display: Definition = {
@@ -183,10 +241,6 @@
     type: question.type,
     definition: question.definitions[health - 1],
   };
-
-  $: if (won) {
-    win();
-  }
 
   $: saveGameState(health, day, inputValue, won);
   // $: setTheme(configurations.theme);
@@ -282,22 +336,21 @@
           }}
         />
       {:else}
-      <InformationContainer
-      inputDisabled={true}
-      inputValue={question.word}
-      display={{
-        word: question.word,
-        type: question.type,
-        definition: question.definitions[0],
-      }}
-    />
+        <InformationContainer
+          inputDisabled={true}
+          inputValue={question.word}
+          display={{
+            word: question.word,
+            type: question.type,
+            definition: question.definitions[0],
+          }}
+        />
       {/if}
-      <EndGameButtons bind:showReveal on:shareButtonClicked={handleShare}
-      />
+      <EndGameButtons bind:showReveal on:shareButtonClicked={handleShare} />
       <!-- won -->
     {:else if won}
       <InformationContainer
-        bind:inputDisabled
+        inputDisabled={true}
         bind:inputValue
         display={{
           word: display.word,
