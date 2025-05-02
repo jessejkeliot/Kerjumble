@@ -8,8 +8,9 @@
 
   // Prop for the settings state
   export let configurations: settingState = defaultSettingState;
+  let selectedThemeName = configurations.theme.name;
 
-
+  $: selectedThemeName = configurations.theme.name;
   // List of available themes
   // const themes = ["light", "dark", "party", "ocean"];
 
@@ -26,7 +27,7 @@
     saveState("settingState", configurations);
   }
 
-  function changeTheme(event: Event) {
+  function changeTheme2(event: Event) {
     const target = event.target as HTMLSelectElement;
     themes.forEach(element => {
       if(element.name == target.value){
@@ -36,6 +37,15 @@
     configurations = {... configurations};
     saveState("settingState", configurations);
   }
+  function changeTheme(event: Event) {
+  const target = event.target as HTMLSelectElement;
+  const selected = themes.find((t) => t.name === target.value);
+  if (selected) {
+    configurations.theme = selected;
+    configurations = { ...configurations }; // force reactivity
+    saveState("settingState", configurations);
+  }
+}
 
   function changeWordset(event: Event) {
     const target = event.target as HTMLSelectElement;
@@ -65,9 +75,9 @@
     <!-- Theme Dropdown -->
     <div class="setting">
       <span>Theme:</span>
-      <select bind:value={configurations.theme} on:change={changeTheme}>
+      <select bind:value={selectedThemeName} on:change={changeTheme}>
         {#each themes as theme (theme.name)}
-          <option value={theme}>{theme.name}</option>
+          <option value={theme.name}>{theme.name}</option>
         {/each}
       </select>
     </div>
@@ -140,7 +150,8 @@
     color:var(--text-color);
     background-color: var(--secondary-color);
     width: 30%;
-
+    text-align: center;
+    margin: 0;
     font-weight: bold;
     font-size: var(--xsmall-text);
   }

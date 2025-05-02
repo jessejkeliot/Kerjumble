@@ -16,7 +16,7 @@
   }
 </script>
 
-<div class="buttonContainer" transition:fade={{delay: 300}}>
+<div class="buttonContainer" in:fade={{delay: 300}}>
   <!-- svelte-ignore a11y_mouse_events_have_key_events -->
   <button id="share" on:click={handleSendShare}
     >{shareButtonText}</button
