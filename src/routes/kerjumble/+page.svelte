@@ -324,9 +324,9 @@
           />
         </button>
       </div>
-    {:else if statsOpen}
-    <StatsWidget {fetchedLocalStats}/>
-      <UserDictionary games={fetchedLocalStats.games} {questions}/>
+    {:else if statsOpen && fetchedLocalStats}
+    <StatsWidget {fetchedLocalStats} on:statsExitClicked={()=> {statsOpen = false}}/>
+    <UserDictionary games={fetchedLocalStats.games} {questions}/>
     {:else if health == 0 && !won}
       {#if showReveal}
         <InformationContainer
