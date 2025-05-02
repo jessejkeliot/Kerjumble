@@ -24,8 +24,6 @@
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
   import EndGameButtons from "./endGameButtons.svelte";
-  import StatsWidget from "./statsWidget.svelte";
-  import UserDictionary from "./userDictionary.svelte";
 
   //   const savedStates = localStorage.getItem("");
   const startDate: string = "2025-03-15";
@@ -112,7 +110,7 @@
     return q;
   }
   function handleReceiveEnter() {
-    fetchedLocalStats = getLocalStats();
+    // fetchedLocalStats = getLocalStats();
     guessedWord = inputValue;
     if (guessedWord == question.word) {
       win();
@@ -228,7 +226,6 @@
     console.log("finished");
     shareText = createShareText(getGameState());
     saveGameToStats();
-    fetchedLocalStats = getLocalStats();
     finalHealth = health;
     health = 0;
   }
@@ -324,9 +321,39 @@
           />
         </button>
       </div>
-    {:else if statsOpen && fetchedLocalStats}
-    <StatsWidget {fetchedLocalStats} on:statsExitClicked={()=> {statsOpen = false}}/>
-    <UserDictionary games={fetchedLocalStats.games} {questions}/>
+    {:else if statsOpen}
+    <div class="statsFlexHolder">
+      <div class="statsHolder">
+        <p>Average: {fetchedLocalStats.meanAverageFinalHealth.toFixed(2)}</p>
+        <div class="divider"></div>
+        <p>Streak: {fetchedLocalStats.streak}</p>
+      </div>
+      <button
+          class="Holder Icon"
+          on:click={() => {
+            statsOpen = !statsOpen;
+          }}
+        >
+          <img
+            src="src/lib/images/Kerjumble/icons/{statsOpen
+              ? 'x_icon_kerjumble.svg'
+              : 'question_icon_kerjumble.svg'}"
+            alt="cross mark"
+          />
+        </button></div>
+      {#each [...fetchedLocalStats.games].reverse() as game (game.number)}
+          <div class="divider"></div>
+          <p class="dictionaryNumbering">{game.number}.</p>
+          <InformationContainer
+          inputDisabled
+          inputValue={questions[game.number].word}
+          display={{word: questions[game.number].word, 
+            type: questions[game.number].type,
+            definition: questions[game.number].definitions[0]
+          }}
+          />
+      {/each}
+      <div class="divider invisible"></div>
     {:else if health == 0 && !won}
       {#if showReveal}
         <InformationContainer
@@ -386,6 +413,38 @@
 </div>
 
 <style>
+  p.dictionaryNumbering {
+    font-size: var(--small-text);
+    margin: var(--boxpaddingxsmall) 0;
+    padding: 0;
+  }
+  .divider.invisible {
+    background-color: transparent;
+  }
+  div.divider {
+    position: relative;
+    width: 100%;
+    margin: var(--boxpaddingxsmall) 0;
+    background-color: var(--primary-color);
+    height: var(--border-width);
+  }
+  div.statsFlexHolder {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  div.statsHolder {
+    width: 50%;
+    text-align: center;
+    font-size: var(--medium-text);
+    background: var(--secondary-color);
+    padding: var(--boxpaddingmedium);
+    border-radius: var(--classic-border-radius);
+  }
+  div.statsHolder p {
+    padding: 0;
+    margin: 0;
+  }
   div.wordContainer {
     position: relative;
     width: 100%;
