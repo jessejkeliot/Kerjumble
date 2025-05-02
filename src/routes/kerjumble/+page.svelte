@@ -47,10 +47,11 @@
   let showReveal = true;
   //settingState
   let configurations: settingState = defaultSettingState;
-
+  let fetchedLocalStats: localStats | undefined = getLocalStats();
   //menus
   let helpOpen = false;
   let settingsOpen = false;
+  let statsOpen = false;
   //sounds
   const useCache: boolean = true;
   if (browser && useCache) {
@@ -109,6 +110,7 @@
     return q;
   }
   function handleReceiveEnter() {
+    // fetchedLocalStats = getLocalStats();
     guessedWord = inputValue;
     if (guessedWord == question.word) {
       win();
@@ -260,6 +262,9 @@
   // }
   $: display.type = question.type;
   $: display.definition = question.definitions[Math.max(0, health - 1)];
+  function getLocalStats(): localStats {
+    return getItemFromLocalStorage("localStats");
+  }
 
   function getSettingState(): settingState {
     // throw new Error("Function not implemented.");
@@ -268,7 +273,11 @@
 </script>
 
 <title>Kerjumble</title>
-<Header number={day} bind:helpOpen bind:settingsOpen></Header>
+{#if statsOpen}
+  <Header number={"stats"} bind:helpOpen bind:settingsOpen></Header>
+{:else}
+  <Header number={day} bind:helpOpen bind:settingsOpen></Header>
+{/if}
 <HealthBar bind:won bind:health></HealthBar>
 <div class="MenuContainer">
   <div class="wordContainer">
@@ -297,11 +306,6 @@
         }}
         capitalise
       />
-
-      <!-- <li>There are no plurals.</li>
-      <li>Words are generally short and simple.</li>
-      <li>The bars above represent how many guesses you have left.</li>
-      <li>A green bar at the top indicates you have won.</li> -->
       <div class="helpCloseHintContainer">
         <button
           class="Holder Icon"
@@ -309,7 +313,6 @@
             helpOpen = !helpOpen;
           }}
         >
-          <!-- ? -->
           <img
             src="src/lib/images/Kerjumble/icons/{helpOpen
               ? 'x_icon_kerjumble.svg'
@@ -318,12 +321,26 @@
           />
         </button>
       </div>
-      <!-- <li>Press the &#9932 in the corner to begin</li> -->
-
-      <!-- <div class="helpCloseHintContainer">
-      press the &#9932 in the corner to begin
-    </div> -->
-      <!-- lost -->
+    {:else if statsOpen}
+    <div class="statsFlexHolder">
+      <div class="statsHolder">
+        <p>Average: {fetchedLocalStats.meanAverageFinalHealth.toFixed(2)}</p>
+        <div class="divider"></div>
+        <p>Streak: {fetchedLocalStats.streak}</p>
+      </div></div>
+      {#each [...fetchedLocalStats.games].reverse() as game (game.number)}
+          <div class="divider"></div>
+          <p class="dictionaryNumbering">{game.number}.</p>
+          <InformationContainer
+          inputDisabled
+          inputValue={questions[game.number].word}
+          display={{word: questions[game.number].word, 
+            type: questions[game.number].type,
+            definition: questions[game.number].definitions[0]
+          }}
+          />
+      {/each}
+      <div class="divider invisible"></div>
     {:else if health == 0 && !won}
       {#if showReveal}
         <InformationContainer
@@ -346,7 +363,13 @@
           }}
         />
       {/if}
-      <EndGameButtons bind:showReveal on:shareButtonClicked={handleShare} />
+      <EndGameButtons
+        bind:showReveal
+        on:shareButtonClicked={handleShare}
+        on:statsClicked={() => {
+          statsOpen = true;
+        }}
+      />
       <!-- won -->
     {:else if won}
       <InformationContainer
@@ -358,7 +381,12 @@
           definition: question.definitions[0],
         }}
       ></InformationContainer>
-      <EndGameButtons on:shareButtonClicked={handleShare}></EndGameButtons>
+      <EndGameButtons
+        on:shareButtonClicked={handleShare}
+        on:statsClicked={() => {
+          statsOpen = true;
+        }}
+      ></EndGameButtons>
       <!-- still playing -->
     {:else if !won}
       <InformationContainer
@@ -372,6 +400,38 @@
 </div>
 
 <style>
+  p.dictionaryNumbering {
+    font-size: var(--small-text);
+    margin: var(--boxpaddingxsmall) 0;
+    padding: 0;
+  }
+  .divider.invisible {
+    background-color: transparent;
+  }
+  div.divider {
+    position: relative;
+    width: 100%;
+    margin: var(--boxpaddingxsmall) 0;
+    background-color: var(--primary-color);
+    height: var(--border-width);
+  }
+  div.statsFlexHolder {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  div.statsHolder {
+    width: 50%;
+    text-align: center;
+    font-size: var(--medium-text);
+    background: var(--secondary-color);
+    padding: var(--boxpaddingmedium);
+    border-radius: var(--classic-border-radius);
+  }
+  div.statsHolder p {
+    padding: 0;
+    margin: 0;
+  }
   div.wordContainer {
     position: relative;
     width: 100%;

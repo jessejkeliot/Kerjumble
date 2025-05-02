@@ -1,6 +1,8 @@
 <script>
+  import { goto } from "$app/navigation";
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
+//   import { Link } from '@sveltejs/kit';
   const dispatch = createEventDispatcher();
     export let showReveal = false;
   let shareButtonText = "Share";
@@ -14,6 +16,10 @@
     dispatch("revealButtonClicked");
     showReveal = false;
   }
+  function handleStats(){
+    dispatch("statsClicked");
+    // goto("/kerjumble/stats");
+  }
 </script>
 
 <div class="buttonContainer" in:fade={{delay: 300}}>
@@ -21,11 +27,11 @@
   <button id="share" on:click={handleSendShare}
     >{shareButtonText}</button
   >
-  <button id="statistics" >Stats</button>
+  <button id="statistics" on:click={handleStats}>Stats</button>
   
 
   {#if showReveal}
-    <button  id="reveal" on:click={handleSendReveal}>Reveal</button>
+    <button id="reveal" on:click={handleSendReveal}>Reveal</button>
   {/if}
 </div>
 

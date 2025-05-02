@@ -1,20 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
   export let text = "Kerjumble";
-  export let number = 102;
+  export let number: number | string = 102;
+
+  import helpIcon from "$lib/images/Kerjumble/icons/question_icon_kerjumble.svg";
+  import xIcon from "$lib/images/Kerjumble/icons/x_icon_kerjumble.svg";
+  import settingsIcon from "$lib/images/Kerjumble/icons/settings_icon_kerjumble.svg"
 
   let display = text;
   let interval: ReturnType<typeof setInterval> | undefined;
   const letters = "abcdefghijklmnopqrstuvwxyz";
   //   const letters = "[}{]';:%^*()+=_#!~.></";]
   export let settingsOpen = false;
-  function toggleSettings(){
+  function toggleSettings() {
     helpOpen = false;
     settingsOpen = !settingsOpen;
-
   }
   export let helpOpen = false;
-  function toggleHelp(){
+  function toggleHelp() {
     settingsOpen = false;
     helpOpen = !helpOpen;
   }
@@ -57,34 +60,34 @@
 
 <div class="header">
   <div class="itemContainer">
-  <button class="Holder Icon" on:click={toggleHelp}>
-    <!-- ? -->
-  <img src="src/lib/images/Kerjumble/icons/{helpOpen ? "x_icon_kerjumble.svg" : "question_icon_kerjumble.svg"}" alt="question mark">
-</button>
-  <div class="Holder">
-  <span
-    class="jumble"
-    data-word="Kerjumble"
-    role="button"
-    tabindex="0"
-    on:mouseenter={jumble}
-    on:click={() => {
-      location.reload();
-    }}
-    on:keydown={(k) => {
-      reloadKeyPress(k);
-    }}
-  >
-    <span class="sup-placeholder" aria-hidden="true">{number}</span>
-    {display}
-    <sup class="sup">{number}</sup>
-    <!-- <span class="day">{number}</span> -->
-  </span>
-</div>
-<button class="Holder Icon" on:click={toggleSettings}>
-  <!-- ⚙ -->
-  <img src="src/lib/images/Kerjumble/icons/{settingsOpen ? "x_icon_kerjumble.svg" : "settings_icon_kerjumble.svg"}" alt="question mark">
-</button>
+    <button class="Holder Icon" on:click={toggleHelp}>
+      <!-- ? -->
+      <img src={helpOpen ? xIcon : helpIcon} alt="Help icon" />
+    </button>
+    <div class="Holder">
+      <span
+        class="jumble"
+        data-word="Kerjumble"
+        role="button"
+        tabindex="0"
+        on:mouseenter={jumble}
+        on:click={() => {
+          location.reload();
+        }}
+        on:keydown={(k) => {
+          reloadKeyPress(k);
+        }}
+      >
+        <span class="sup-placeholder" aria-hidden="true">{number}</span>
+        {display}
+        <sup class="sup">{number}</sup>
+        <!-- <span class="day">{number}</span> -->
+      </span>
+    </div>
+    <button class="Holder Icon" on:click={toggleSettings}>
+      <!-- ⚙ -->
+      <img src={settingsOpen ? xIcon : settingsIcon} alt="Settings icon" />
+    </button>
   </div>
   <div class="divider"></div>
 </div>
@@ -98,20 +101,20 @@
     /* margin: 3px; */
     /* padding: 3px; */
   }
-  button{
+  button {
     border: none;
     border-radius: var(--classic-border-radius);
     background: var(--secondary-color);
     background: none;
   }
-  .Holder{
+  .Holder {
     /* justify-content: center;
     align-items: center; */
     margin: 0 0;
-    outline: 2px solid purple ;
+    outline: 2px solid purple;
     padding: none;
   }
-  .Holder.Icon{
+  .Holder.Icon {
     aspect-ratio: 1;
     margin: auto 0;
     display: flex;
@@ -124,7 +127,7 @@
     font-family: inherit;
     font-size: var(--medium-text);
     max-width: 2.5rem;
-    padding:0;
+    padding: 0;
     background-color: var(--secondary-color);
   }
   .jumble {
@@ -156,7 +159,6 @@
     /* img {
       height: var(--large-text);
     } */
-
   }
   .sup-placeholder {
     visibility: hidden;
@@ -171,7 +173,7 @@
     vertical-align: super;
     font-family: serif;
   }
-  .itemContainer{
+  .itemContainer {
     width: auto;
     height: min-content;
     display: flex;
