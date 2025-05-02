@@ -29,6 +29,8 @@
 body{
 	margin: 0;
 	padding: 0;
+	background-color: white;
+	background-color: var(--background-color);
 	/* touch-action: none;
 	overscroll-behavior: none;
 	-ms-touch-action: none; */

@@ -1,37 +1,80 @@
 <script lang="ts">
   import "./style.css";
-  import type { gameState, Question } from "./types";
+  import type {
+    Definition,
+    gameState,
+    Question,
+    settingState,
+    theme,
+  } from "./types";
   import Header from "./header.svelte";
-  import { onMount } from "svelte";
-  import { cubicInOut } from "svelte/easing";
-  import type { FocusEventHandler } from "svelte/elements";
+  import { onDestroy, onMount, tick } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
-  import { getDaysDifferenceUTC } from "./types";
-  import { fade, fly } from "svelte/transition";
+  import {
+    defaultSettingState,
+    getDaysDifferenceUTC,
+    playSound,
+    setTheme,
+    saveState,
+    getItemFromLocalStorage,
+  } from "./types"; //functions
   import { browser } from "$app/environment";
-  const questions: Question[] = questionsJson as Question[];
+  import HealthBar from "./healthBar.svelte";
+  import InformationContainer from "./informationContainer.svelte";
+  import SettingsWidget from "./settingsWidget.svelte";
+  import EndGameButtons from "./endGameButtons.svelte";
+
   //   const savedStates = localStorage.getItem("");
+  const startDate: string = "2025-04-13";
+  const questions: Question[] = questionsJson as Question[];
   let question: Question;
-  let day = getDaysDifferenceUTC("2025-04-15");
-  console.warn(questionsJson.length);
-  let number = day % (questionsJson.length);
+  let day = getDaysDifferenceUTC(startDate);
+  let checkInterval: number;
+  // console.warn(questionsJson.length);
+  let number = day % questionsJson.length;
+  //input
   let inputDisabled = false;
   let inputValue: string = ""; //same as below
-  const maxHealth = 7;
+  //gameState
+  const maxHealth = 5;
   let health = maxHealth; //later use the savedStates object;
   let finalHealth = maxHealth;
   let won = false;
+  //sharing
+  let shareText = "Nully";
+  //reveal
+  let showReveal = true;
+  //settingState
+  let configurations: settingState = defaultSettingState;
+
+  //menus
+  let helpOpen = false;
+  let settingsOpen = false;
+  //sounds
   const useCache: boolean = false;
-  let gs: gameState | null = getState();
-  if (gs && useCache) {
-    if (number == gs.number) {
-      health = gs.health;
-      inputValue = gs.currentInput;
-      won = gs.won;
+  if (browser && useCache) {
+    const loadedSettings = getSettingState();
+    if (loadedSettings) {
+      configurations = loadedSettings;
+    } else {
+      // no settings saved yet
+      saveState("settingState", configurations);
+    }
+  }
+  $: setTheme(configurations.theme);
+  // let ss_: settingState | null = getSettingState();
+  let gs_: gameState | null = getGameState();
+  if (gs_ && useCache) {
+    if (number == gs_.number) {
+      health = gs_.health;
+      inputValue = gs_.currentInput;
+      won = gs_.won;
     } else {
     }
   } else {
-    saveState(health, number, inputValue, won);
+    console.log("First time playing!");
+    helpOpen = true;
+    saveGameState(health, number, inputValue, won);
   }
   //get the gameState with getState and then compare the number from
   //state and number above to see whether the local storage should be cleared or read from
@@ -40,13 +83,18 @@
     if (window.innerWidth > 480) {
       focusAnswerBox();
     }
+    checkInterval = setInterval(() => {
+      const newDay = getDaysDifferenceUTC(startDate);
+      if (newDay !== day) {
+        // the day changed — reload the game state
+        location.reload(); // OR update question manually
+      }
+    }, 60 * 1000); // check every minute
     // question = getQuestionObject();
   });
-  function removePlaceholder() {
-    // if (window.innerWidth < 480) {
-    //   document.getElementById("answerBox")?.removeAttribute("placeholder");
-    // }
-  }
+  onDestroy(() => {
+    clearInterval(checkInterval);
+  });
   function focusAnswerBox() {
     const input = document.getElementById("answerBox");
     if (input) {
@@ -59,21 +107,36 @@
     q = questions[number];
     return q;
   }
-  function handleEnter() {
+  function handleReceiveEnter() {
     guessedWord = inputValue;
+    if (guessedWord == question.word) {
+      won = true;
+      playSound("click4_kerjumble.mp3", configurations.sound);
+      // click3.play();
+    } else if (guessedWord !== "") {
+      // click4.play();
+      health--;
+      inputValue = "";
+      health == 0
+        ? playSound("click6_kerjumble.mp3", configurations.sound)
+        : playSound("click9_kerjumble.mp3", configurations.sound);
+      // if (health == 0) {
+      //   lost();
+      // }
+    }
     console.log(guessedWord);
   }
-  function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  async function runLoopWithDelay() {
-    for (let i = 0; i < health; i++) {
-      // console.log(`Iteration ${i}`);
-      health--;
-      await delay(50); // wait 500ms before next iteration
+  function handleShare() {
+    console.log("Share Clicked");
+    //shareText is made pre-emptively when the game is finished to avoid lag.
+    // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
+    try {
+      navigator.share({ text: shareText, title: "Kerjumble Results" });
+    } catch (error) {
+      navigator.clipboard.writeText(shareText);
     }
   }
-  function saveState(
+  function saveGameState(
     health: number,
     number: number,
     inputValue: string,
@@ -91,283 +154,222 @@
     };
     localStorage.setItem("gameState", JSON.stringify(gs));
   }
-  function getState() {
-    if (!browser) {
-      return null;
-    }
-    const returnString = localStorage.getItem("gameState");
-    if (returnString) {
-      var returnvalue = JSON.parse(returnString);
-    }
-    return returnvalue;
+  function getGameState() {
+    return getItemFromLocalStorage("gameState");
   }
-  let shareButtonText = "Share";
-  let shareButtonColor = "var(--primary-color)";
-  function handleShare(){
-    console.log("Share Clicked");
-    // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
-    try {
-      navigator.share({text: "Kerjumble", title: "Kerjumble Results"});
-    } catch (error) {
-      navigator.clipboard.writeText("resultRepresentation");
-    }
-    shareButtonText = "Copied!";
-  }
-  function handleShareMouseDown(){
-    shareButtonColor = "var(--type-grey)";
-  }
-  function handleShareMouseUp(){
-    shareButtonColor = "var(--primary-color)";
-  }
-  function createShareText() {
-
+  function createShareText(gs: gameState): string {
+    //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
+    // Kerjumble 5 3*
+    // Kerjumble 5, ✅, 3*
+    let temp = "Kerjumble No." + gs.number + ": " + health + "⭐️\n";
+    return temp;
   }
   function finished() {
     inputDisabled = true;
     document.getElementById("answerBox")?.blur();
-    createShareText();
+    console.log("finished");
+    shareText = createShareText(getGameState());
     finalHealth = health;
     health = 0;
   }
-  function lost() {
-    finished();
-    inputValue = "loser";
-    question.type = "noun";
-    question.definitions[0] =
-      "The person looking at the screen at this moment; you.";
-    question.definitions[0] = "A person that does not win a game; you.";
-    console.log("Lost ", day);
-  }
   function win() {
     finished();
-    console.log("Won ", day);
+    console.log("Won ", day, question.word);
   }
   let guessedWord = "";
   question = getQuestionObject();
+  let display: Definition = {
+    word: inputValue,
+    type: question.type,
+    definition: question.definitions[health - 1],
+  };
+
   $: if (won) {
     win();
   }
-  $: if (health == 0 && !won) {
-    lost();
-  }
-  $: saveState(health, day, inputValue, won);
-  $: {
-    if (guessedWord == question.word) {
-      won = true;
-      // runLoopWithDelay();
-      //   inputValue = "yay!";
-    } else if (guessedWord !== "") {
-      health--;
-      inputValue = "";
-      // if (health == 0) {
-      //   lost();
-      // }
-    }
-  }
-  // transitions.ts
-  export function shrinkFlex(node: Element, { duration = 700 } = {}) {
-    const style = getComputedStyle(node);
-    const initialFlex = parseFloat(style.flexGrow);
 
-    return {
-      duration,
-      css: (t: number) => {
-        const eased = cubicInOut(t);
-        return `flex-grow: ${eased * initialFlex};`;
-      },
-    };
+  $: saveGameState(health, day, inputValue, won);
+  // $: setTheme(configurations.theme);
+  //menus
+  // $: inputValue = helpOpen ? "Kerjumble" : tempGuess;
+  // $: if (helpOpen) {
+  //   tempGuess = inputValue;
+  //   inputValue = "Kerjumble";
+  //   inputDisabled = true;
+  // } else if (inputValue == "Kerjumble") {
+  //   inputValue = tempGuess;
+  //   inputDisabled = false;
+
+  //   tick().then(() => {
+  //     focusAnswerBox();
+  //   });
+  // }
+  $: display.type = question.type;
+  $: display.definition = question.definitions[Math.max(0, health - 1)];
+
+  function getSettingState(): settingState {
+    // throw new Error("Function not implemented.");
+    return getItemFromLocalStorage("settingState");
   }
 </script>
 
 <title>Kerjumble</title>
-<Header number = {day}></Header>
-<div
-  class="health-bar"
-  style="background-color:{won ? 'var(--win-green)' : '#d00'}"
->
-  {#each Array.from({ length: health }) as _, index}
-    <div
-      transition:shrinkFlex
-      class="bar"
-      style="
-        background-color: {health == 1
-        ? 'var(--mid-red)'
-        : 'var(--primary-color)'}"
-    ></div>
-  {/each}
-</div>
-<div class="questionContainer">
+<Header number={day} bind:helpOpen bind:settingsOpen></Header>
+<HealthBar bind:won bind:health></HealthBar>
+<div class="MenuContainer">
   <div class="wordContainer">
-    <input
-      class="guessBox"
-      id="answerBox"
-      bind:value={inputValue}
-      on:keydown={(e) => {
-        if (e.key === "Enter") {
-          handleEnter();
-        }
-      }}
-      on:focus={() => {
-        removePlaceholder();
-      }}
-      disabled={inputDisabled}
-      type="text"
-      maxlength="14"
-      placeholder="guess"
-      autocapitalize="off"
-    />
-    <!-- <div class="underline"></div> -->
-    <div class="typeContainer">{question.type}</div>
-    <div class="descriptionContainer">
-      <p>{question.definitions[Math.max(0, health - 1)]}</p>
-    </div>
-    {#if health == 0}
-      <div class="shareButtonContainer">
-        <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-        <button
-        style="background-color: {shareButtonColor};"
-        on:click={handleShare}
-        on:mousedown={handleShareMouseDown}
-        on:mouseup={handleShareMouseUp}
-        on:mouseout={handleShareMouseUp}
+    {#if settingsOpen}
+      <!-- <SettingsWidget bind:configurations></SettingsWidget> -->
+      <InformationContainer
+        inputDisabled={true}
+        inputValue="Settings"
+        display={{
+          word: "Settings",
+          type: "noun",
+          definition: "A place to customise and configure an experience.",
+        }}
+        capitalise
+      />
+      <SettingsWidget bind:configurations></SettingsWidget>
+    {:else if helpOpen}
+      <InformationContainer
+        inputDisabled={true}
+        inputValue="Kerjumble"
+        display={{
+          word: "Kerjumble",
+          type: "noun",
+          definition:
+            "A game where you have to guess the day's word from a shuffled definition.",
+        }}
+        capitalise
+      />
 
-          transition:fade={{
-            duration: 500,
-            delay:0
-          }}><em>{shareButtonText}</em></button
+      <!-- <li>There are no plurals.</li>
+      <li>Words are generally short and simple.</li>
+      <li>The bars above represent how many guesses you have left.</li>
+      <li>A green bar at the top indicates you have won.</li> -->
+      <div class="helpCloseHintContainer">
+        <button
+          class="Holder Icon"
+          on:click={() => {
+            helpOpen = !helpOpen;
+          }}
         >
+          <!-- ? -->
+          <img
+            src="src/lib/images/Kerjumble/icons/{helpOpen
+              ? 'x_icon_kerjumble.svg'
+              : 'question_icon_kerjumble.svg'}"
+            alt="question mark"
+          />
+        </button>
       </div>
+      <!-- <li>Press the &#9932 in the corner to begin</li> -->
+
+      <!-- <div class="helpCloseHintContainer">
+      press the &#9932 in the corner to begin
+    </div> -->
+      <!-- lost -->
+    {:else if health == 0 && !won}
+      {#if showReveal}
+        <InformationContainer
+          inputDisabled={true}
+          inputValue="loser"
+          display={{
+            word: "loser",
+            type: "noun",
+            definition: "A person that does not win a game; you.",
+          }}
+        />
+      {:else}
+      <InformationContainer
+      inputDisabled={true}
+      inputValue={question.word}
+      display={{
+        word: question.word,
+        type: question.type,
+        definition: question.definitions[0],
+      }}
+    />
+      {/if}
+      <EndGameButtons bind:showReveal on:shareButtonClicked={handleShare}
+      />
+      <!-- won -->
+    {:else if won}
+      <InformationContainer
+        bind:inputDisabled
+        bind:inputValue
+        display={{
+          word: display.word,
+          type: display.type,
+          definition: question.definitions[0],
+        }}
+      ></InformationContainer>
+      <EndGameButtons on:shareButtonClicked={handleShare}></EndGameButtons>
+      <!-- still playing -->
+    {:else if !won}
+      <InformationContainer
+        bind:inputDisabled
+        bind:inputValue
+        bind:display
+        on:wordEntered={handleReceiveEnter}
+      ></InformationContainer>
     {/if}
   </div>
 </div>
 
 <style>
-  .shareButtonContainer {
+  div.wordContainer {
+    position: relative;
     width: 100%;
-    margin: var(--boxpaddingmedium) 0;
-    /* outline: 1px solid blueviolet; */
-    display: flex;
-    justify-content: center;
-    position: absolute;
-  }
-  .shareButtonContainer button {
-    margin: 0;
-    padding: var(--boxpaddingsmall);
-    width: 50%;
-
-    background-color: var(--type-grey);
-    color: var(--background-color);
-    border-radius: 0.4em;
-    border: none;
-    font-family: Helvetica, sans-serif;
-    font-size: var(--small-text);
-    transition: background-color 0.3s 0.1s;
-  }
-  .guessBox {
-    margin: 0;
-    padding: 0;
-    border: none;
-    height: calc(var(--large-text) + 0.2em);
-    overflow: visible;
-    text-transform: lowercase;
-    font-size: var(--large-text);
-    font-family: inherit;
-    font-weight: lighter;
-    caret-color: #000;
-    /* outline: 1px dotted black; */
-    outline: none;
-    width: 100%;
-    transition: font-weight 0.2s ease;
-    /* border-bottom: 0.2rem solid black; */
-    /* animation: blink 1s ease infinite; */
-  }
-  div.health-bar {
-    margin: 0 0 0 0;
-    padding: 0px;
-    display: flex;
-    flex-wrap: wrap;
-    /* gap: 10px; */
-    height: calc(var(--boxpaddingmedium) / 2);
-    width: 100%;
-    background-color: var(--lose-red);
-  }
-
-  .bar {
-    /* margin: inherit;
-    padding: inherit; */
-    /* margin: 0 1px; */
-    flex: 1;
-    padding: inherit;
-    background-color: var(--primary-color);
-    background-color: var(--mid-grey);
-    outline: 2px solid var(--background-color);
-    transition:
-      flex 0.5s ease,
-      background-color 1s ease;
-  }
-  .health-bar:first-child {
-    margin-left: 0;
-  }
-  .health-bar:last-child {
-    margin-right: 0;
-  }
-  .guessBox::placeholder {
-    color: var(--mid-grey);
-    animation: blinkText 2.5s infinite reverse;
-    animation-delay: 2.5s;
-  }
-  .guessBox:disabled {
-    background-color: inherit;
-    /* font-weight: bold; */
+    outline: 1px dashed salmon;
     color: var(--text-color);
-    opacity: 1;
-    -webkit-text-fill-color: var(--text-color);
-  }
-  .descriptionContainer p {
+    min-width: 10rem;
+    max-width: 45rem;
     margin: 0;
-    padding: 0;
+    padding: none;
+    /* display: block; */
+    text-align: left;
   }
-
-  /* @media screen and (max-width: 480px) {
-  .guessBox:focus::placeholder{
-    color:transparent;
-    animation: none;
+  div.helpCloseHintContainer {
+    margin: var(--boxpaddingmedium) 0 0 0;
+    /* height: 100px; */
+    padding: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    outline: 2px solid burlywood;
+    font-size: var(--small-text);
   }
-} */
-  /* .guessBox:focus{
-    outline: none;
-  } */
-  /* .guessBox:focus-visible {
-    outline: 3px solid black;
-  } */
-  @keyframes blinkText {
-    0%,
-    100% {
-      color: var(--mid-grey);
-    }
-
-    50% {
-      color: var(--background-color);
-    }
+  div.hints {
+    position: relative;
+    width: auto;
+    text-align: left;
+    margin: var(--boxpaddingxsmall) 0 0 0;
+    padding: none;
+    color: var(--text-color);
+    outline: 2px solid burlywood;
+    font-size: var(--small-text);
   }
-
-  div.questionContainer {
+  div.MenuContainer {
     /* top: 20% */
     /* width: 20%; */
-    max-height: 25rem;
-    /* min-width: 10rem; */
+
     /* margin-top: var(--boxmarginmedium); */
     /* max-width: 50rem; */
     padding: calc(var(--boxpaddingmedium) / 2) var(--boxpaddingmedium);
     position: relative;
     /* top: 30%; */
     width: auto;
+    max-height: 30rem;
+    max-width: 30rem;
+    min-width: none;
     margin: 0 0;
     aspect-ratio: 1;
     /* height: fit-content; */
     background-color: var(--background-color);
     /* border: 3px solid var(--primary-color); */
-    /* outline: 3px dotted deeppink; */
+    outline: 3px dotted rgb(148, 64, 109);
     text-align: center;
     font-size: 3rem;
     display: flex;
@@ -376,32 +378,50 @@
     align-items: center;
   }
   @media screen and (min-width: 480px) {
-    div.questionContainer {
-      flex-direction: row;
-      padding: 0 var(--boxpaddingmedium);
+    div.MenuContainer {
+      /* outline: 4px solid blue; */
+      /* justify-content: center; */
+      top: 100%;
+      vertical-align: middle;
+      margin: auto 0;
+      /* flex-direction: row; */
+      /* padding: 5rem 0 ; */
     }
   }
-
-  div.wordContainer {
-    position: relative;
-    width: auto;
-    /* outline: 1px dashed salmon; */
-    min-width: 10rem;
-    max-width: 45rem;
-    margin: 0;
-    /* display: block; */
-    text-align: left;
+  img {
+    display: block;
+    height: var(--medium-text);
+    height: 80%;
+    outline: 3px dashed teal;
+    /* margin: 3px; */
+    /* padding: 3px; */
   }
-  div.typeContainer {
-    font-size: var(--medium-text);
-    font-style: italic;
-    margin: var(--boxpaddingxsmall) 0;
-    color: var(--type-grey);
+  button {
+    border: none;
+    border-radius: var(--classic-border-radius);
+    background: var(--secondary-color);
+    background: none;
   }
-  div.descriptionContainer {
+  .Holder {
+    /* justify-content: center;
+    align-items: center; */
+    margin: 0 0;
+    outline: 2px solid purple;
+    padding: none;
+  }
+  .Holder.Icon {
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--medium-text);
+    width: 100%;
+    min-width: var(--medium-text);
+    min-height: var(--medium-text);
+    font-family: inherit;
     font-size: var(--medium-text);
-    margin: var(--boxpaddingxsmall)0 0 0;
-    text-wrap: stable;
-    /* outline: 1px solid black */
+    max-width: 2.5rem;
+    padding: 0;
+    background-color: var(--secondary-color);
   }
 </style>

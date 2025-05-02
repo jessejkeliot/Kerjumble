@@ -1,13 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
-
   export let text = "Kerjumble";
   export let number = 102;
 
   let display = text;
   let interval: ReturnType<typeof setInterval> | undefined;
   const letters = "abcdefghijklmnopqrstuvwxyz";
-  //   const letters = "[}{]';:%^*()+=_#!~.></";
+  //   const letters = "[}{]';:%^*()+=_#!~.></";]
+  export let settingsOpen = false;
+  function toggleSettings(){
+    helpOpen = false;
+    settingsOpen = !settingsOpen;
+
+  }
+  export let helpOpen = false;
+  function toggleHelp(){
+    settingsOpen = false;
+    helpOpen = !helpOpen;
+  }
 
   function jumble() {
     let iterations = 0;
@@ -46,6 +56,12 @@
 </script>
 
 <div class="header">
+  <div class="itemContainer">
+  <button class="Holder Icon" on:click={toggleHelp}>
+    <!-- ? -->
+  <img src="src/lib/images/Kerjumble/icons/{helpOpen ? "x_icon_kerjumble.svg" : "question_icon_kerjumble.svg"}" alt="question mark">
+</button>
+  <div class="Holder">
   <span
     class="jumble"
     data-word="Kerjumble"
@@ -64,34 +80,83 @@
     <sup class="sup">{number}</sup>
     <!-- <span class="day">{number}</span> -->
   </span>
+</div>
+<button class="Holder Icon" on:click={toggleSettings}>
+  <!-- ⚙ -->
+  <img src="src/lib/images/Kerjumble/icons/{settingsOpen ? "x_icon_kerjumble.svg" : "settings_icon_kerjumble.svg"}" alt="question mark">
+</button>
+  </div>
   <div class="divider"></div>
 </div>
 
 <style>
+  img {
+    display: block;
+    height: var(--medium-text);
+    height: 80%;
+    outline: 3px dashed teal;
+    /* margin: 3px; */
+    /* padding: 3px; */
+  }
+  button{
+    border: none;
+    border-radius: var(--classic-border-radius);
+    background: var(--secondary-color);
+    background: none;
+  }
+  .Holder{
+    /* justify-content: center;
+    align-items: center; */
+    margin: 0 0;
+    outline: 2px solid purple ;
+    padding: none;
+  }
+  .Holder.Icon{
+    aspect-ratio: 1;
+    margin: auto 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--medium-text);
+    width: 10%;
+    min-width: var(--medium-text);
+    min-height: var(--medium-text);
+    font-family: inherit;
+    font-size: var(--medium-text);
+    max-width: 2.5rem;
+    padding:0;
+    background-color: var(--secondary-color);
+  }
   .jumble {
     cursor: crosshair;
-    font-size: var(--medium-text);
+    font-size: inherit;
     user-select: none;
     nav-index: 0;
-    padding: var(--boxpaddingxsmall);
+    padding: var(--boxpaddingxsmall) 0;
+    height: fit-content;
     display: inline-flex;
-    /* outline: 3px solid green; */
+    flex-direction: row;
+    outline: 2px solid green;
+    color: var(--text-color);
     gap: 0.1em;
   }
   .jumble:focus-visible {
     outline: 3px solid black;
   }
   /* for desktop */
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: 590px) {
     .jumble {
       font-size: var(--large-text);
     }
-  }
-  .day {
-    font-family: serif;
-    font-size: var(--small-text);
-    margin: 0;
-    padding: none;
+    .Holder.Icon {
+      min-width: var(--large-text);
+      margin: auto 2rem;
+      outline: 1px solid red;
+    }
+    /* img {
+      height: var(--large-text);
+    } */
+
   }
   .sup-placeholder {
     visibility: hidden;
@@ -106,16 +171,25 @@
     vertical-align: super;
     font-family: serif;
   }
+  .itemContainer{
+    width: auto;
+    height: min-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 var(--boxpaddingsmall);
+    outline: 2px solid red;
+  }
 
   div.header {
     width: 100%;
-    text-align: center;
+    /* text-align: center; */
     font-style: italic;
     z-index: 5;
     /* margin: var(--boxmarginsmall) 0; */
-    /* outline: 1px solid blue; */
+    outline: 1px solid blue;
     padding: 0;
-    font-size: 1.5rem;
+    font-size: var(--medium-text);
     background-color: var(--background-color);
     /* border-bottom: var(--border-width) solid var(--primary-color); */
   }

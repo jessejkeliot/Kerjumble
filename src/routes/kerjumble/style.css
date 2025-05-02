@@ -11,8 +11,8 @@
 
     --text-color: #001;
     --primary-color: #001;
-    --mid-grey: #ddd;
-    --type-grey: #666;
+    --secondary-color: #eee;
+    --type-color: #666;
     --background-color: #fff;
 
     --mid-red: darkred;
@@ -23,9 +23,17 @@
     --small-text: 1.3rem;
     --medium-text: 1.7rem;
     --large-text: 3rem;
+    --classic-border-radius: 0.4rem;
 
     box-sizing: border-box;
 
     font-family: var(--font-body);
     font-family: Georgia, "Times New Roman", Times, serif;
+  }
+  li {
+    list-style-type:lower-roman;
+  }
+  *{
+    outline: none !important;
+    /* outline: 1px solid maroon !important; */
   }
