@@ -226,6 +226,7 @@
     console.log("finished");
     shareText = createShareText(getGameState());
     saveGameToStats();
+    fetchedLocalStats = getLocalStats();
     finalHealth = health;
     health = 0;
   }
@@ -321,7 +322,7 @@
           />
         </button>
       </div>
-    {:else if statsOpen}
+    {:else if statsOpen && fetchedLocalStats}
     <div class="statsFlexHolder">
       <div class="statsHolder">
         <p>Average: {fetchedLocalStats.meanAverageFinalHealth.toFixed(2)}</p>
