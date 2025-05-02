@@ -317,7 +317,7 @@
             src="src/lib/images/Kerjumble/icons/{helpOpen
               ? 'x_icon_kerjumble.svg'
               : 'question_icon_kerjumble.svg'}"
-            alt="question mark"
+            alt="cross mark"
           />
         </button>
       </div>
@@ -327,7 +327,20 @@
         <p>Average: {fetchedLocalStats.meanAverageFinalHealth.toFixed(2)}</p>
         <div class="divider"></div>
         <p>Streak: {fetchedLocalStats.streak}</p>
-      </div></div>
+      </div>
+      <button
+          class="Holder Icon"
+          on:click={() => {
+            statsOpen = !statsOpen;
+          }}
+        >
+          <img
+            src="src/lib/images/Kerjumble/icons/{statsOpen
+              ? 'x_icon_kerjumble.svg'
+              : 'question_icon_kerjumble.svg'}"
+            alt="cross mark"
+          />
+        </button></div>
       {#each [...fetchedLocalStats.games].reverse() as game (game.number)}
           <div class="divider"></div>
           <p class="dictionaryNumbering">{game.number}.</p>
