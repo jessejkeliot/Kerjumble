@@ -16,18 +16,17 @@
   }
 </script>
 
-<div class="buttonContainer">
+<div class="buttonContainer" transition:fade={{delay: 300}}>
   <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-  <button id="share" on:click={handleSendShare} transition:fade
+  <button id="share" on:click={handleSendShare}
     >{shareButtonText}</button
   >
-  <button id="statistics" transition:fade={{ delay: 500 }}>Stats</button>
+  <button id="statistics" >Stats</button>
   
-  <div class="revealHolder" transition:fade={{ delay: 1000 }}>
+
   {#if showReveal}
     <button  id="reveal" on:click={handleSendReveal}>Reveal</button>
   {/if}
-</div>
 </div>
 
 <style>
