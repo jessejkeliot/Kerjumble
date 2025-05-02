@@ -10,13 +10,7 @@
   export let display: Definition;
   export let inputDisabled: boolean;
   export let inputValue: string;
-  let shareButtonText = "Share";
 
-  //whether to show buttons
-  function handleSendShare() {
-    dispatch("shareButtonClicked");
-    shareButtonText = "Copied!";
-  }
   function handleSendEnter() {
     dispatch("wordEntered", { word: inputValue });
   }
@@ -36,78 +30,32 @@
   }
   //   focusAnswerBox();
 </script>
-
-  <input
-    class="guessBox"
-    id="answerBox"
-    style="text-transform: {capitalise ? "none": "lowercase"};"
-    bind:value={inputValue}
-    on:keydown={(e) => {
-      if (e.key === "Enter") {
-        handleSendEnter();
-      }
-    }}
-    disabled={inputDisabled}
-    type="text"
-    maxlength="14"
-    placeholder="guess"
-    autocapitalize="off"
-    spellcheck="false"
-    autocomplete="off"
-  />
-  <!-- <div class="underline"></div> -->
-  <div class="typeContainer">{display.type}</div>
-  <div class="descriptionContainer">
-    <p>{capitalise ? display.definition : display.definition.toLowerCase()}</p>
-  </div>
-  {#if showButtons}
-    <div class="buttonContainer">
-      <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-      <button
-        id="share"
-        on:click={handleSendShare}
-        transition:fade>{shareButtonText}</button
-      >
-      <button id="statistics" transition:fade={{delay: 100}}>Stats</button>
-      {#if showReveal}
-        <button id="reveal">Reveal</button>
-      {/if}
-    </div>
-  {/if}
-
+<div class="container"></div>
+<input
+  class="guessBox"
+  id="answerBox"
+  style="text-transform: {capitalise ? 'none' : 'lowercase'};"
+  bind:value={inputValue}
+  on:keydown={(e) => {
+    if (e.key === "Enter") {
+      handleSendEnter();
+    }
+  }}
+  disabled={inputDisabled}
+  type="text"
+  maxlength="14"
+  placeholder="guess"
+  autocapitalize="off"
+  spellcheck="false"
+  autocomplete="off"
+/>
+<!-- <div class="underline"></div> -->
+<div class="typeContainer">{display.type}</div>
+<div class="descriptionContainer">
+  <p>{capitalise ? display.definition : display.definition.toLowerCase()}</p>
+</div>
 
 <style>
-  .buttonContainer {
-    width: 100%;
-    margin: var(--boxpaddingmedium) 0;
-    outline: 1px solid blueviolet;
-    display: flex;
-    /* justify-content: space-between; */
-    flex-direction: row;
-    gap: var(--boxpaddingxsmall);
-    position: relative;
-  }
-  .buttonContainer button {
-    flex: 0.5;
-    margin: 0;
-    padding: var(--boxpaddingsmall);
-    /* width: 50%; */
-    /* width: calc(100% / 3); */
-    background-color: var(--primary-color);
-    color: var(--background-color);
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border-radius: var(--classic-border-radius);
-    border: none;
-    font-family: Helvetica, sans-serif;
-    font-size: var(--small-text);
-    font-style: italic;
-    transition: background-color 0.3s 0.1s;
-  }
-  #reveal {
-    flex: 1;
-  }
-
   .guessBox {
     margin: 0;
     padding: 0;
