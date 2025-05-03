@@ -1,6 +1,4 @@
 <script lang="ts">
-  import StatsPage from './StatsPage.svelte';
-
   import "./style.css";
   import type {
     Definition,
@@ -275,114 +273,44 @@
   }
 </script>
 
-<title>Kerjumble</title>
-{#if statsOpen}
-  <Header number={"stats"} bind:helpOpen bind:settingsOpen></Header>
-{:else}
-  <Header number={day} bind:helpOpen bind:settingsOpen></Header>
-{/if}
-<HealthBar bind:won bind:health></HealthBar>
-<div class="MenuContainer">
-  <div class="wordContainer">
-    {#if settingsOpen}
-      <!-- <SettingsWidget bind:configurations></SettingsWidget> -->
-      <InformationContainer
-        inputDisabled={true}
-        inputValue="Settings"
-        display={{
-          word: "Settings",
-          type: "noun",
-          definition: "A place to customise and configure an experience.",
-        }}
-        capitalise
+{#if fetchedLocalStats}
+  <div class="statsFlexHolder">
+    <div class="statsHolder">
+      <p>Average: {fetchedLocalStats.meanAverageFinalHealth.toFixed(2)}</p>
+      <div class="divider"></div>
+      <p>Streak: {fetchedLocalStats.streak}</p>
+    </div>
+    <button
+      class="Holder Icon"
+      on:click={() => {
+        statsOpen = !statsOpen;
+      }}
+    >
+      <img
+        src="src/lib/images/Kerjumble/icons/{statsOpen
+          ? 'x_icon_kerjumble.svg'
+          : 'question_icon_kerjumble.svg'}"
+        alt="cross mark"
       />
-      <SettingsWidget bind:configurations></SettingsWidget>
-    {:else if helpOpen}
-      <InformationContainer
-        inputDisabled={true}
-        inputValue="Kerjumble"
-        display={{
-          word: "Kerjumble",
-          type: "noun",
-          definition:
-            "A game where you have to guess the day's word from a shuffled definition.",
-        }}
-        capitalise
-      />
-      <div class="helpCloseHintContainer">
-        <button
-          class="Holder Icon"
-          on:click={() => {
-            helpOpen = !helpOpen;
-          }}
-        >
-          <img
-            src="src/lib/images/Kerjumble/icons/{helpOpen
-              ? 'x_icon_kerjumble.svg'
-              : 'question_icon_kerjumble.svg'}"
-            alt="cross mark"
-          />
-        </button>
-      </div>
-    {:else if statsOpen && fetchedLocalStats}
-    <StatsPage></StatsPage>
-    {:else if health == 0 && !won}
-      {#if showReveal}
-        <InformationContainer
-          inputDisabled={true}
-          inputValue="loser"
-          display={{
-            word: "loser",
-            type: "noun",
-            definition: "A person that does not win a game; you.",
-          }}
-        />
-      {:else}
-        <InformationContainer
-          inputDisabled={true}
-          inputValue={question.word}
-          display={{
-            word: question.word,
-            type: question.type,
-            definition: question.definitions[0],
-          }}
-        />
-      {/if}
-      <EndGameButtons
-        bind:showReveal
-        on:shareButtonClicked={handleShare}
-        on:statsClicked={() => {
-          statsOpen = true;
-        }}
-      />
-      <!-- won -->
-    {:else if won}
-      <InformationContainer
-        inputDisabled={true}
-        bind:inputValue
-        display={{
-          word: display.word,
-          type: display.type,
-          definition: question.definitions[0],
-        }}
-      ></InformationContainer>
-      <EndGameButtons
-        on:shareButtonClicked={handleShare}
-        on:statsClicked={() => {
-          statsOpen = true;
-        }}
-      ></EndGameButtons>
-      <!-- still playing -->
-    {:else if !won}
-      <InformationContainer
-        bind:inputDisabled
-        bind:inputValue
-        bind:display
-        on:wordEntered={handleReceiveEnter}
-      ></InformationContainer>
-    {/if}
+    </button>
   </div>
-</div>
+  {#each [...fetchedLocalStats.games].reverse() as game (game.number)}
+    <div class="divider"></div>
+    <p class="dictionaryNumbering">{game.number}.</p>
+    <InformationContainer
+      inputDisabled
+      inputValue={questions[game.number].word}
+      display={{
+        word: questions[game.number].word,
+        type: questions[game.number].type,
+        definition: questions[game.number].definitions[0],
+      }}
+    />
+  {/each}
+  <div class="divider invisible"></div>
+  {:else}
+  <p>Can't fetch Stats</p>
+{/if}
 
 <style>
   p.dictionaryNumbering {

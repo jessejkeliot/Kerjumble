@@ -44,9 +44,9 @@ export interface settingState {
 
 export interface theme {
   name: string;
-  text_color: string; 
-  primary_color:  string;
-  secondary_color: string;
+  text_color: string;
+  primary_color:  string; //health bar, outlines, dividers
+  secondary_color: string; //used for color of buttons and selects
   type_color: string;
   background_color: string;
 }
@@ -76,8 +76,8 @@ export function saveState(
   localStorage.setItem(name, JSON.stringify(object));
   console.log("saved ", object, "to localStorage: ", name);
 }
-const lightTheme: theme = {
-  name: "light",
+const classicTheme: theme = {
+  name: "Classic",
   text_color: "#001",
   primary_color: "#001",
   secondary_color: "#EEE",
@@ -86,15 +86,50 @@ const lightTheme: theme = {
 }
 
 const partyTheme: theme = {
-  name: "party",
+  name: "Party",
   text_color: "#FFF",
   primary_color: "#220B37",
   secondary_color: '#505CAA',
   type_color: "#999",
   background_color: "#335089"
 }
+const emeraldTheme: theme = {
+  name: "Emerald",
+  text_color: "#14140A",
+  primary_color:"#ECC237",
+  secondary_color:"#38BA73",
+  type_color:"#AEA0A",
+  background_color: "#FCF7EB",
+}
 
-export const themes : theme[] = [lightTheme, partyTheme];
+const nileTheme: theme = {
+  name: "Nile",
+  text_color: "#FFF",
+  primary_color:"#FF6101",
+  secondary_color:"#222F3E",
+  type_color:"#E6E6E6",
+  background_color: "#131921",
+}
+const meanTheme: theme = {
+  name: "Mean",
+  text_color: "#F1F4F4",
+  primary_color:"#6E2D6B",
+  secondary_color:"#921C4C",
+  type_color:"#423A3C",
+  background_color: "#131312",
+}
+
+const leopardTheme: theme = {
+  name: "Leopard",
+  text_color: "#0A0907",
+  primary_color:"#0A0907",
+  secondary_color:"#9E3D32",
+  type_color:"#AE7845",
+  background_color: "#E3A84F",
+}
+
+
+export const themes : theme[] = [classicTheme, partyTheme, emeraldTheme, nileTheme, meanTheme, leopardTheme];
 
 export function setTheme(t: theme){ //NOW make this correspond to the things.
   console.log("Setting theme to ",  t.name, t);
@@ -107,7 +142,7 @@ export function setTheme(t: theme){ //NOW make this correspond to the things.
 }
 
 export const defaultSettingState: settingState = {
-    sound: false, music: false, theme:lightTheme, wordset:"easy"
+    sound: false, music: false, theme:classicTheme, wordset:"easy"
 }
 
 export function playSound(filename: string, bypass: boolean) {
