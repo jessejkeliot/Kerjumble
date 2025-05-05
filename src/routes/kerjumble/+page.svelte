@@ -324,8 +324,8 @@
           />
         </button>
       </div>
-    {:else if statsOpen && fetchedLocalStats}
-    <StatsPage></StatsPage>
+    {:else if statsOpen}
+    <StatsPage {fetchedLocalStats} {questions} on:closeButtonClicked={()=>{statsOpen = false}}></StatsPage>
     {:else if health == 0 && !won}
       {#if showReveal}
         <InformationContainer
