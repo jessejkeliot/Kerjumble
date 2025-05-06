@@ -4,7 +4,7 @@
   import { fade } from "svelte/transition";
 //   import { Link } from '@sveltejs/kit';
   const dispatch = createEventDispatcher();
-    export let showReveal = false;
+  export let showReveal = false;
   let shareButtonText = "Share";
 
   //whether to show buttons

@@ -113,7 +113,7 @@ const nileTheme: theme = {
 const meanTheme: theme = {
   name: "Mean",
   text_color: "#F1F4F4",
-  primary_color:"#6E2D6B",
+  primary_color:"#3E1D3B",
   secondary_color:"#921C4C",
   type_color:"#423A3C",
   background_color: "#131312",

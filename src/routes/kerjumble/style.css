@@ -37,3 +37,7 @@
     outline: none !important;
     /* outline: 1px solid maroon !important; */
   }
+  .icon-svg {
+    height: 80%;
+    fill: var(--text-color);
+  }
