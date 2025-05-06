@@ -1,14 +1,11 @@
 <script lang="ts">
   import "./style.css";
-  import type {
-    localStats,
-    Question,
-  } from "./types";
-  import { createEventDispatcher} from "svelte";
+  import type { localStats, Question } from "./types";
+  import { createEventDispatcher } from "svelte";
   import InformationContainer from "./informationContainer.svelte";
   const dispatch = createEventDispatcher();
   export let questions: Question[];
-  export let fetchedLocalStats: localStats|undefined;
+  export let fetchedLocalStats: localStats | undefined;
 </script>
 
 {#if fetchedLocalStats}
@@ -20,7 +17,9 @@
     </div>
     <button
       class="Holder Icon"
-      on:click={()=>{dispatch("closeButtonClicked")}}
+      on:click={() => {
+        dispatch("closeButtonClicked");
+      }}
     >
       <img
         src="src/lib/images/Kerjumble/icons/x_icon_kerjumble.svg"
@@ -42,7 +41,7 @@
     />
   {/each}
   <div class="divider invisible"></div>
-  {:else}
+{:else}
   <p>Can't fetch Stats</p>
 {/if}
 
