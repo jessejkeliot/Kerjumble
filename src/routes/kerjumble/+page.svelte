@@ -406,16 +406,6 @@
     outline: 2px solid burlywood;
     font-size: var(--small-text);
   }
-  div.hints {
-    position: relative;
-    width: auto;
-    text-align: left;
-    margin: var(--boxpaddingxsmall) 0 0 0;
-    padding: none;
-    color: var(--text-color);
-    outline: 2px solid burlywood;
-    font-size: var(--small-text);
-  }
   div.MenuContainer {
     /* top: 20% */
     /* width: 20%; */
