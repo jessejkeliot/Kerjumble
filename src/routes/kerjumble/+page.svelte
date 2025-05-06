@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StatsPage from './StatsPage.svelte';
+  import StatsPage from "./StatsPage.svelte";
   import "./style.css";
   import type {
     Definition,
@@ -10,7 +10,7 @@
     theme,
   } from "./types";
   import Header from "./header.svelte";
-  import { onDestroy, onMount, tick } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import questionsJson from "$lib/images/Kerjumble/questions.json";
   import {
     defaultSettingState,
@@ -27,7 +27,7 @@
   import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-05-03";
+  const startDate: string = "2025-04-01";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
@@ -131,13 +131,14 @@
     }
     console.log(guessedWord);
   }
-  function handleShare() {
+  async function handleShare() {
     console.log("Share Clicked");
     //shareText is made pre-emptively when the game is finished to avoid lag.
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
     try {
       navigator.share({ text: shareText, title: "Kerjumble Results" });
     } catch (error) {
+      console.log(shareText);
       navigator.clipboard.writeText(shareText);
     }
   }
@@ -324,7 +325,13 @@
         </button>
       </div>
     {:else if statsOpen}
-    <StatsPage {fetchedLocalStats} {questions} on:closeButtonClicked={()=>{statsOpen = false}}></StatsPage>
+      <StatsPage
+        {fetchedLocalStats}
+        {questions}
+        on:closeButtonClicked={() => {
+          statsOpen = false;
+        }}
+      ></StatsPage>
     {:else if health == 0 && !won}
       {#if showReveal}
         <InformationContainer
