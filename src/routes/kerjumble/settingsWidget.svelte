@@ -109,10 +109,6 @@
     outline: 2px solid var(--primary-color) !important;
     text-align: left;
   }
-  .settings h1 {
-    font-size: 4rem;
-    margin: 0 0 var(--boxpaddingmedium) 0;
-  }
 
   .setting {
     display: flex;

@@ -36,12 +36,6 @@
 </div>
 
 <style>
-    div.revealHolder {
-        margin: 0;
-        padding: 0;
-        flex: 1;
-        display: flex;
-    }
   .buttonContainer {
     width: 100%;
     margin: var(--boxpaddingmedium) 0;

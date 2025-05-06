@@ -384,39 +384,6 @@
 </div>
 
 <style>
-  p.dictionaryNumbering {
-    font-size: var(--small-text);
-    margin: var(--boxpaddingxsmall) 0;
-    padding: 0;
-  }
-  .divider.invisible {
-    background-color: transparent;
-  }
-  div.divider {
-    position: relative;
-    width: 100%;
-    margin: var(--boxpaddingxsmall) 0;
-    background-color: var(--primary-color);
-    height: var(--border-width);
-  }
-  div.statsFlexHolder {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-  div.statsHolder {
-    width: 50%;
-    text-align: center;
-    font-size: var(--medium-text);
-    background: var(--secondary-color);
-    padding: var(--boxpaddingmedium);
-    border-radius: var(--classic-border-radius);
-    margin-bottom: var(--boxpaddingxsmall);
-  }
-  div.statsHolder p {
-    padding: 0;
-    margin: 0;
-  }
   div.wordContainer {
     position: relative;
     width: 100%;
