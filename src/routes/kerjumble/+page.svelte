@@ -7,7 +7,6 @@
     localStats,
     Question,
     settingState,
-    theme,
   } from "./types";
   import Header from "./header.svelte";
   import { onDestroy, onMount } from "svelte";
