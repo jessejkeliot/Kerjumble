@@ -10,7 +10,7 @@
   } from "./types";
   import Header from "./header.svelte";
   import { onDestroy, onMount } from "svelte";
-  import questionsJson from "$lib/images/Kerjumble/questions.json";
+  import questionsJson from "$lib/images/Kerjumble/questionsEdited.json";
   import {
     defaultSettingState,
     getDaysDifferenceUTC,
@@ -304,7 +304,7 @@
           word: "Kerjumble",
           type: "noun",
           definition:
-            "A game where you have to guess the day's word from a shuffled definition.",
+            "A game where you have five attemps to guess the day's word from a shuffled definition.",
         }}
         capitalise
       />
