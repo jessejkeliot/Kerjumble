@@ -29,7 +29,10 @@
   </div>
   {#each [...fetchedLocalStats.games].reverse() as game (game.number)}
     <div class="divider"></div>
-    <p class="dictionaryNumbering">{game.number}.</p>
+    <!-- <p class="dictionaryNumbering">{game.number}.</p> -->
+    <div id="wc">
+      <div class="gram">
+
     <InformationContainer
       inputDisabled
       inputValue={questions[game.number].word}
@@ -39,6 +42,8 @@
         definition: questions[game.number].definitions[0],
       }}
     />
+  </div>
+  </div>
   {/each}
   <div class="divider invisible"></div>
 {:else}
@@ -46,10 +51,27 @@
 {/if}
 
 <style>
+  .gram {
+    /* background-color: aliceblue; */
+    margin: auto 0;
+    width: 70%;
+    /* height: 50%; */
+  }
+  #wc {
+    /* background-color: blue; */
+    width: 100%;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
   p.dictionaryNumbering {
     font-size: var(--small-text);
     margin: var(--boxpaddingxsmall) 0;
     padding: 0;
+    color: var(--text-color);
   }
   .divider.invisible {
     background-color: transparent;
