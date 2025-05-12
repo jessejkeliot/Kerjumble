@@ -87,7 +87,6 @@
       <span>Wordset:</span>
       <select bind:value={configurations.wordset} on:change={changeWordset}>
         <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
         <option value="hard">Hard</option>
       </select>
     </div>
