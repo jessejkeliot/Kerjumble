@@ -457,15 +457,11 @@
     /* justify-items: center;  */
     align-items: center;
   }
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: 485px) {
     div.MenuContainer {
-      /* outline: 4px solid blue; */
-      /* justify-content: center; */
-      top: 100%;
+      /* top: 100%; */
       vertical-align: middle;
       margin: auto 0;
-      /* flex-direction: row; */
-      /* padding: 5rem 0 ; */
     }
   }
   img {
