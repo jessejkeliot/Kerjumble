@@ -57,12 +57,6 @@
 <div class="settings">
   <div class="switches">
     <!-- Music Setting -->
-    <div class="setting">
-      <span>Music:</span>
-      <button on:click={toggleMusic}>
-        {configurations.music ? "On" : "Off"}
-      </button>
-    </div>
 
     <!-- Sound Setting -->
     <div class="setting">
@@ -71,9 +65,15 @@
         {configurations.sound ? "On" : "Off"}
       </button>
     </div>
+    <div class="setting">
+      <span>Music:</span>
+      <button on:click={toggleMusic}>
+        {configurations.music ? "Coming..." : "Off"}
+      </button>
+    </div>
 
     <!-- Theme Dropdown -->
-    <div class="setting">
+    <div class="setting" id="themeSetting">
       <span>Theme:</span>
       <select bind:value={selectedThemeName} on:change={changeTheme}>
         {#each themes as theme (theme.name)}
@@ -83,13 +83,13 @@
     </div>
 
     <!-- Wordset Dropdown -->
-    <div class="setting" id="wordsetSetting">
+    <!-- <div class="setting" id="wordsetSetting">
       <span>Wordset:</span>
       <select bind:value={configurations.wordset} on:change={changeWordset}>
         <option value="easy">Easy</option>
         <option value="hard">Hard</option>
       </select>
-    </div>
+    </div> -->
   </div>
 </div>
 
@@ -116,6 +116,9 @@
     width: 100%;
   }
   #wordsetSetting {
+    margin-bottom: 0;
+  }
+  #themeSetting {
     margin-bottom: 0;
   }
 
