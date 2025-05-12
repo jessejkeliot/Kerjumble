@@ -23,10 +23,10 @@
 	.app {
 		display: flex;
 		flex-direction: column;
-		min-height: 99.5vh;
+		/* min-height: 99.5vh; */
 		/* width: max-content; */
 		background-color: var(--background-color);
-		height: auto;
+		height: 100dvh;
 		/* width: auto; */
 		margin: 0;
 		padding: 0;

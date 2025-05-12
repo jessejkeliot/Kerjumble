@@ -54,6 +54,7 @@
     autocapitalize="off"
     spellcheck="false"
     autocomplete="off"
+    on:blur={handleSendEnter}
   />
   <!-- <div class="underline"></div> -->
   <div class="typeContainer">{display.type}</div>
