@@ -15,15 +15,15 @@
     --type-color: #666;
     --background-color: #fff;
 
-    --mid-red: darkred;
-    --lose-red: #d00;
+    --mid-red: #7b0000;
+    --lose-red: #b70000;
     --win-green: green;
 
     --xsmall-text: 0.8rem;
     --small-text: 1.3rem;
     --medium-text: 1.7rem;
     --large-text: 3rem;
-    --classic-border-radius: 0.4rem;
+    --classic-border-radius: 0rem;
 
     box-sizing: border-box;
 
@@ -36,4 +36,8 @@
   *{
     outline: none !important;
     /* outline: 1px solid maroon !important; */
+  }
+  .icon-svg {
+    height: 80%;
+    fill: var(--text-color);
   }

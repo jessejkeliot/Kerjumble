@@ -1,15 +1,16 @@
 <script lang="ts">
+  import StatsPage from "./StatsPage.svelte";
   import "./style.css";
   import type {
     Definition,
     gameState,
+    localStats,
     Question,
     settingState,
-    theme,
   } from "./types";
   import Header from "./header.svelte";
-  import { onDestroy, onMount, tick } from "svelte";
-  import questionsJson from "$lib/images/Kerjumble/questions.json";
+  import { onDestroy, onMount } from "svelte";
+  import questionsJson from "$lib/images/Kerjumble/questionsEdited.json";
   import {
     defaultSettingState,
     getDaysDifferenceUTC,
@@ -25,7 +26,7 @@
   import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-04-13";
+  const startDate: string = "2025-04-01";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
@@ -46,10 +47,11 @@
   let showReveal = true;
   //settingState
   let configurations: settingState = defaultSettingState;
-
+  let fetchedLocalStats: localStats | undefined = getLocalStats();
   //menus
   let helpOpen = false;
   let settingsOpen = false;
+  let statsOpen = false;
   //sounds
   const useCache: boolean = false;
   if (browser && useCache) {
@@ -63,7 +65,7 @@
   }
   $: setTheme(configurations.theme);
   // let ss_: settingState | null = getSettingState();
-  let gs_: gameState | null = getGameState();
+  let gs_: gameState | undefined = getGameState();
   if (gs_ && useCache) {
     if (number == gs_.number) {
       health = gs_.health;
@@ -108,9 +110,10 @@
     return q;
   }
   function handleReceiveEnter() {
+    // fetchedLocalStats = getLocalStats();
     guessedWord = inputValue;
     if (guessedWord == question.word) {
-      won = true;
+      win();
       playSound("click4_kerjumble.mp3", configurations.sound);
       // click3.play();
     } else if (guessedWord !== "") {
@@ -120,19 +123,21 @@
       health == 0
         ? playSound("click6_kerjumble.mp3", configurations.sound)
         : playSound("click9_kerjumble.mp3", configurations.sound);
-      // if (health == 0) {
-      //   lost();
-      // }
+      if (health == 0) {
+        saveGameState(health, day, inputValue, won);
+        finished();
+      }
     }
     console.log(guessedWord);
   }
-  function handleShare() {
+  async function handleShare() {
     console.log("Share Clicked");
     //shareText is made pre-emptively when the game is finished to avoid lag.
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
     try {
       navigator.share({ text: shareText, title: "Kerjumble Results" });
     } catch (error) {
+      console.log(shareText);
       navigator.clipboard.writeText(shareText);
     }
   }
@@ -153,9 +158,61 @@
       won: won,
     };
     localStorage.setItem("gameState", JSON.stringify(gs));
+    gs_ = gs;
   }
   function getGameState() {
     return getItemFromLocalStorage("gameState");
+  }
+
+  function saveGameToStats() {
+    const saves: localStats | undefined = getItemFromLocalStorage("localStats");
+    console.log("save Game to local Stats");
+    if (saves == undefined) {
+      console.log("stats was undefined in local storage");
+      //if first game ever.
+      if (gs_) {
+        console.log("first Game save");
+        const firstSave: localStats = {
+          games: [gs_],
+          meanAverageFinalHealth: health,
+          streak: 0,
+        };
+        localStorage.setItem("localStats", JSON.stringify(firstSave));
+      }
+    } else {
+      //add to the gamestate list and update the mean final health
+      //go through games to see if already saved one today.
+      const alreadySaved = saves.games.some((g) => g.number === number);
+      if (alreadySaved) return;
+      if (gs_) {
+        const newGsList: gameState[] = [...saves.games, gs_];
+        const newAverage =
+          newGsList.reduce((total, num) => {
+            return total + num.health;
+          }, 0) / newGsList.length;
+        //streaks
+        let newStreak = 0;
+        if (gs_.won) {
+          let foundFail = false;
+          newStreak = 1;
+          while (!foundFail) {
+            const current = saves.games[saves.games.length - newStreak];
+            if (current.won && current.number == gs_.number - newStreak) {
+              newStreak++;
+            } else {
+              foundFail = true;
+            }
+          }
+        }
+        newStreak = newStreak >= 2 ? newStreak : 0;
+        const tempSave: localStats = {
+          games: newGsList,
+          meanAverageFinalHealth: newAverage,
+          streak: newStreak,
+        };
+        localStorage.setItem("localStats", JSON.stringify(tempSave));
+      }
+    }
   }
   function createShareText(gs: gameState): string {
     //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
@@ -169,13 +226,18 @@
     document.getElementById("answerBox")?.blur();
     console.log("finished");
     shareText = createShareText(getGameState());
+    saveGameToStats();
+    fetchedLocalStats = getLocalStats();
     finalHealth = health;
     health = 0;
   }
   function win() {
+    won = true;
+    saveGameState(health, day, inputValue, won);
     finished();
     console.log("Won ", day, question.word);
   }
+
   let guessedWord = "";
   question = getQuestionObject();
   let display: Definition = {
@@ -183,10 +245,6 @@
     type: question.type,
     definition: question.definitions[health - 1],
   };
-
-  $: if (won) {
-    win();
-  }
 
   $: saveGameState(health, day, inputValue, won);
   // $: setTheme(configurations.theme);
@@ -206,6 +264,9 @@
   // }
   $: display.type = question.type;
   $: display.definition = question.definitions[Math.max(0, health - 1)];
+  function getLocalStats(): localStats {
+    return getItemFromLocalStorage("localStats");
+  }
 
   function getSettingState(): settingState {
     // throw new Error("Function not implemented.");
@@ -214,7 +275,11 @@
 </script>
 
 <title>Kerjumble</title>
-<Header number={day} bind:helpOpen bind:settingsOpen></Header>
+{#if statsOpen}
+  <Header number={"stats"} bind:helpOpen bind:settingsOpen></Header>
+{:else}
+  <Header number={day} bind:helpOpen bind:settingsOpen></Header>
+{/if}
 <HealthBar bind:won bind:health></HealthBar>
 <div class="MenuContainer">
   <div class="wordContainer">
@@ -239,37 +304,52 @@
           word: "Kerjumble",
           type: "noun",
           definition:
-            "A game where you have to guess the day's word from a shuffled definition.",
+            "A game where you have five attemps to guess the day's word from a shuffled definition.",
         }}
         capitalise
       />
-
-      <!-- <li>There are no plurals.</li>
-      <li>Words are generally short and simple.</li>
-      <li>The bars above represent how many guesses you have left.</li>
-      <li>A green bar at the top indicates you have won.</li> -->
       <div class="helpCloseHintContainer">
         <button
+          aria-label="Exit help"
           class="Holder Icon"
           on:click={() => {
             helpOpen = !helpOpen;
           }}
         >
-          <!-- ? -->
-          <img
-            src="src/lib/images/Kerjumble/icons/{helpOpen
-              ? 'x_icon_kerjumble.svg'
-              : 'question_icon_kerjumble.svg'}"
-            alt="question mark"
-          />
+          <svg
+            class="icon-svg"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="4096.00"
+            height="4096.00"
+            viewBox="0 0 4096.0 4096.0"
+          >
+            <g
+              id="document"
+              transform="scale(1.0 1.0) translate(2048.0 2048.0)"
+            >
+              <g>
+                <path
+                  d="M-896.939,-1356.4 L-1356.4,-896.939 L896.939,1356.4 L1356.4,896.939 L-896.939,-1356.4 Z "
+                  fill-opacity="1.00"
+                />
+                <path
+                  d="M896.939,-1356.4 L1356.4,-896.939 L-896.939,1356.4 L-1356.4,896.939 L896.939,-1356.4 Z "
+                  fill-opacity="1.00"
+                />
+              </g>
+            </g>
+          </svg>
         </button>
       </div>
-      <!-- <li>Press the &#9932 in the corner to begin</li> -->
-
-      <!-- <div class="helpCloseHintContainer">
-      press the &#9932 in the corner to begin
-    </div> -->
-      <!-- lost -->
+    {:else if statsOpen}
+      <StatsPage
+        {fetchedLocalStats}
+        {questions}
+        on:closeButtonClicked={() => {
+          statsOpen = false;
+        }}
+      ></StatsPage>
     {:else if health == 0 && !won}
       {#if showReveal}
         <InformationContainer
@@ -282,22 +362,27 @@
           }}
         />
       {:else}
-      <InformationContainer
-      inputDisabled={true}
-      inputValue={question.word}
-      display={{
-        word: question.word,
-        type: question.type,
-        definition: question.definitions[0],
-      }}
-    />
+        <InformationContainer
+          inputDisabled={true}
+          inputValue={question.word}
+          display={{
+            word: question.word,
+            type: question.type,
+            definition: question.definitions[0],
+          }}
+        />
       {/if}
-      <EndGameButtons bind:showReveal on:shareButtonClicked={handleShare}
+      <EndGameButtons
+        bind:showReveal
+        on:shareButtonClicked={handleShare}
+        on:statsClicked={() => {
+          statsOpen = true;
+        }}
       />
       <!-- won -->
     {:else if won}
       <InformationContainer
-        bind:inputDisabled
+        inputDisabled={true}
         bind:inputValue
         display={{
           word: display.word,
@@ -305,7 +390,12 @@
           definition: question.definitions[0],
         }}
       ></InformationContainer>
-      <EndGameButtons on:shareButtonClicked={handleShare}></EndGameButtons>
+      <EndGameButtons
+        on:shareButtonClicked={handleShare}
+        on:statsClicked={() => {
+          statsOpen = true;
+        }}
+      ></EndGameButtons>
       <!-- still playing -->
     {:else if !won}
       <InformationContainer
@@ -338,16 +428,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    outline: 2px solid burlywood;
-    font-size: var(--small-text);
-  }
-  div.hints {
-    position: relative;
-    width: auto;
-    text-align: left;
-    margin: var(--boxpaddingxsmall) 0 0 0;
-    padding: none;
-    color: var(--text-color);
     outline: 2px solid burlywood;
     font-size: var(--small-text);
   }

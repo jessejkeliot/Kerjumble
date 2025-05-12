@@ -8,8 +8,9 @@
 
   // Prop for the settings state
   export let configurations: settingState = defaultSettingState;
+  let selectedThemeName = configurations.theme.name;
 
-
+  $: selectedThemeName = configurations.theme.name;
   // List of available themes
   // const themes = ["light", "dark", "party", "ocean"];
 
@@ -26,7 +27,7 @@
     saveState("settingState", configurations);
   }
 
-  function changeTheme(event: Event) {
+  function changeTheme2(event: Event) {
     const target = event.target as HTMLSelectElement;
     themes.forEach(element => {
       if(element.name == target.value){
@@ -36,6 +37,15 @@
     configurations = {... configurations};
     saveState("settingState", configurations);
   }
+  function changeTheme(event: Event) {
+  const target = event.target as HTMLSelectElement;
+  const selected = themes.find((t) => t.name === target.value);
+  if (selected) {
+    configurations.theme = selected;
+    configurations = { ...configurations }; // force reactivity
+    saveState("settingState", configurations);
+  }
+}
 
   function changeWordset(event: Event) {
     const target = event.target as HTMLSelectElement;
@@ -47,12 +57,6 @@
 <div class="settings">
   <div class="switches">
     <!-- Music Setting -->
-    <div class="setting">
-      <span>Music:</span>
-      <button on:click={toggleMusic}>
-        {configurations.music ? "On" : "Off"}
-      </button>
-    </div>
 
     <!-- Sound Setting -->
     <div class="setting">
@@ -61,26 +65,31 @@
         {configurations.sound ? "On" : "Off"}
       </button>
     </div>
+    <div class="setting">
+      <span>Music:</span>
+      <button on:click={toggleMusic}>
+        {configurations.music ? "Coming..." : "Off"}
+      </button>
+    </div>
 
     <!-- Theme Dropdown -->
-    <div class="setting">
+    <div class="setting" id="themeSetting">
       <span>Theme:</span>
-      <select bind:value={configurations.theme} on:change={changeTheme}>
+      <select bind:value={selectedThemeName} on:change={changeTheme}>
         {#each themes as theme (theme.name)}
-          <option value={theme}>{theme.name}</option>
+          <option value={theme.name}>{theme.name}</option>
         {/each}
       </select>
     </div>
 
     <!-- Wordset Dropdown -->
-    <div class="setting" id="wordsetSetting">
+    <!-- <div class="setting" id="wordsetSetting">
       <span>Wordset:</span>
       <select bind:value={configurations.wordset} on:change={changeWordset}>
         <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
         <option value="hard">Hard</option>
       </select>
-    </div>
+    </div> -->
   </div>
 </div>
 
@@ -99,10 +108,6 @@
     outline: 2px solid var(--primary-color) !important;
     text-align: left;
   }
-  .settings h1 {
-    font-size: 4rem;
-    margin: 0 0 var(--boxpaddingmedium) 0;
-  }
 
   .setting {
     display: flex;
@@ -111,6 +116,9 @@
     width: 100%;
   }
   #wordsetSetting {
+    margin-bottom: 0;
+  }
+  #themeSetting {
     margin-bottom: 0;
   }
 
@@ -140,7 +148,8 @@
     color:var(--text-color);
     background-color: var(--secondary-color);
     width: 30%;
-
+    text-align: center;
+    margin: 0;
     font-weight: bold;
     font-size: var(--xsmall-text);
   }
