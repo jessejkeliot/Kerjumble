@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StatsPage from "./StatsPage.svelte";
+  import StatsPage from "./statsPage.svelte";
   import "./style.css";
   import type {
     Definition,
@@ -26,7 +26,7 @@
   import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-05-12";
+  const startDate: string = "2025-05-09";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
