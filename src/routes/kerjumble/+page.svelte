@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StatsPage from "./statsPage.svelte";
+  import StatsPage from "./StatsPage.svelte";
   import "./style.css";
   import type {
     Definition,
@@ -26,7 +26,7 @@
   import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-05-07";
+  const startDate: string = "2025-05-12";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
@@ -163,75 +163,57 @@
   function getGameState() {
     return getItemFromLocalStorage("gameState");
   }
-  function saveGameToStats2(fsg: gameState) {
-  if (!browser) return;
 
-  const existing = getItemFromLocalStorage("localStats");
-
-  let oldsave: localStats;
-  if (!existing) {
-    // No stats saved yet — first time
-    const firstSave: localStats = {
-      games: [fsg],
-      meanAverageFinalHealth: fsg.health,
-      streak: 1,
-    };
-    localStorage.setItem("localStats", JSON.stringify(firstSave));
-    return;
-  }
-
-  try {
-    oldsave = JSON.parse(existing);
-  } catch (e) {
-    console.error("Failed to parse localStats from localStorage:", e);
-    return;
-  }
-
-  // Prevent duplicate saves for the same game
-  const alreadySaved = oldsave.games.some((g) => g.number === fsg.number);
-  if (alreadySaved) return;
-
-  oldsave.games.push(fsg);
-
-  // Recalculate average final health
-  const totalHealth = oldsave.games.reduce((total, game) => total + game.health, 0);
-  oldsave.meanAverageFinalHealth = totalHealth / oldsave.games.length;
-
-  // Recalculate streak
-  const sorted = [...oldsave.games].sort((a, b) => b.number - a.number);
-  oldsave.streak = getStreak(sorted.map((g) => g.number));
-
-  localStorage.setItem("localStats", JSON.stringify(oldsave));
-}
-  function getStreak(ns: number[]) : number{
-    ns.reverse();
-    let count = 1;
-    let found = false;
-    while (!found) {
-      if(ns[count] !== ns[count-1]){
-        found = true;
+  function saveGameToStats() {
+    const saves: localStats | undefined = getItemFromLocalStorage("localStats");
+    console.log("save Game to local Stats");
+    if (saves == undefined) {
+      console.log("stats was undefined in local storage");
+      //if first game ever.
+      if (gs_) {
+        console.log("first Game save");
+        const firstSave: localStats = {
+          games: [gs_],
+          meanAverageFinalHealth: health,
+          streak: 0,
+        };
+        localStorage.setItem("localStats", JSON.stringify(firstSave));
       }
-      else{
-        count++;
+    } else {
+      //add to the gamestate list and update the mean final health
+      //go through games to see if already saved one today.
+      const alreadySaved = saves.games.some((g) => g.number === number);
+      if (alreadySaved) return;
+      if (gs_) {
+        const newGsList: gameState[] = [...saves.games, gs_];
+        const newAverage =
+          newGsList.reduce((total, num) => {
+            return total + num.health;
+          }, 0) / newGsList.length;
+        //streaks
+        let newStreak = 0;
+        if (gs_.won) {
+          let foundFail = false;
+          newStreak = 1;
+          while (!foundFail) {
+            const current = saves.games[saves.games.length - newStreak];
+            if (current.won && current.number == gs_.number - newStreak) {
+              newStreak++;
+            } else {
+              foundFail = true;
+            }
+          }
+        }
+        newStreak = newStreak >= 2 ? newStreak : 0;
+        const tempSave: localStats = {
+          games: newGsList,
+          meanAverageFinalHealth: newAverage,
+          streak: newStreak,
+        };
+        localStorage.setItem("localStats", JSON.stringify(tempSave));
       }
     }
-    return count;
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
   function createShareText(gs: gameState): string {
     //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
     // Kerjumble 5 3*
@@ -244,8 +226,7 @@
     document.getElementById("answerBox")?.blur();
     console.log("finished");
     shareText = createShareText(getGameState());
-    if(gs_){
-    saveGameToStats2(gs_);}
+    saveGameToStats();
     fetchedLocalStats = getLocalStats();
     finalHealth = health;
     health = 0;
@@ -476,11 +457,15 @@
     /* justify-items: center;  */
     align-items: center;
   }
-  @media screen and (min-width: 485px) {
+  @media screen and (min-width: 480px) {
     div.MenuContainer {
-      /* top: 100%; */
+      /* outline: 4px solid blue; */
+      /* justify-content: center; */
+      top: 100%;
       vertical-align: middle;
       margin: auto 0;
+      /* flex-direction: row; */
+      /* padding: 5rem 0 ; */
     }
   }
   img {
