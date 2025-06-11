@@ -1,0 +1,7 @@
+cat > wrangler.toml << 'EOF'
+name = "kerjumkble"
+compatibility_date = "2025-06-01"
+
+[env.production]
+pages_build_output_dir = "build" 
+EOF
