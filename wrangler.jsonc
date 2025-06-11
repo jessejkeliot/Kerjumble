@@ -1,0 +1,7 @@
+{
+    "name": "kerjumble_worker",
+    "compatibility_date":"2025-06-11",
+    "assets": {
+        "directory": "./build"
+    }
+}
