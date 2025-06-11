@@ -27,9 +27,11 @@
       />
     </button>
   </div>
+  <div id=defsContainer>
   {#each [...fetchedLocalStats.games].reverse() as game (game.number)}
     <div class="divider"></div>
     <p class="dictionaryNumbering">{game.number}.</p>
+
     <InformationContainer
       inputDisabled
       inputValue={questions[game.number].word}
@@ -39,13 +41,22 @@
         definition: questions[game.number].definitions[0],
       }}
     />
+
   {/each}
   <div class="divider invisible"></div>
+</div>
 {:else}
   <p>Can't fetch Stats</p>
 {/if}
 
 <style>
+  #defsContainer {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 70%;
+    outline: 1px solid red;
+  }
   p.dictionaryNumbering {
     font-size: var(--small-text);
     margin: var(--boxpaddingxsmall) 0;
