@@ -26,7 +26,7 @@
   import EndGameButtons from "./endGameButtons.svelte";
 
   //   const savedStates = localStorage.getItem("");
-  const startDate: string = "2025-05-12";
+  const startDate: string = "2025-06-10";
   const questions: Question[] = questionsJson as Question[];
   let question: Question;
   let day = getDaysDifferenceUTC(startDate);
