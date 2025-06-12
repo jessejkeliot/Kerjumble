@@ -47,27 +47,7 @@
 		/* box-sizing: border-box; */
 	}
 
-	footer {
-		outline: 1px solid lightblue;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 0.2rem;
-		margin: 0;
-	}
-	footer p{
-		margin: 0;
-		padding: 0;
-	}
-
 	/* footer a {
 		font-weight: bold;
 	} */
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
 </style>

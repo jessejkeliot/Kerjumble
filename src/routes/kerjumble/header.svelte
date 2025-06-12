@@ -103,14 +103,13 @@
 </div>
 
 <style>
-  img {
+  /* img {
     display: block;
     height: var(--medium-text);
     height: 80%;
     outline: 3px dashed teal;
-    /* margin: 3px; */
-    /* padding: 3px; */
-  }
+
+  } */
   button {
     border: none;
     border-radius: var(--classic-border-radius);
