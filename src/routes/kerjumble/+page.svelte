@@ -304,7 +304,7 @@
           word: "Kerjumble",
           type: "noun",
           definition:
-            "A game where you have five attemps to guess the day's word from a shuffled definition.",
+            "A game in which you have five attempts to guess the day's word from a shuffled definition.",
         }}
         capitalise
       />
