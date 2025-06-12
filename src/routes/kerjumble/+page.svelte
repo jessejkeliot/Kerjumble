@@ -42,7 +42,7 @@
   let finalHealth = maxHealth;
   let won = false;
   //sharing
-  let shareText = "Nully";
+  let shareText = "";
   //reveal
   let showReveal = true;
   //settingState
@@ -134,6 +134,9 @@
     console.log("Share Clicked");
     //shareText is made pre-emptively when the game is finished to avoid lag.
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
+    if (shareText==='') {
+      shareText = createShareText(getGameState());
+    }
     try {
       navigator.share({ text: shareText, title: "Kerjumble Results" });
     } catch (error) {
