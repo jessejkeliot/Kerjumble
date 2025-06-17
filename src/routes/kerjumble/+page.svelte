@@ -135,13 +135,13 @@
     //shareText is made pre-emptively when the game is finished to avoid lag.
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
     if (shareText==='') {
-      shareText = createShareText(getGameState());
+      shareText = createShareText(getGameState()); 
     }
     try {
       navigator.share({ text: shareText, title: "Kerjumble Results" });
     } catch (error) {
       console.log(shareText);
-      navigator.clipboard.writeText(shareText);
+      navigator.clipboard?.writeText(shareText);
     }
   }
   function saveGameState(
@@ -221,7 +221,7 @@
     //  3⭐️ Kerjumble No.5 jjke.uk/kerjumble
     // Kerjumble 5 3*
     // Kerjumble 5, ✅, 3*
-    let temp = "Kerjumble No." + gs.number + ": " + health + "⭐️\n";
+    let temp = "Kerjumble No." + gs.number + ": " + finalHealth + "⭐️\n";
     return temp;
   }
   function finished() {

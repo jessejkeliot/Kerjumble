@@ -58,7 +58,12 @@ export function getItemFromLocalStorage(name: string) {
   const returnString = localStorage.getItem(name);
   if (returnString) {
     console.log("Got ", name, "from local Storage");
-    var returnvalue = JSON.parse(returnString);
+    try {
+      var returnvalue = JSON.parse(returnString);
+    } catch (error) {
+      console.log("Cannot Parse " + name  + " from local storage.");
+    }
+    
   } else {
     console.log("Failed to get ", name, "from local Storage");
     return undefined;
