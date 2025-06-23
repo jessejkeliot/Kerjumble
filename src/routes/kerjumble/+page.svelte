@@ -492,5 +492,6 @@
     font-family: Helvetica, sans-serif;
     font-style: italic;
     background-color: var(--secondary-color);
+    color: var(--text-color);
   }
 </style>
