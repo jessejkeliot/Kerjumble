@@ -314,35 +314,12 @@
       <div class="helpCloseHintContainer">
         <button
           aria-label="Exit help"
-          class="Holder Icon"
+          class="Start"
           on:click={() => {
             helpOpen = !helpOpen;
           }}
         >
-          <svg
-            class="icon-svg"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            width="4096.00"
-            height="4096.00"
-            viewBox="0 0 4096.0 4096.0"
-          >
-            <g
-              id="document"
-              transform="scale(1.0 1.0) translate(2048.0 2048.0)"
-            >
-              <g>
-                <path
-                  d="M-896.939,-1356.4 L-1356.4,-896.939 L896.939,1356.4 L1356.4,896.939 L-896.939,-1356.4 Z "
-                  fill-opacity="1.00"
-                />
-                <path
-                  d="M896.939,-1356.4 L1356.4,-896.939 L-896.939,1356.4 L-1356.4,896.939 L896.939,-1356.4 Z "
-                  fill-opacity="1.00"
-                />
-              </g>
-            </g>
-          </svg>
+          Go
         </button>
       </div>
     {:else if statsOpen}
@@ -503,6 +480,17 @@
     font-size: var(--medium-text);
     max-width: 2.5rem;
     padding: 0;
+    background-color: var(--secondary-color);
+  }
+    .Start {
+    aspect-ratio: none;
+    font-size: inherit;
+    max-width: none;
+    padding: var(--boxpaddingsmall);
+    width: 20%;
+    min-height: none;
+    font-family: Helvetica, sans-serif;
+    font-style: italic;
     background-color: var(--secondary-color);
   }
 </style>
