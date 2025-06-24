@@ -7,6 +7,7 @@
   export let showButtons = false;
   export let capitalise = false;
   export let showReveal = false;
+  export let won = false;
   export let display: Definition;
   export let inputDisabled: boolean;
   export let inputValue: string;
@@ -37,45 +38,52 @@
   //   focusAnswerBox();
 </script>
 
-  <input
-    class="guessBox"
-    id="answerBox"
-    style="text-transform: {capitalise ? "none": "lowercase"};"
-    bind:value={inputValue}
-    on:keydown={(e) => {
-      if (e.key === "Enter") {
-        handleSendEnter();
-      }
-    }}
-    disabled={inputDisabled}
-    type="text"
-    maxlength="14"
-    placeholder="guess"
-    autocapitalize="off"
-    spellcheck="false"
-    autocomplete="off"
-    on:blur={handleSendEnter}
-  />
-  <!-- <div class="underline"></div> -->
-  <div class="typeContainer">{display.type}</div>
-  <div class="descriptionContainer">
-    <p>{capitalise ? display.definition : display.definition.toLowerCase()}</p>
+<input
+  class="guessBox won{won}"
+  id="answerBox"
+  style="text-transform: {capitalise ? 'none' : 'lowercase'};"
+  bind:value={inputValue}
+  on:keydown={(e) => {
+    if (e.key === "Enter") {
+      handleSendEnter();
+    }
+  }}
+  disabled={inputDisabled}
+  type="text"
+  maxlength="14"
+  placeholder="guess"
+  autocapitalize="off"
+  spellcheck="false"
+  autocomplete="off"
+  on:blur={handleSendEnter}
+/>
+{#if won}
+  <div class="waveOverlay" aria-hidden="true">
+    {#each inputValue.split("") as letter, i}
+      <span class:waveLetter={won} style="animation-delay: {i * 90 + i/2}ms">
+        {letter}
+      </span>
+    {/each}
   </div>
-  {#if showButtons}
-    <div class="buttonContainer">
-      <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-      <button
-        id="share"
-        on:click={handleSendShare}
-        transition:fade>{shareButtonText}</button
-      >
-      <button id="statistics" transition:fade={{delay: 100}}>Stats</button>
-      {#if showReveal}
-        <button id="reveal">Reveal</button>
-      {/if}
-    </div>
-  {/if}
+{/if}
 
+<!-- <div class="underline"></div> -->
+<div class="typeContainer">{display.type}</div>
+<div class="descriptionContainer">
+  <p>{capitalise ? display.definition : display.definition.toLowerCase()}</p>
+</div>
+{#if showButtons}
+  <div class="buttonContainer">
+    <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+    <button id="share" on:click={handleSendShare} transition:fade
+      >{shareButtonText}</button
+    >
+    <button id="statistics" transition:fade={{ delay: 100 }}>Stats</button>
+    {#if showReveal}
+      <button id="reveal">Reveal</button>
+    {/if}
+  </div>
+{/if}
 
 <style>
   .buttonContainer {
@@ -140,6 +148,12 @@
     opacity: 1;
     -webkit-text-fill-color: var(--text-color);
   }
+  .guessBox.wontrue{
+    color: transparent ;
+    -webkit-text-fill-color: transparent;
+    caret-color: transparent;
+    z-index: 0;
+  }
   .descriptionContainer p {
     margin: 0;
     padding: 0;
@@ -181,5 +195,39 @@
     text-wrap: stable;
     overflow: hidden;
     /* outline: 1px solid black */
+  }
+  .waveOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    font-size: var(--large-text);
+    font-family: inherit;
+    color: var(--text-color);
+    -webkit-text-fill-color: var(--text-color);
+  }
+
+  .waveLetter {
+    display: inline-block;
+    animation: wave 0.35s ease;
+    user-select: none;
+  }
+
+  @keyframes wave {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-0.25em);
+    }
+    90% {
+      transform: translateY(0.05em);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
 </style>

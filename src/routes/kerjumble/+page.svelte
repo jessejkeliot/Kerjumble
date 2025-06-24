@@ -24,6 +24,8 @@
   import InformationContainer from "./informationContainer.svelte";
   import SettingsWidget from "./settingsWidget.svelte";
   import EndGameButtons from "./endGameButtons.svelte";
+  import Confetti from "./Confetti.svelte";
+  import { fade } from "svelte/transition";
 
   //   const savedStates = localStorage.getItem("");
   const startDate: string = "2025-06-10";
@@ -364,6 +366,7 @@
       <InformationContainer
         inputDisabled={true}
         bind:inputValue
+        won={true}
         display={{
           word: display.word,
           type: display.type,
