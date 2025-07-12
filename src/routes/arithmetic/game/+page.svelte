@@ -5,19 +5,21 @@
   import type { Operator, Question, questionSetting } from "../+page";
   import { operators } from "../functions";
   let count = 0;
-  let timeLeft = 120;
+  let timeLeft: number = 120;
   const title = "Arithmetic";
   //get URL Search Params
+  //stats features like. a projected score graph over time, a seconds per answer, input delay, worst sums;
   //intersect operators with urlsearchparams
   let ops: Operator[] = [];
   let question: Question;
-  let startTime = 0;
+  let startTime: number;
   const max = 100;
   let opSymbol = "";
   let opnum = 0;
   let currentAnswer = 0;
   let userInput = "";
   let isActive = false;
+  let finished = false;
 
   let answerInput: HTMLInputElement;
 
@@ -65,7 +67,7 @@
   onMount(() => {
     const searchParams = page.url.searchParams;
     const modesParams = searchParams.get("modes");
-    const timeParam = searchParams.get("time");
+    const timeParam = searchParams.get("time")?.replaceAll("\"", "");
     if (modesParams) {
       try {
         //setting game parameters
@@ -88,7 +90,8 @@
           });
           console.log(ops);
         }
-        startTime = timeParam ? parseInt(timeParam, 10) : 0;
+        startTime = Number(timeParam);
+        timeLeft = startTime;
         randomiseQuestion2();
         console.log("Received modes:", ops);
       } catch (e) {
@@ -97,6 +100,7 @@
     }
     isActive = true;
     const interval = setInterval(() => {
+      if(timeLeft > 0)
       timeLeft--;
     }, 1000);
     return () => clearInterval(interval);
@@ -106,50 +110,61 @@
       answerInput.focus();
     });
   }
+  $: finished = timeLeft <= 0;
 </script>
 
 {#if isActive}
   <div id="game">
-    <div class="gameStats">
-      <span id="time">Time Left: {timeLeft}</span>
-      <span id="score">{count}</span>
-    </div>
-    <div class="titleContainer">
-      <div class="waveOverlay" aria-hidden="true">
-        {#each title.split("") as letter, i}
-          {#if letter === " "}
-            <span class="waveLetter space">&nbsp;</span>
-          {:else}
-            <span class="waveLetter" style="animation-delay: {i * 125}ms">
-              {letter}
-            </span>
-          {/if}
-        {/each}
+    {#if !finished}
+      <div class="gameStats">
+        <span id="time">Time Left: {timeLeft}</span>
+        <span id="score">{count}</span>
       </div>
-    </div>
+      <div class="titleContainer">
+        <div class="waveOverlay" aria-hidden="true">
+          {#each title.split("") as letter, i}
+            {#if letter === " "}
+              <span class="waveLetter space">&nbsp;</span>
+            {:else}
+              <span class="waveLetter" style="animation-delay: {i * 125}ms">
+                {letter}
+              </span>
+            {/if}
+          {/each}
+        </div>
+      </div>
 
-    <!-- <h2>Question {count+1}</h2> -->
-    <div class="question">
-      <h3>
-        {question.num1}
-        {question.symbol}
-        {question.num2} =
-        <input
-          bind:value={userInput}
-          oninput={checkifcorrect}
-          type="number"
-          name="answerbox"
-          id="ab1"
-          bind:this={answerInput}
-        />
-      </h3>
-    </div>
+      <!-- <h2>Question {count+1}</h2> -->
+      <div class="question">
+        <h3>
+          {question.num1}
+          {question.symbol}
+          {question.num2} =
+          <input
+            bind:value={userInput}
+            oninput={checkifcorrect}
+            type="number"
+            name="answerbox"
+            id="ab1"
+            bind:this={answerInput}
+          />
+        </h3>
+      </div>
+    {:else}
+      <div class="question middle">
+      <h2>Score: {count}</h2>
+      <button onkeydown={(e: KeyboardEvent) => { if (e.key === "Enter") location.reload(); }} onclick={() => location.reload()} aria-label="retry button">Click me to retry!</button>
+      </div>
+    {/if}
   </div>
 {:else}
   <h1>Loading</h1>
 {/if}
 
 <style>
+  .middle {
+    margin: 50% 0;
+  }
   .title {
     font-size: 3rem;
   }
