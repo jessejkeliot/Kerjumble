@@ -1,7 +1,5 @@
-cat > wrangler.toml << 'EOF'
-name = "kerjumkble"
-compatibility_date = "2025-06-01"
-
-[env.production]
-pages_build_output_dir = "build" 
-EOF
+name = "Kerjumble"
+type = "javascript"
+account_id = "a44e82dfdcdf99f3c721f7fe02b6a769"
+workers_dev = true
+compatibility_date = "2024-07-01"
