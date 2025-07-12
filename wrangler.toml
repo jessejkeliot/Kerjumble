@@ -1,5 +1,4 @@
-name = "Kerjumble"
-type = "javascript"
+name = "kerjumble"
 account_id = "a44e82dfdcdf99f3c721f7fe02b6a769"
 workers_dev = true
 compatibility_date = "2024-07-01"
