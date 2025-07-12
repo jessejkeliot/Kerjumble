@@ -66,7 +66,7 @@
   }
   function setGameParameters() {}
   onMount(() => {
-    const {searchParams} = get(page).url;
+    const searchParams = $page.url.searchParams;
     const modesParams = searchParams.get("modes");
     const timeParam = searchParams.get("time")?.replaceAll("\"", "");
     if (modesParams) {
