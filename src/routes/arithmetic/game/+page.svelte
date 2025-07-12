@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
   import { doOperator } from "../functions";
-  import { page } from "$app/state";
+  import { get } from "svelte/store";
+  import { page } from "$app/stores";
   import type { Operator, Question, questionSetting } from "../+page";
   import { operators } from "../functions";
   let count = 0;
@@ -65,7 +66,7 @@
   }
   function setGameParameters() {}
   onMount(() => {
-    const searchParams = page.url.searchParams;
+    const {searchParams} = get(page).url;
     const modesParams = searchParams.get("modes");
     const timeParam = searchParams.get("time")?.replaceAll("\"", "");
     if (modesParams) {
