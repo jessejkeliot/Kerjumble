@@ -22,7 +22,9 @@
     event.preventDefault();
 
     // Filter out disabled modes
-    const activeModes = modes.filter((mode) => mode.on).map(m=> ({name:m.name, range:m.range}));
+    const activeModes = modes
+      .filter((mode) => mode.on)
+      .map((m) => ({ name: m.name, range: m.range }));
 
     // Format modes object into JSON string
     const modesParam = JSON.stringify(activeModes);
@@ -42,7 +44,7 @@
 <div class="topbar">
   <h1 class="title">Speed Arithmetic</h1>
 </div>
-<form onsubmit={onsubmit}>
+<form {onsubmit}>
   {#each modes as mode, i}
     <br />
     <div>
@@ -77,7 +79,7 @@
   <br />
   <div>
     <label for="times">Time Limit: </label>
-    <select id="times" name="Time Limit" bind:value={timeLimit}>
+    <select id="times" name="Time Limit" class="shadow" bind:value={timeLimit}>
       <option selected value="120">120</option>
       <option value="60">60</option>
       <option value="30">30</option>
@@ -85,7 +87,7 @@
     </select>
   </div>
   <br />
-  <input type="submit" value="Start">
+  <button class="shadow">Start</button>
 </form>
 
 <style>
@@ -116,6 +118,19 @@
     width: 50%;
     margin: 0 auto;
   }
+  button {
+    max-width: 180px;
+    margin: 0 auto;
+    width: 40%;
+  }
+  .shadow {
+    box-shadow: inset 0 0 5px #444;
+    border: 1px solid black;
+    border-radius: 8px;
+    background: linear-gradient(#ddd, #aab);
+    padding: 4px 0;
+  }
+
   .topbar {
     width: 100%;
     min-height: 2em;
