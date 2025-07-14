@@ -36,6 +36,9 @@
   }
 </script>
 
+<svelte:head>
+  <title>Arithmetic Game</title>
+</svelte:head>
 <div class="topbar">
   <h1 class="title">Speed Arithmetic</h1>
 </div>

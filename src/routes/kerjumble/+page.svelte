@@ -136,8 +136,8 @@
     console.log("Share Clicked");
     //shareText is made pre-emptively when the game is finished to avoid lag.
     // navigator.canShare() ? navigator.share() : navigator.clipboard.writeText("Ker");
-    if (shareText==='') {
-      shareText = createShareText(getGameState()); 
+    if (shareText === "") {
+      shareText = createShareText(getGameState());
     }
     try {
       navigator.share({ text: shareText, title: "Kerjumble Results" });
@@ -279,7 +279,9 @@
   }
 </script>
 
-<title>Kerjumble</title>
+<svelte:head>
+  <title>Kerjumble</title>
+</svelte:head>
 {#if statsOpen}
   <Header number={"stats"} bind:helpOpen bind:settingsOpen></Header>
 {:else}
@@ -485,7 +487,7 @@
     padding: 0;
     background-color: var(--secondary-color);
   }
-    .Start {
+  .Start {
     aspect-ratio: none;
     font-size: inherit;
     max-width: none;
