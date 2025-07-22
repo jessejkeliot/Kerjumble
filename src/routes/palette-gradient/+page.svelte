@@ -115,7 +115,12 @@
 <!-- STYLES -->
 <style>
   * {
-    outline: 1px solid #0009 !important;
+    /* outline: 1px solid #0009 !important; */
+  }
+  input[type="range"]{
+    accent-color: green;
+    min-width: none;
+    width: 50%;
   }
   .middlebox {
     display: flex;

@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
-  import { palette, settings } from "./shared.svelte";
   import { getPaletteColours } from "./functions";
 
   // Image files and previews
@@ -30,6 +28,7 @@
   }
   function handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement;
+    console.log(input.id);
     const files = input.files;
     const id = input.id;
 
@@ -68,12 +67,7 @@
       );
 
       if (imageData) {
-        palette.colours = getPaletteColours(
-          imageData,
-          settings.numberOfColours,
-          settings.differenceOfColour,
-          settings.Algorithm
-        );
+        
       } else {
         console.log("No imageData after drawImage");
       }
@@ -97,7 +91,7 @@
 <div class="data">
   <div
     class="imageHolder input"
-    id="canvas"
+    id="output imageHolder"
     ondrop={handleDrop}
     ondragover={handleDragOver}
     aria-hidden="true"
@@ -109,19 +103,13 @@
         class="containedImage"
         onload={onImageLoad}
       />
-      <canvas
-        bind:this={canvasEl}
-        width={canvasWidth}
-        height={canvasHeight}
-        id="canvas"
-      ></canvas>
     {/if}
-    <label for="paletteFileInput">
+    <label for="outputFileInput">
       <MageImageAdd style="font-size: 3rem" />
     </label>
     <input
       type="file"
-      id="paletteFileInput"
+      id="outputFileInput"
       accept="image/*"
       hidden
       onchange={handleFileInput}
@@ -167,6 +155,9 @@
   @media (max-width: 600px) {
     .imageHolder {
       width: 100%;
+    }
+    .data {
+        width: 100%;
     }
   }
 

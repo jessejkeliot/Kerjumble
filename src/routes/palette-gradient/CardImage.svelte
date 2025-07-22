@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import { palette, settings } from "./shared.svelte";
   import { getPaletteColours } from "./functions";
@@ -177,6 +176,9 @@
   @media (max-width: 600px) {
     .imageHolder {
       width: 100%;
+    }
+    .data {
+        width: 100%;
     }
   }
 
