@@ -1,4 +1,5 @@
 import { vector } from "@js-basics/vector";
+import type { colour } from "./types";
 function processFile(file: File): string {
   return URL.createObjectURL(file);
 }
@@ -23,12 +24,7 @@ export function getPaletteColours(
 
   return colours;
 }
-type colour = {
-  red: number;
-  green: number;
-  blue: number;
-  alpha?: number;
-};
+
 
 function histogramExtraction(
   image: ImageData,
@@ -95,8 +91,7 @@ function histogramExtraction2(
   console.log("Frequency map:", freqMap);
 
   const colours = sorted.slice(0, numberOfColours).map((entry) => entry[0]);
-  console.log("Extracted colours:", colours);
-
+  //finding colours that are too similar and removing them
   const selected: string[] = [];
 
   for (const [hex] of sorted) {

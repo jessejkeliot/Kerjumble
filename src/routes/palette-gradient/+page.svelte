@@ -2,8 +2,6 @@
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import CardImage from "./CardImage.svelte";
-  import { settings } from "./shared.svelte";
-  import OutputCard from "./OutputCard.svelte";
 
   // Image files and previews
   let paletteImage: File | null = $state(null);
@@ -82,32 +80,14 @@
 </script>
 
 <div class="whole">
-  <div class="title"><h1>Palette Generator</h1></div>
+  <div class="title"><h1>Ollets</h1></div>
   <div class="middlebox">
     <div class="IOContainer">
       <!-- Palette Drop Zone -->
-      <CardImage></CardImage>
+      <CardImage name="one"></CardImage>
 
       <!-- Canvas Drop Zone -->
-      <OutputCard></OutputCard>
-    </div>
-    <div class="settingsHolder">
-      <label for="algorithms"
-        >Algorithm:
-        <select name="Algorithm" id="algorithms" bind:value={settings.Algorithm}>
-          <option value="histogram">Histogram</option>
-          <option value="k-means">K-means</option>
-        </select>
-      </label>
-      <label for="paletteSize">
-        n:
-        <input type="range" name="paletteSize" id="paletteSize" bind:value={settings.numberOfColours}>
-      </label>
-      <label for="colourDifference">
-        diff:
-        <input type="range" name="colourdiff" id="colourDifference" min="2" max="50" bind:value={settings.differenceOfColour}>
-      </label>
-      <button type="button">Apply</button>
+      <CardImage name="two"></CardImage>
     </div>
   </div>
 </div>
@@ -116,11 +96,6 @@
 <style>
   * {
     /* outline: 1px solid #0009 !important; */
-  }
-  input[type="range"]{
-    accent-color: green;
-    min-width: none;
-    width: 50%;
   }
   .middlebox {
     display: flex;
@@ -156,19 +131,23 @@
   }
 
   .title {
-    font-family: Helvetica;
+    font-family:monospace;
+    font-weight: 600;
     font-style: italic;
     display: flex;
     align-items: center;
+    margin-bottom: 1rem;
   }
 
   .title h1 {
-    color: #fff0;
-    text-shadow: 0 0 20px #222;
+    color: #000;
+    /* text-shadow: 0 0 24px #333d; */
+    outline: 1px dashed black;
     font-size: 5rem;
     margin: 0;
-    animation: fadeColorIn 1.2s ease 1s forwards;
+    /* animation: fadeColorIn 1.2s ease 1s forwards; */
     user-select: none;
+    font-weight: 100;
   }
 
   .IOContainer {
