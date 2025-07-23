@@ -14,9 +14,10 @@
 
   let palette: paletteState = $state({
     colours: [],
-    settings: {...defaultSettings},
+    settings: { ...defaultSettings },
   });
   // Image files and previews
+  let originalImageFile: File | null = $state(null);
   let imageFile: File | null = $state(null);
   let imageURL: string | null = $state(null);
   let imageElement: HTMLImageElement | null = $state(null);
@@ -30,6 +31,9 @@
     } else {
       imageURL = null;
     }
+  });
+  $effect(() => {
+    imageFile = originalImageFile;
   });
   $effect(() => {
     return () => {
@@ -64,7 +68,7 @@
     if (files.length >= 2) {
       twoFiles();
     } else {
-      imageFile = files[0];
+      originalImageFile = files[0];
     }
   }
   //Get HTMLImageElement
@@ -78,7 +82,7 @@
     }
     const img = event.target as HTMLImageElement;
     if (imageURL) {
-      const p = generatePalette(img, {...palette.settings});
+      const p = generatePalette(img, { ...palette.settings });
       if (p) {
         palette.colours = p;
       }
@@ -86,7 +90,7 @@
   }
   function applySettings() {
     if (imageElement && imageURL) {
-      const p = generatePalette(imageElement, {...palette.settings});
+      const p = generatePalette(imageElement, { ...palette.settings });
       if (p) {
         palette.colours = p;
       }
@@ -107,7 +111,7 @@
 <div class="data">
   <div class="Image Options">
     <button onclick={() => (imageFile = null)}>Clear Image</button>
-    <button onclick={() => (imageFile = null)}>Reset Image</button>
+    <button onclick={() => (imageFile = originalImageFile)}>Reset Image</button>
     <button onclick={() => (imageFile = null)}>Save Image</button>
     <button onclick={() => (imageFile = null)}>Save Palette</button>
   </div>
