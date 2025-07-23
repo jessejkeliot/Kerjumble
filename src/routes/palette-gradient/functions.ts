@@ -1,5 +1,5 @@
 import { vector } from "@js-basics/vector";
-import type { colour } from "./types";
+import type { colour, paletteSettings } from "./types";
 function processFile(file: File): string {
   return URL.createObjectURL(file);
 }
@@ -25,6 +25,38 @@ export function getPaletteColours(
   return colours;
 }
 
+export function generatePalette(img: HTMLImageElement, settings : paletteSettings): string[] | null {
+  const offscreen = new OffscreenCanvas(img.naturalWidth, img.naturalHeight);
+  const canvasContext = offscreen.getContext("2d");
+  if (!canvasContext) {
+    console.error("Failed to get canvas context");
+    return null;
+  }
+  if (!img.complete) {
+    console.error("Image not complete");
+    return null;
+  }
+  console.log("Drawing Image to Offscreen Canvas");
+  canvasContext.drawImage(img, 0, 0);
+  const imageData = canvasContext?.getImageData(
+    0,
+    0,
+    offscreen.width,
+    offscreen.height
+  );
+
+  if (imageData) {
+    return getPaletteColours(
+      imageData,
+      settings.numberOfColours,
+      settings.differenceOfColour,
+      settings.Algorithm
+    );
+  } else {
+    console.error("No Imagedata received");
+    return null;
+  }
+}
 
 function histogramExtraction(
   image: ImageData,

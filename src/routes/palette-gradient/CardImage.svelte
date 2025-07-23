@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
-  import { getPaletteColours } from "./functions";
+  import { generatePalette } from "./functions";
   import type { paletteSettings, paletteState } from "./types.ts";
 
   let { name } = $props();
@@ -14,30 +14,27 @@
 
   let palette: paletteState = $state({
     colours: [],
-    settings: defaultSettings,
+    settings: {...defaultSettings},
   });
   // Image files and previews
-  let canvasImage: File | null = $state(null);
-  let canvasImageURL: string | null = $state(null);
-  let canvasEl: HTMLCanvasElement | null = $state(null);
-  let imageEl: HTMLImageElement | null = $state(null);
-  let canvasHeight = $state(0);
-  let canvasWidth = $state(0);
+  let imageFile: File | null = $state(null);
+  let imageURL: string | null = $state(null);
+  let imageElement: HTMLImageElement | null = $state(null);
 
   let dispatch = createEventDispatcher();
 
   // Create preview URLs when image files are set
   $effect(() => {
-    if (canvasImage) {
-      canvasImageURL = URL.createObjectURL(canvasImage);
+    if (imageFile) {
+      imageURL = URL.createObjectURL(imageFile);
     } else {
-      canvasImageURL = null;
+      imageURL = null;
     }
   });
   $effect(() => {
     return () => {
-      if (canvasImageURL) {
-        URL.revokeObjectURL(canvasImageURL);
+      if (imageURL) {
+        URL.revokeObjectURL(imageURL);
       }
     };
   });
@@ -67,7 +64,7 @@
     if (files.length >= 2) {
       twoFiles();
     } else {
-      canvasImage = files[0];
+      imageFile = files[0];
     }
   }
   //Get HTMLImageElement
@@ -80,16 +77,16 @@
       return;
     }
     const img = event.target as HTMLImageElement;
-    if (canvasImageURL) {
-      const p = generatePalette(img, canvasImageURL);
+    if (imageURL) {
+      const p = generatePalette(img, {...palette.settings});
       if (p) {
         palette.colours = p;
       }
     }
   }
   function applySettings() {
-    if (imageEl && canvasImageURL) {
-      const p = generatePalette(imageEl, canvasImageURL);
+    if (imageElement && imageURL) {
+      const p = generatePalette(imageElement, {...palette.settings});
       if (p) {
         palette.colours = p;
       }
@@ -104,53 +101,15 @@
     const b = parseInt(colour.slice(5, 7), 16);
     return (r + g + b) / 3; // Average of RGB values
   }
-  function generatePalette(
-    img: HTMLImageElement,
-    imageURL: string
-  ): string[] | null {
-    if (!imageURL) {
-      console.error("No Image URL has been provided");
-      return null;
-    }
-    const offscreen = new OffscreenCanvas(img.naturalWidth, img.naturalHeight);
-    const canvasContext = offscreen.getContext("2d");
-    if (!canvasContext) {
-      console.error("Failed to get canvas context");
-      return null;
-    }
-
-    const image = new Image();
-    image.src = imageURL;
-    console.log("starting the onload");
-    canvasContext?.drawImage(image, 0, 0);
-    const imageData = canvasContext?.getImageData(
-      0,
-      0,
-      offscreen.width,
-      offscreen.height
-    );
-
-    if (imageData) {
-      return getPaletteColours(
-        imageData,
-        palette.settings.numberOfColours,
-        palette.settings.differenceOfColour,
-        palette.settings.Algorithm
-      );
-    } else {
-      console.error("No Imagedata received");
-      return null;
-    }
-  }
   //image option buttons must be done.
 </script>
 
 <div class="data">
   <div class="Image Options">
-    <button onclick={() => (canvasImage = null)}>Clear Image</button>
-    <button onclick={() => (canvasImage = null)}>Reset Image</button>
-    <button onclick={() => (canvasImage = null)}>Save Image</button>
-    <button onclick={() => (canvasImage = null)}>Save Palette</button>
+    <button onclick={() => (imageFile = null)}>Clear Image</button>
+    <button onclick={() => (imageFile = null)}>Reset Image</button>
+    <button onclick={() => (imageFile = null)}>Save Image</button>
+    <button onclick={() => (imageFile = null)}>Save Palette</button>
   </div>
   <div
     class="imageHolder input"
@@ -159,20 +118,14 @@
     ondragover={handleDragOver}
     aria-hidden="true"
   >
-    {#if canvasImageURL}
+    {#if imageURL}
       <img
-        src={canvasImageURL}
+        src={imageURL}
         alt="canvas preview"
         class="containedImage"
         onload={onImageLoad}
-        bind:this={imageEl}
+        bind:this={imageElement}
       />
-      <canvas
-        bind:this={canvasEl}
-        width={canvasWidth}
-        height={canvasHeight}
-        id="canvas{name}"
-      ></canvas>
     {/if}
     <label for="paletteFileInput{name}">
       <MageImageAdd style="font-size: 3rem" />
