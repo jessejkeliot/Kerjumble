@@ -22,6 +22,8 @@
   let canvasWidth: number = $state(0);
   let canvasHeight: number = $state(0);
 
+  //could have a check if the settings have changed before applying
+
   let inputElement: HTMLInputElement | null = $state(null);
 
   let gradientLineElement: HTMLDivElement | null = $state(null);
@@ -57,14 +59,16 @@
       await new Promise(requestAnimationFrame);
 
       context.drawImage(image, 0, 0, w, h);
-      const imageData = context.getImageData(0, 0, w, h);
-      const colours = getPaletteColours(
-        imageData,
-        palette.settings.numberOfColours,
-        palette.settings.differenceOfColour,
-        palette.settings.Algorithm
-      );
-      palette.colours = colours;
+      if (palette.colours.length === 0) {
+        const imageData = context.getImageData(0, 0, w, h);
+        const colours = getPaletteColours(
+          imageData,
+          palette.settings.numberOfColours,
+          palette.settings.differenceOfColour,
+          palette.settings.Algorithm
+        );
+        palette.colours = colours;
+      }
     } catch (error) {
       console.error("Failed to load or process image", error);
       imageURL = null; // Clear the URL on error
