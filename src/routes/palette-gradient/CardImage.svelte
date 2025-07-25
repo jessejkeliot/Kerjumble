@@ -1,119 +1,218 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
-  import { generatePalette } from "./functions";
-  import type { paletteSettings, paletteState } from "./types.ts";
+  import { getPaletteColours } from "./functions";
+  import type { paletteSettings, paletteState } from "./types";
 
   let { name } = $props();
   let defaultSettings: paletteSettings = {
     numberOfColours: 5,
-    differenceOfColour: 30,
+    differenceOfColour: 60,
     Algorithm: "histogram",
-    downsampleRate: 1,
+    downsampleRate: "1",
   };
 
   let palette: paletteState = $state({
     colours: [],
     settings: { ...defaultSettings },
   });
-  // Image files and previews
-  let originalImageFile: File | null = $state(null);
   let imageFile: File | null = $state(null);
   let imageURL: string | null = $state(null);
-  let imageElement: HTMLImageElement | null = $state(null);
+  let canvasEl: HTMLCanvasElement | null = $state(null);
+  let canvasWidth: number = $state(0);
+  let canvasHeight: number = $state(0);
+
+  let inputElement: HTMLInputElement | null = $state(null);
+
+  let gradientLineElement: HTMLDivElement | null = $state(null);
 
   let dispatch = createEventDispatcher();
 
-  // Create preview URLs when image files are set
-  $effect(() => {
-    if (imageFile) {
-      imageURL = URL.createObjectURL(imageFile);
-    } else {
-      imageURL = null;
+  // Handle image loading and canvas drawing
+  async function loadImageAndProcess(file: File) {
+    const url = URL.createObjectURL(file);
+    imageURL = url; // Update state so the template can show the canvas
+
+    const image = new Image();
+
+    try {
+      // Wait for the image to load using a Promise
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+        image.src = url; // Start loading
+      });
+
+      if (!canvasEl) return;
+
+      const w = image.naturalWidth;
+      const h = image.naturalHeight;
+      canvasWidth = w;
+      canvasHeight = h;
+
+      const context = canvasEl.getContext("2d", { willReadFrequently: true });
+      if (!context) return;
+
+      // Ensure canvas is ready for drawing
+      await new Promise(requestAnimationFrame);
+
+      context.drawImage(image, 0, 0, w, h);
+      const imageData = context.getImageData(0, 0, w, h);
+      const colours = getPaletteColours(
+        imageData,
+        palette.settings.numberOfColours,
+        palette.settings.differenceOfColour,
+        palette.settings.Algorithm
+      );
+      palette.colours = colours;
+    } catch (error) {
+      console.error("Failed to load or process image", error);
+      imageURL = null; // Clear the URL on error
     }
-  });
+    // We don't revoke the URL here because the <img> tag might still need it.
+    // The cleanup in $effect will handle it.
+  }
   $effect(() => {
-    imageFile = originalImageFile;
-  });
-  $effect(() => {
+    // This effect now ONLY reacts to changes in imageFile.
+    if (imageFile) {
+      loadImageAndProcess(imageFile);
+    }
     return () => {
       if (imageURL) {
         URL.revokeObjectURL(imageURL);
       }
     };
   });
-  function handleDragOver(event: DragEvent) {
-    event.preventDefault(); // Required for allowing drop
+  $effect(() => {
+    if (palette && palette.colours.length > 1) {
+      updateGradientLine();
+    }
+  });
+
+  function updateGradientLine() {
+    if (gradientLineElement) {
+      gradientLineElement.style.background = `linear-gradient(to right, ${palette.colours.join(", ")})`;
+    }
   }
+
+  function clearImage() {
+    imageFile = null;
+    imageURL = null;
+    if (inputElement) {
+      console.log("2 file bug stopper");
+      inputElement.value = ""; //This stops the 2 of the same file in a row not registering problem.
+    }
+    canvasWidth = 0;
+    canvasHeight = 0;
+  }
+
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
   function handleDrop(event: DragEvent) {
     event.preventDefault();
     const target = event.currentTarget as HTMLElement;
     const id = target.id;
     const files = event.dataTransfer?.files;
-
     loadFile(id, files);
   }
+
   function handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement;
     const files = input.files;
     const id = input.id;
-    console.log(input.id);
-
     loadFile(id, files);
   }
-  function twoFiles() {}
+
+  function twoFiles() {
+    console.error("Please drop only one file");
+  }
+
   function loadFile(id: string, files: FileList | null | undefined) {
     if (!files || files.length === 0) return;
-
     if (files.length >= 2) {
       twoFiles();
     } else {
-      originalImageFile = files[0];
+      imageFile = files[0];
     }
   }
-  //Get HTMLImageElement
-  //use offscreen canvas to run palette algorithm
-  //use another offscreen canvas to apply the palette algorithm
-  function onImageLoad(event: Event) {
-    console.log("Running ONimageload");
-    if (!(event.target instanceof HTMLImageElement)) {
-      console.error("Event target is not an HTMLImageElement");
+
+  function applySettings() {
+    if (!canvasEl || canvasWidth === 0 || canvasHeight === 0) {
+      console.error("No image loaded to apply settings");
       return;
     }
-    const img = event.target as HTMLImageElement;
-    if (imageURL) {
-      const p = generatePalette(img, { ...palette.settings });
-      if (p) {
-        palette.colours = p;
-      }
+    const context = canvasEl.getContext("2d", { willReadFrequently: true });
+    if (!context) {
+      console.error("Failed to get canvas context");
+      console.error("Failed to get canvas context");
+      return;
     }
+    const imageData = context.getImageData(0, 0, canvasWidth, canvasHeight);
+    const colours = getPaletteColours(
+      imageData,
+      palette.settings.numberOfColours,
+      palette.settings.differenceOfColour,
+      palette.settings.Algorithm
+    );
+    palette.colours = colours;
+    dispatch("paletteUpdated", { colours: palette.colours });
   }
-  function applySettings() {
-    if (imageElement && imageURL) {
-      const p = generatePalette(imageElement, { ...palette.settings });
-      if (p) {
-        palette.colours = p;
-      }
-    } else {
-      toast();
+
+  function resetImage() {
+    if (!imageFile) {
+      console.error("No image file loaded to reset");
+      return;
     }
+    if (!imageURL || !canvasEl) {
+      console.error("No image loaded to reset");
+      return;
+    }
+    const context = canvasEl.getContext("2d", { willReadFrequently: true });
+    if (!context) {
+      console.error("Failed to get canvas context");
+      console.error("Failed to get canvas context");
+      return;
+    }
+    context.clearRect(0, 0, canvasWidth, canvasHeight);
+    const image = new Image();
+    image.src = imageURL;
+    image.onload = () => {
+      console.log("Resetting image on canvas");
+      context.drawImage(image, 0, 0);
+    };
   }
-  function toast() {}
+
   function getDarkness(colour: string): number {
     const r = parseInt(colour.slice(1, 3), 16);
     const g = parseInt(colour.slice(3, 5), 16);
     const b = parseInt(colour.slice(5, 7), 16);
-    return (r + g + b) / 3; // Average of RGB values
+    return (r + g + b) / 3;
   }
-  //image option buttons must be done.
+
+  function savePalette() {
+    if (palette.colours.length === 0) {
+      console.error("No palette to save");
+      return;
+    }
+    const data = JSON.stringify(palette.colours);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "palette.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 </script>
 
 <div class="data">
   <div class="Image Options">
-    <button onclick={() => (imageFile = null)}>Clear Image</button>
-    <button onclick={() => (imageFile = originalImageFile)}>Reset Image</button>
+    <button onclick={clearImage}>Clear Image</button>
+    <button onclick={resetImage}>Reset Image</button>
     <button onclick={() => (imageFile = null)}>Save Image</button>
-    <button onclick={() => (imageFile = null)}>Save Palette</button>
+    <button onclick={savePalette}>Save Palette</button>
   </div>
   <div
     class="imageHolder input"
@@ -123,16 +222,15 @@
     aria-hidden="true"
   >
     {#if imageURL}
-      <img
-        src={imageURL}
-        alt="canvas preview"
+      <canvas
+        bind:this={canvasEl}
+        width={canvasWidth}
+        height={canvasHeight}
         class="containedImage"
-        onload={onImageLoad}
-        bind:this={imageElement}
-      />
+      ></canvas>
     {/if}
     <label for="paletteFileInput{name}">
-      <MageImageAdd style="font-size: 3rem" />
+      <MageImageAdd style="font-size: 3em" />
     </label>
     <input
       type="file"
@@ -140,6 +238,7 @@
       accept="image/*"
       hidden
       onchange={handleFileInput}
+      bind:this={inputElement}
     />
   </div>
   <div class="paletteDisplay">
@@ -153,16 +252,15 @@
             : 'black'}"
           role="cell"
           tabindex={i}
-          onclick={() => {
-            navigator.clipboard.writeText(colour);
-          }}
+          onclick={() => navigator.clipboard.writeText(colour)}
         ></button>
       </div>
     {/each}
   </div>
+  <div class="gradientLine" bind:this={gradientLineElement}></div>
   <div class="configBox">
-    <label for="algorithms"
-      >Algo:
+    <label for="algorithms">
+      Algo:
       <select
         name="Algorithm"
         id="algorithms"
@@ -195,33 +293,43 @@
       />
     </label>
     <label for="downsampling">
-      downsample
+      reduce:
       <select
         name="Algorithm"
         id="downsampling"
         bind:value={palette.settings.downsampleRate}
       >
-        <option value="1">1x</option>
+        <option value="1" selected>1x</option>
         <option value="2">2x</option>
-        <option value="4" class="red">4x</option>
+        <option value="4">4x</option>
         <option value="8">8x</option>
         <option value="16">16x</option>
       </select>
     </label>
-    <button onclick={applySettings}>Apply</button>
+    <button class="apply" onclick={applySettings}>Apply</button>
   </div>
 </div>
 
 <style>
-  * {
-    /* outline: 1px solid #0009 !important; */
+  /* * {
+    outline: 1px solid #0009 !important;
+  } */
+  .apply {
+    font-size: inherit;
+  }
+  .gradientLine {
+    height: 3%;
+    width: 100%;
+    background: #000;
+    outline: 1px solid #000;
   }
   .configBox {
     flex: 1;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.5em;
+    padding: 0 0.5em;
     margin-top: 1rem;
   }
   .Options {
@@ -237,11 +345,18 @@
   .Options button {
     flex: 1;
   }
+  button,
+  input,
+  select {
+    font-size: inherit;
+  }
   .data {
     flex: 1;
+    font-size: 1rem;
     display: flex;
     flex-direction: column;
     height: 100%;
+    width: 100%;
     text-overflow: clip;
   }
   .paletteDisplay {
@@ -278,12 +393,20 @@
     object-fit: contain;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 850px) {
     .imageHolder {
       width: 100%;
     }
     .data {
+      font-size: 0.8rem;
+    }
+    .data {
       width: 100%;
+    }
+  }
+  @media (max-width: 480px) {
+    .data {
+      font-size: 0.6rem;
     }
   }
 

@@ -10,6 +10,10 @@ export function getPaletteColours(
   differenceOfColour: number,
   algorithm: string
 ): string[] {
+  if (!image || !image.data.length) {
+    console.error("Invalid or empty image data");
+    return [];
+  }
   // Placeholder for actual palette extraction logic
   const colours: string[] = [];
   // histogram or k-means clustering logic would go here
@@ -21,7 +25,6 @@ export function getPaletteColours(
     // Implement histogram-based colour extraction logic
     return histogramExtraction2(image, numberOfColours, differenceOfColour);
   }
-
   return colours;
 }
 

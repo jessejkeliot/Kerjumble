@@ -2,85 +2,14 @@
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import CardImage from "./CardImage.svelte";
+  import Number from "./Number.svelte";
 
   // Image files and previews
-  let paletteImage: File | null = $state(null);
-  let paletteImageURL: string | null = $state(null);
-  let paletteEl: HTMLCanvasElement | null = $state(null);
-  let paletteHeight = $state(0);
-  let paletteWidth = $state(0);
-  let canvasImage: File | null = $state(null);
-  let canvasImageURL: string | null = $state(null);
 
-  // Create preview URLs when image files are set
-  $effect(() => {
-    if (paletteImage) {
-      paletteImageURL = URL.createObjectURL(paletteImage);
-    }
-    if (canvasImage) {
-      canvasImageURL = URL.createObjectURL(canvasImage);
-    }
-  });
-  function handleDragOver(event: DragEvent) {
-    event.preventDefault(); // Required for allowing drop
-  }
-  function handleDrop(event: DragEvent) {
-    event.preventDefault();
-    const target = event.currentTarget as HTMLElement;
-    const id = target.id;
-    const files = event.dataTransfer?.files;
-
-    loadFile(id, files);
-  }
-  function handleFileInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const files = input.files;
-    const id = input.id;
-
-    loadFile(id, files);
-  }
-  function loadFile(id: string, files: FileList | null | undefined) {
-    if (!files || files.length === 0) return;
-
-    if (files.length >= 2) {
-      paletteImage = files[0];
-      canvasImage = files[1];
-    } else {
-      const file = files[0];
-      if (id.startsWith("palette")) {
-        paletteImage = file;
-      } else if (id.startsWith("canvas")) {
-        canvasImage = file;
-      }
-    }
-  }
-  function onImageLoad(event: Event) {
-    const img = event.target as HTMLImageElement;
-    paletteWidth = img.naturalWidth;
-    paletteHeight = img.naturalHeight;
-    if (!paletteEl) return;
-    paletteEl.width = paletteWidth;
-    paletteEl.height = paletteHeight;
-    const ctx = paletteEl.getContext("2d");
-    if (!ctx) return;
-    ctx.drawImage(img, 0, 0);
-
-    // MAIN PIXEL LOOP:
-    const imageData = ctx.getImageData(0, 0, paletteWidth, paletteHeight);
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      // Example: invert colors
-      data[i] = 255 - data[i]; // R
-      data[i + 1] = 255 - data[i + 1]; // G
-      data[i + 2] = 255 - data[i + 2]; // B
-      // Alpha unchanged (data[i + 3])
-    }
-    ctx.putImageData(imageData, 0, 0);
-  }
 </script>
 
 <div class="whole">
-  <div class="title"><h1>Ollets</h1></div>
+  <!-- <div class="title"><h4>Ollets</h4></div> -->
   <div class="middlebox">
     <div class="IOContainer">
       <!-- Palette Drop Zone -->
@@ -91,7 +20,7 @@
     </div>
   </div>
 </div>
-
+<!-- <Number prefix={"$"}></Number> -->
 <!-- STYLES -->
 <style>
   * {
@@ -101,8 +30,11 @@
     display: flex;
     flex-direction: column;
     height: 70%;
-    width: 75%;
+    width: 90%;
+    /* max-height: 700px;
+    max-width: 1000px; */
     border-radius: 1rem;
+    /* outline: 1px solid black; */
     align-items: center;
   }
   .settingsHolder {
@@ -131,18 +63,21 @@
   }
 
   .title {
-    font-family:monospace;
-    font-weight: 600;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-weight: 900;
     font-style: italic;
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
+    text-decoration: underline;
+    text-underline-offset: 20px;
+    text-decoration-color: aqua;
   }
 
   .title h1 {
     color: #000;
     /* text-shadow: 0 0 24px #333d; */
-    outline: 1px dashed black;
+    /* outline: 1px solid black; */
     font-size: 5rem;
     margin: 0;
     /* animation: fadeColorIn 1.2s ease 1s forwards; */
@@ -157,15 +92,19 @@
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    gap: 1rem;
+    gap: 1em;
     width: 100%;
+    height: 100%;
     max-width: 1000px;
     outline: 3px solid #e9e9e9;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 700px) {
     .IOContainer {
       flex-direction: column;
+    }
+    .middlebox {
+      height: 90%;
     }
     .imageHolder {
       width: 100%;
