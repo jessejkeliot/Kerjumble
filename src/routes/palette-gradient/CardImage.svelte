@@ -6,6 +6,10 @@
     getPaletteColours,
     fisherYates,
     interpolateColor,
+    getColourAt,
+    hueSimilarity,
+    getPixelIndex,
+    brightnessSimilarity,
   } from "./functions";
   import type { colour, paletteSettings, paletteState } from "./types";
   import {
@@ -105,37 +109,94 @@
       return;
     }
 
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const width = canvas.width;
+    const height = canvas.height;
+    const imageData = context.getImageData(0, 0, width, height);
+    const data = imageData.data;
     console.log("Colorspace:", imageData.colorSpace);
 
-    for (let i = 0; i < imageData.data.length; i += 4) {
-      const r = imageData.data[i];
-      const g = imageData.data[i + 1];
-      const b = imageData.data[i + 2];
-      const currentColour = { red: r, green: g, blue: b };
-      let newColour: colour = { red: r, green: g, blue: b };
-      switch (via) {
-        case "brightness":
-          newColour = gradientFromPalette(getLuma(currentColour), palette);
-          break;
-        case "hue":
-          const hue = getHue(currentColour) / 6;
-          newColour = gradientFromPalette(hue, palette);
-          break;
-        case "posterise":
-          const posterhue = getHue(currentColour) / 6;
-          newColour = colourFromPalette(posterhue, palette);
-          break;
-        case "brightness posterise":
-          newColour = colourFromPalette(getLuma(currentColour), palette);
-          break;
-        default:
-          console.error("Via: ", via, " not implemented");
-          break;
+    const originalData = new Uint8ClampedArray(data);
+
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const i = getPixelIndex(x, y, width);
+        const r = originalData[i];
+        const g = originalData[i + 1];
+        const b = originalData[i + 2];
+        const currentColour = { red: r, green: g, blue: b };
+        let newColour: colour = currentColour;
+
+        switch (via) {
+          case "brightness":
+            newColour = gradientFromPalette(getLuma(currentColour), palette);
+            break;
+
+          case "hue":
+            const hue = getHue(currentColour) / 6;
+            newColour = gradientFromPalette(hue, palette);
+            break;
+
+          case "posterise":
+            const posterhue = getHue(currentColour) / 6;
+            newColour = colourFromPalette(posterhue, palette);
+            break;
+
+          case "brightness posterise":
+            newColour = colourFromPalette(getLuma(currentColour), palette);
+            break;
+          case "brightness similarity":
+            let sum1 = 0;
+            let count1 = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                if (dx === 0 && dy === 0) continue; // skip self
+                const neighbor = getColourAt(
+                  x + dx,
+                  y + dy,
+                  width,
+                  originalData
+                );
+                sum1 += brightnessSimilarity(currentColour, neighbor);
+                count1++;
+              }
+            }
+            const avgSim1 = sum1 / count1;
+
+            // Exponential scaling to weight high similarity more
+            const boosted1 = Math.pow(avgSim1, 1); // adjust exponent to tune effect
+            newColour = gradientFromPalette(boosted1, palette);
+            break;
+          case "similarity":
+            let sum = 0;
+            let count = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                if (dx === 0 && dy === 0) continue; // skip self
+                const neighbor = getColourAt(
+                  x + dx,
+                  y + dy,
+                  width,
+                  originalData
+                );
+                sum += hueSimilarity(currentColour, neighbor);
+                count++;
+              }
+            }
+            const avgSim = sum / count;
+
+            // Exponential scaling to weight high similarity more
+            const boosted = Math.pow(avgSim, 1); // adjust exponent to tune effect
+            newColour = gradientFromPalette(boosted, palette);
+            break;
+
+          default:
+            console.error("Via: ", via, " not implemented");
+            break;
+        }
+        imageData.data[i] = newColour.red;
+        imageData.data[i + 1] = newColour.green;
+        imageData.data[i + 2] = newColour.blue;
       }
-      imageData.data[i] = newColour.red;
-      imageData.data[i + 1] = newColour.green;
-      imageData.data[i + 2] = newColour.blue;
     }
 
     context.putImageData(imageData, 0, 0);
@@ -425,7 +486,8 @@
               role="menuitem"
               tabindex={i}
               onclick={() => navigator.clipboard.writeText(colour)}
-            ><div></div></button>
+              ><div></div></button
+            >
           </div>
         {/each}
       </div>

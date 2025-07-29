@@ -1,5 +1,6 @@
 import { vector } from "@js-basics/vector";
 import type { colour, paletteSettings } from "./types";
+import { getLuma } from "./sorts";
 function processFile(file: File): string {
   return URL.createObjectURL(file);
 }
@@ -186,4 +187,31 @@ export function generatePalette(
     console.error("No Imagedata received");
     return null;
   }
+}
+
+export function getPixelIndex(x: number, y: number, width: number): number {
+  return (y * width + x) * 4;
+}
+
+export function getColourAt(x: number, y: number, width: number, originalData: Uint8ClampedArray): colour {
+  const index = getPixelIndex(x, y, width);
+  return {
+    red: originalData[index],
+    green: originalData[index + 1],
+    blue: originalData[index + 2],
+  };
+}
+
+export function hueSimilarity(c1: colour, c2: colour): number {
+  // Euclidean distance between RGB, normalized
+  const dr = c1.red - c2.red;
+  const dg = c1.green - c2.green;
+  const db = c1.blue - c2.blue;
+  const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+  return 1 - dist / (Math.sqrt(3) * 255); // normalize to [0,1]
+}
+export function brightnessSimilarity(c1: colour, c2: colour): number {
+  const average1 = getLuma(c1);
+  const average2 = getLuma(c2);
+  return Math.abs(average1 - average2);
 }

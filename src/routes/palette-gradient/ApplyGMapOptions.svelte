@@ -24,8 +24,9 @@
     <select name="pattern" id="pattern" bind:value={options.via}>
       <option value="brightness">brightness</option>
       <option value="similarity">similarity</option>
+      <option value="brightness similarity">brightness similarity</option>
       <option value="hue">hue</option>
-      <option value="posterise">posterise</option>
+      <option value="posterise">hue posterise</option>
       <option value="brightness posterise">brightness posterise</option>
     </select>
   </div>
