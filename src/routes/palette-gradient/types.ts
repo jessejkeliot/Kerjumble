@@ -1,5 +1,5 @@
 export type paletteState = {
-    colours: string[];
+    colours:Map<string, number>
     settings: paletteSettings;
 }
 

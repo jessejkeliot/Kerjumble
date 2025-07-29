@@ -2,10 +2,21 @@
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import CardImage from "./CardImage.svelte";
-  import Number from "./Number.svelte";
 
   // Image files and previews
+  let cardARef: any;
+  let cardBRef: any;
 
+  function handleApplyToOtherA(event: CustomEvent) {
+    const { palette, via } = event.detail;
+    console.log("")
+    cardBRef?.applyExternalMap(palette, via);
+  }
+
+  function handleApplyToOtherB(event: CustomEvent) {
+    const { palette, via } = event.detail;
+    cardARef?.applyExternalMap(palette, via);
+  }
 </script>
 
 <div class="whole">
@@ -13,13 +24,13 @@
   <div class="middlebox">
     <div class="IOContainer">
       <!-- Palette Drop Zone -->
-      <CardImage name="one"></CardImage>
-
+      <CardImage bind:this={cardARef} name="A" on:applyToOther={handleApplyToOtherA}></CardImage>
       <!-- Canvas Drop Zone -->
-      <CardImage name="two"></CardImage>
+      <CardImage bind:this={cardBRef} name="B" on:applyToOther={handleApplyToOtherB}></CardImage>
     </div>
   </div>
 </div>
+
 <!-- <Number prefix={"$"}></Number> -->
 <!-- STYLES -->
 <style>
@@ -37,22 +48,6 @@
     /* outline: 1px solid black; */
     align-items: center;
   }
-  .settingsHolder {
-    width: 66%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    flex: 1;
-  }
-
-  .containedImage {
-    position: absolute;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-
   .whole {
     display: flex;
     flex-direction: column;
@@ -60,29 +55,6 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-  }
-
-  .title {
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    font-weight: 900;
-    font-style: italic;
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    text-decoration: underline;
-    text-underline-offset: 20px;
-    text-decoration-color: aqua;
-  }
-
-  .title h1 {
-    color: #000;
-    /* text-shadow: 0 0 24px #333d; */
-    /* outline: 1px solid black; */
-    font-size: 5rem;
-    margin: 0;
-    /* animation: fadeColorIn 1.2s ease 1s forwards; */
-    user-select: none;
-    font-weight: 100;
   }
 
   .IOContainer {
@@ -95,7 +67,7 @@
     gap: 1em;
     width: 100%;
     height: 100%;
-    max-width: 1000px;
+    max-width: 1600px;
     outline: 3px solid #e9e9e9;
   }
 
@@ -106,38 +78,5 @@
     .middlebox {
       height: 90%;
     }
-    .imageHolder {
-      width: 100%;
-    }
-    .title h1 {
-      font-size: minmax(10vw, 5rem);
-    }
-  }
-
-  .imageHolder {
-    flex: 1;
-    height: 100%;
-    background-color: #f9f9f9;
-    border-radius: 0.5rem;
-    box-shadow: inset 0 0 10px #0003;
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    outline: 1px solid hsl(0, 0%, 40.5%);
-  }
-
-  @keyframes fadeColorIn {
-    from {
-      color: #0000;
-    }
-    to {
-      color: #0009;
-    }
-  }
-  canvas {
-    z-index: 20;
-    position: absolute;
   }
 </style>

@@ -3,111 +3,44 @@ import type { colour, paletteSettings } from "./types";
 function processFile(file: File): string {
   return URL.createObjectURL(file);
 }
-
 export function getPaletteColours(
   image: ImageData,
   numberOfColours: number,
   differenceOfColour: number,
   algorithm: string
-): string[] {
+): Map<string, number> {
   if (!image || !image.data.length) {
     console.error("Invalid or empty image data");
-    return [];
+    return new Map<string, number>();
   }
   // Placeholder for actual palette extraction logic
   const colours: string[] = [];
   // histogram or k-means clustering logic would go here
   if (algorithm === "k-means") {
     // Implement k-means clustering logic to extract colours
-    return kmeansClustering(image, numberOfColours);
+    // return kmeansClustering(image, numberOfColours);
   }
   if (algorithm === "histogram") {
     // Implement histogram-based colour extraction logic
     return histogramExtraction2(image, numberOfColours, differenceOfColour);
   }
-  return colours;
+  return new Map<string, number>();
 }
 
-export function generatePalette(img: HTMLImageElement, settings : paletteSettings): string[] | null {
-  const offscreen = new OffscreenCanvas(img.naturalWidth, img.naturalHeight);
-  const canvasContext = offscreen.getContext("2d");
-  if (!canvasContext) {
-    console.error("Failed to get canvas context");
-    return null;
+export function fisherYates<T>(colours: T[]): T[] {
+  for (let i = colours.length - 1; i >= 0; i--) {
+    const j = Math.floor(Math.random() * i + 1);
+    const temp = colours[j];
+    colours[j] = colours[i];
+    colours[i] = temp;
   }
-  if (!img.complete) {
-    console.error("Image not complete");
-    return null;
-  }
-  console.log("Drawing Image to Offscreen Canvas");
-  canvasContext.drawImage(img, 0, 0);
-  const imageData = canvasContext?.getImageData(
-    0,
-    0,
-    offscreen.width,
-    offscreen.height
-  );
-
-  if (imageData) {
-    return getPaletteColours(
-      imageData,
-      settings.numberOfColours,
-      settings.differenceOfColour,
-      settings.Algorithm
-    );
-  } else {
-    console.error("No Imagedata received");
-    return null;
-  }
-}
-
-function histogramExtraction(
-  image: ImageData,
-  numberOfColours: number,
-  differenceOfColour: number
-): string[] {
-  // Placeholder for histogram extraction logic
-  const colours: string[] = [];
-  const freqMap = new Map<colour, number>();
-  // Implement histogram logic to extract colours
-  for (let i = 0; i < image.data.length; i += 4) {
-    const r = image.data[i];
-    const g = image.data[i + 1];
-    const b = image.data[i + 2];
-    const a = image.data[i + 3];
-    const currentColour: colour = { red: r, green: g, blue: b, alpha: a };
-    // console.log("Current colour:", currentColour.red);
-    freqMap.has(currentColour)
-      ? freqMap.set(currentColour, freqMap.get(currentColour)! + 1)
-      : freqMap.set(currentColour, 1);
-  }
-  console.log("Frequency map:", freqMap);
-  console.log(
-    "Number of colours:",
-    freqMap.get({ red: 0, green: 0, blue: 0, alpha: 0 })
-  );
-  //difference of colours algorithm needed;
-  const sortedColours = Array.from(freqMap.entries()).sort(
-    (a, b) => b[1] - a[1]
-  );
-  for (let i = 0; i < numberOfColours && i < sortedColours.length; i++) {
-    colours.push(
-      RGBValuesToHex(
-        sortedColours[i][0].red,
-        sortedColours[i][0].green,
-        sortedColours[i][0].blue,
-        sortedColours[i][0].alpha
-      )
-    );
-  }
-  console.log("Extracted colours:", colours);
   return colours;
 }
 function histogramExtraction2(
   image: ImageData,
   numberOfColours: number,
   differenceOfColour: number
-): string[] {
+): Map<string, number> {
   console.log("starting histogram extraction");
   // Placeholder for histogram extraction logic
   const freqMap = new Map<string, number>();
@@ -157,8 +90,14 @@ function histogramExtraction2(
     if (selected.length >= numberOfColours) break;
   }
 
+  let newMap: Map<string, number> = new Map<string, number>();
+  for (let i = 0; i < selected.length; i++) {
+    newMap.set(selected[i], freqMap.get(selected[i])!);
+  }
+  //make newMap from selected as keys and find their frequencies from the original frequencymap entries
+
   console.log("Extracted colours:", selected);
-  return selected;
+  return newMap;
 }
 function kmeansClustering(image: ImageData, numberOfColours: number): string[] {
   const colours: string[] = [];
@@ -200,9 +139,51 @@ function RGBValuesToHex(
   return colour;
 }
 
-export function getDarkness(hex: string): number {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return (r + g + b) / 3; // Average of RGB values
+type Colour = {
+  red: number;
+  green: number;
+  blue: number;
+};
+export function interpolateColor(c1: Colour, c2: Colour, t: number): Colour {
+  return {
+    red: Math.round(c1.red + (c2.red - c1.red) * t),
+    green: Math.round(c1.green + (c2.green - c1.green) * t),
+    blue: Math.round(c1.blue + (c2.blue - c1.blue) * t),
+  };
+}
+
+export function generatePalette(
+  img: HTMLImageElement,
+  settings: paletteSettings
+): Map<string, number> | null {
+  const offscreen = new OffscreenCanvas(img.naturalWidth, img.naturalHeight);
+  const canvasContext = offscreen.getContext("2d");
+  if (!canvasContext) {
+    console.error("Failed to get canvas context");
+    return null;
+  }
+  if (!img.complete) {
+    console.error("Image not complete");
+    return null;
+  }
+  console.log("Drawing Image to Offscreen Canvas");
+  canvasContext.drawImage(img, 0, 0);
+  const imageData = canvasContext?.getImageData(
+    0,
+    0,
+    offscreen.width,
+    offscreen.height
+  );
+
+  if (imageData) {
+    return getPaletteColours(
+      imageData,
+      settings.numberOfColours,
+      settings.differenceOfColour,
+      settings.Algorithm
+    );
+  } else {
+    console.error("No Imagedata received");
+    return null;
+  }
 }

@@ -1,8 +1,22 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
-  import { getPaletteColours } from "./functions";
-  import type { paletteSettings, paletteState } from "./types";
+  import MageSort from "~icons/mage/chart-up-fill";
+  import {
+    getPaletteColours,
+    fisherYates,
+    interpolateColor,
+  } from "./functions";
+  import type { colour, paletteSettings, paletteState } from "./types";
+  import {
+    getHue,
+    getLightness,
+    getSaturation,
+    hexToColour,
+    sortBy,
+  } from "./sorts";
+  import { getLuma } from "./sorts";
+  import ApplyGMapOptions from "./ApplyGMapOptions.svelte";
 
   let { name } = $props();
   let defaultSettings: paletteSettings = {
@@ -11,11 +25,15 @@
     Algorithm: "histogram",
     downsampleRate: "1",
   };
-
+  const map = new Map<string, number>();
   let palette: paletteState = $state({
-    colours: [],
+    colours: map,
     settings: { ...defaultSettings },
   });
+  const paletteSorts = ["frequency", "naive luminance", "saturation", "hue"];
+  let paletteSortMethodCounter = $state(0);
+  let paletteSortMethodName = $derived(paletteSorts[paletteSortMethodCounter]);
+  let paletteMixedStatus = false;
   let imageFile: File | null = $state(null);
   let imageURL: string | null = $state(null);
   let canvasEl: HTMLCanvasElement | null = $state(null);
@@ -29,7 +47,143 @@
   let gradientLineElement: HTMLDivElement | null = $state(null);
 
   let dispatch = createEventDispatcher();
+  function handleMixPalette() {
+    paletteMixedStatus = true;
+    const shuffled = fisherYates<string>(Array.from(palette.colours.keys()));
+    let newMap: Map<string, number> = new Map<string, number>();
+    for (let i = 0; i < shuffled.length; i++) {
+      //palette.colours.get(shuffled[i]) becuase shuffled is an array made from the keys of p.colours.
+      newMap.set(shuffled[i], palette.colours.get(shuffled[i])!);
+    }
+    palette.colours = newMap;
+  }
+  function handleSortPalette() {
+    if (!paletteMixedStatus) {
+      paletteSortMethodCounter++;
+      paletteSortMethodCounter %= paletteSorts.length;
+    } else {
+      paletteSortMethodCounter = 0; // sorting algorithm resets after you have been mixing
+    }
+    console.log("Sorting Palette by: ", paletteSortMethodName);
+    palette.colours = sortPalette(palette.colours, paletteSortMethodName);
+    paletteMixedStatus = false;
+  }
+  function handleReversePalette() {
+    palette.colours = new Map([...palette.colours.entries()].reverse());
+  }
+  function handleApplyMap(event: CustomEvent) {
+    const options = event.detail;
+    console.log("Received options: ", options);
+    if (canvasEl && canvasEl.height > 0 && canvasEl.width > 0) {
+      //is canvasEl real?
+      switch (options.image) {
+        case "this":
+          applyMap(Array.from(palette.colours.keys()), canvasEl, options.via);
+          break;
+        case "other":
+          dispatch("applyToOther", {
+            palette: Array.from(palette.colours.keys()),
+            via: options.via,
+          });
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  export function applyExternalMap(palette: string[], via: string) {
+    if (!canvasEl) {
+      console.error("No canvas to apply map to");
+      return;
+    }
+    applyMap(palette, canvasEl, via);
+  }
+  function applyMap(palette: string[], canvas: HTMLCanvasElement, via: string) {
+    const context = canvas.getContext("2d");
+    if (!context) {
+      console.error("Failed to get 2D context");
+      return;
+    }
 
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    console.log("Colorspace:", imageData.colorSpace);
+
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const r = imageData.data[i];
+      const g = imageData.data[i + 1];
+      const b = imageData.data[i + 2];
+      const currentColour = { red: r, green: g, blue: b };
+      let newColour: colour = { red: r, green: g, blue: b };
+      switch (via) {
+        case "brightness":
+          newColour = gradientFromPalette(getLuma(currentColour), palette);
+          break;
+        case "hue":
+          const hue = getHue(currentColour) / 6;
+          newColour = gradientFromPalette(hue, palette);
+          break;
+        case "posterise":
+          const posterhue = getHue(currentColour) / 6;
+          newColour = colourFromPalette(posterhue, palette);
+          break;
+        case "brightness posterise":
+          newColour = colourFromPalette(getLuma(currentColour), palette);
+          break;
+        default:
+          console.error("Via: ", via, " not implemented");
+          break;
+      }
+      imageData.data[i] = newColour.red;
+      imageData.data[i + 1] = newColour.green;
+      imageData.data[i + 2] = newColour.blue;
+    }
+
+    context.putImageData(imageData, 0, 0);
+  }
+  function gradientFromPalette(value: number, palette: string[]): colour {
+    const n = palette.length;
+    if (n === 0) throw new Error("Palette must have at least one color");
+
+    if (value <= 0) return hexToColour(palette[0]);
+    if (value >= 1) return hexToColour(palette[n - 1]);
+
+    const scaled = value * (n - 1);
+    const index = Math.floor(scaled);
+    const t = scaled - index;
+
+    const c1 = hexToColour(palette[index]);
+    const c2 = hexToColour(palette[index + 1]);
+
+    return interpolateColor(c1, c2, t);
+  }
+  function colourFromPalette(value: number, palette: string[]): colour {
+    const n = palette.length;
+    if (value <= 0) return hexToColour(palette[0]);
+    if (value >= 1) return hexToColour(palette[n - 1]);
+    const chosen = palette[Math.floor(value * n)];
+    return hexToColour(chosen);
+  }
+  function gradientFromPaletteMap(palette: Map<string, number>) {}
+  function sortPalette(
+    colours: Map<string, number>,
+    algorithm: string
+  ): Map<string, number> {
+    switch (algorithm) {
+      case "frequency":
+        return new Map([...colours.entries()].sort((a, b) => b[1] - a[1]));
+      case "naive luminance":
+        return sortBy(colours, getLuma);
+      case "lightness":
+        return sortBy(colours, getLightness);
+      case "saturation":
+        return sortBy(colours, getSaturation);
+      case "hue":
+        return sortBy(colours, getHue);
+      default:
+        console.error("Sorting Algorithm Chosen has not yet been implemented");
+        return colours;
+    }
+  }
   // Handle image loading and canvas drawing
   async function loadImageAndProcess(file: File) {
     const url = URL.createObjectURL(file);
@@ -59,7 +213,7 @@
       await new Promise(requestAnimationFrame);
 
       context.drawImage(image, 0, 0, w, h);
-      if (palette.colours.length === 0) {
+      if (palette.colours.size === 0) {
         const imageData = context.getImageData(0, 0, w, h);
         const colours = getPaletteColours(
           imageData,
@@ -88,14 +242,14 @@
     };
   });
   $effect(() => {
-    if (palette && palette.colours.length > 1) {
+    if (palette && palette.colours.size > 1) {
       updateGradientLine();
     }
   });
 
   function updateGradientLine() {
     if (gradientLineElement) {
-      gradientLineElement.style.background = `linear-gradient(to right, ${palette.colours.join(", ")})`;
+      gradientLineElement.style.background = `linear-gradient(to right, ${Array.from(palette.colours.keys()).join(", ")})`;
     }
   }
 
@@ -147,6 +301,8 @@
       console.error("No image loaded to apply settings");
       return;
     }
+    paletteMixedStatus = false;
+    paletteSortMethodCounter = 0;
     const context = canvasEl.getContext("2d", { willReadFrequently: true });
     if (!context) {
       console.error("Failed to get canvas context");
@@ -176,7 +332,6 @@
     const context = canvasEl.getContext("2d", { willReadFrequently: true });
     if (!context) {
       console.error("Failed to get canvas context");
-      console.error("Failed to get canvas context");
       return;
     }
     context.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -188,15 +343,8 @@
     };
   }
 
-  function getDarkness(colour: string): number {
-    const r = parseInt(colour.slice(1, 3), 16);
-    const g = parseInt(colour.slice(3, 5), 16);
-    const b = parseInt(colour.slice(5, 7), 16);
-    return (r + g + b) / 3;
-  }
-
   function savePalette() {
-    if (palette.colours.length === 0) {
+    if (palette.colours.size === 0) {
       console.error("No palette to save");
       return;
     }
@@ -209,13 +357,24 @@
     a.click();
     URL.revokeObjectURL(url);
   }
+  function saveImage() {
+    if (!canvasEl) {
+      console.error("No canvas!");
+    } else {
+      const link = document.createElement("a");
+      link.download = imageFile?.name + "-mapped.png";
+      link.href = canvasEl.toDataURL("image/png");
+      link.click();
+    }
+  }
+  //sorting palette. Need to add a UI Element with a little sorting icon
 </script>
 
 <div class="data">
   <div class="Image Options">
     <button onclick={clearImage}>Clear Image</button>
     <button onclick={resetImage}>Reset Image</button>
-    <button onclick={() => (imageFile = null)}>Save Image</button>
+    <button onclick={saveImage}>Save Image</button>
     <button onclick={savePalette}>Save Palette</button>
   </div>
   <div
@@ -245,23 +404,34 @@
       bind:this={inputElement}
     />
   </div>
-  <div class="paletteDisplay">
-    {palette.colours.length <= 0 ? "palette" : ""}
-    {#each palette.colours as colour, i}
-      <div class="colour">
-        <button
-          aria-label="colour copy"
-          style="background-color: {colour}; color: {getDarkness(colour) < 70
-            ? 'white'
-            : 'black'}"
-          role="cell"
-          tabindex={i}
-          onclick={() => navigator.clipboard.writeText(colour)}
-        ></button>
+  <div class="paletteBox">
+    <div class="paletteOptions">
+      <button onclick={handleMixPalette}>Mix</button>
+      <button onclick={handleSortPalette}>Sort</button>
+      <button onclick={handleReversePalette}>Reverse</button>
+    </div>
+    <div class="palettePlusGradientBox">
+      <div class="paletteDisplay">
+        {palette.colours.size <= 0 ? "palette" : ""}
+        {#each palette.colours.keys() as colour, i}
+          <div class="colour">
+            <button
+              aria-label="colour copy"
+              style="background-color: {colour}; color: {getLuma(
+                hexToColour(colour)
+              ) < 0.3
+                ? 'white'
+                : 'black'}"
+              role="menuitem"
+              tabindex={i}
+              onclick={() => navigator.clipboard.writeText(colour)}
+            ><div></div></button>
+          </div>
+        {/each}
       </div>
-    {/each}
+      <div class="gradientLine" bind:this={gradientLineElement}></div>
+    </div>
   </div>
-  <div class="gradientLine" bind:this={gradientLineElement}></div>
   <div class="configBox">
     <label for="algorithms">
       Algo:
@@ -312,17 +482,47 @@
     </label>
     <button class="apply" onclick={applySettings}>Apply</button>
   </div>
+  <ApplyGMapOptions on:applyMap={handleApplyMap} />
 </div>
 
 <style>
   /* * {
     outline: 1px solid #0009 !important;
   } */
+  .paletteBox {
+    flex: 2;
+    display: flex;
+    flex-direction: row;
+    outline: 3px solid green;
+  }
+  .paletteOptions button {
+    flex: 1;
+    outline: 1px solid black;
+    border: none;
+    border-radius: 0;
+    transition: box-shadow 0.3s;
+    font-size: 0.8em;
+    &:hover {
+      box-shadow: inset 0 0 2px #000;
+    }
+  }
+  .paletteOptions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .palettePlusGradientBox {
+    display: flex;
+    flex-direction: column;
+    flex: 7;
+    outline: 1px solid red;
+  }
+
   .apply {
     font-size: inherit;
   }
   .gradientLine {
-    height: 3%;
+    height: 20%;
     width: 100%;
     background: #000;
     outline: 1px solid #000;
@@ -330,11 +530,16 @@
   .configBox {
     flex: 1;
     display: flex;
-    justify-content: space-around;
+
     align-items: center;
-    gap: 0.5em;
+
     padding: 0 0.5em;
     margin-top: 1rem;
+  }
+  .configBox label {
+    flex: 1;
+    outline: 1px solid black;
+    font-family: inherit;
   }
   .Options {
     flex: 1;
@@ -364,10 +569,10 @@
     text-overflow: clip;
   }
   .paletteDisplay {
-    flex: 2;
+    flex: 1;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
     z-index: 20;
     /* height: 10%; */
@@ -376,6 +581,7 @@
     width: 100%;
   }
   .colour {
+    box-sizing: border-box;
     flex: 1;
     display: flex;
     align-items: center;
@@ -383,10 +589,12 @@
     min-width: none;
     height: 100%;
     outline: 1px solid black;
+    padding: none;
   }
   .colour button {
     width: 100%;
     height: 100%;
+    padding: none;
     border: none;
   }
 
