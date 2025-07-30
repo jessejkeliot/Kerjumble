@@ -1,4 +1,8 @@
 <script lang="ts">
+  import PaletteExtractionOptions from "./PaletteExtractionOptions.svelte";
+
+  import PaletteBox from "./PaletteBox.svelte";
+
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import MageSort from "~icons/mage/chart-up-fill";
@@ -10,29 +14,39 @@
     hueSimilarity,
     getPixelIndex,
     brightnessSimilarity,
+    mapToObject,
   } from "./functions";
   import type { colour, paletteSettings, paletteState } from "./types";
+  import { sortBy } from "./sorts";
   import {
+    getLuma,
     getHue,
     getLightness,
     getSaturation,
     hexToColour,
-    sortBy,
-  } from "./sorts";
-  import { getLuma } from "./sorts";
+    calculateAvColour,
+    divideColours,
+    averageColours,
+  } from "./colourfunctions";
   import ApplyGMapOptions from "./ApplyGMapOptions.svelte";
 
   let { name } = $props();
+  let showPEO = $state(false);
   let defaultSettings: paletteSettings = {
     numberOfColours: 5,
     differenceOfColour: 60,
     Algorithm: "histogram",
-    downsampleRate: "1",
+    downsampleRate: 8,
   };
   const map = new Map<string, number>();
   let palette: paletteState = $state({
     colours: map,
     settings: { ...defaultSettings },
+  });
+  const paletteAlgorithms = ["histogram", "k-means"];
+  let paletteAlgorithmCounter = $state(0);
+  $effect(() => {
+    palette.settings.Algorithm = paletteAlgorithms[paletteAlgorithmCounter];
   });
   const paletteSorts = ["frequency", "naive luminance", "saturation", "hue"];
   let paletteSortMethodCounter = $state(0);
@@ -51,30 +65,6 @@
   let gradientLineElement: HTMLDivElement | null = $state(null);
 
   let dispatch = createEventDispatcher();
-  function handleMixPalette() {
-    paletteMixedStatus = true;
-    const shuffled = fisherYates<string>(Array.from(palette.colours.keys()));
-    let newMap: Map<string, number> = new Map<string, number>();
-    for (let i = 0; i < shuffled.length; i++) {
-      //palette.colours.get(shuffled[i]) becuase shuffled is an array made from the keys of p.colours.
-      newMap.set(shuffled[i], palette.colours.get(shuffled[i])!);
-    }
-    palette.colours = newMap;
-  }
-  function handleSortPalette() {
-    if (!paletteMixedStatus) {
-      paletteSortMethodCounter++;
-      paletteSortMethodCounter %= paletteSorts.length;
-    } else {
-      paletteSortMethodCounter = 0; // sorting algorithm resets after you have been mixing
-    }
-    console.log("Sorting Palette by: ", paletteSortMethodName);
-    palette.colours = sortPalette(palette.colours, paletteSortMethodName);
-    paletteMixedStatus = false;
-  }
-  function handleReversePalette() {
-    palette.colours = new Map([...palette.colours.entries()].reverse());
-  }
   function handleApplyMap(event: CustomEvent) {
     const options = event.detail;
     console.log("Received options: ", options);
@@ -116,6 +106,11 @@
     console.log("Colorspace:", imageData.colorSpace);
 
     const originalData = new Uint8ClampedArray(data);
+    let totalAverage: colour = {red: 0, green: 0, blue:0};
+    if (via.includes("average")) {
+      totalAverage = calculateAvColour(imageData, 1);
+      console.log("totalAverage",  totalAverage);
+    }
 
     for (let y = 1; y < height - 1; y++) {
       for (let x = 1; x < width - 1; x++) {
@@ -144,7 +139,8 @@
           case "brightness posterise":
             newColour = colourFromPalette(getLuma(currentColour), palette);
             break;
-          case "brightness similarity":
+          case "edge brightness":
+            //first calculate the average similarity;
             let sum1 = 0;
             let count1 = 0;
             for (let dy = -1; dy <= 1; dy++) {
@@ -166,7 +162,7 @@
             const boosted1 = Math.pow(avgSim1, 1); // adjust exponent to tune effect
             newColour = gradientFromPalette(boosted1, palette);
             break;
-          case "similarity":
+          case "edge hue":
             let sum = 0;
             let count = 0;
             for (let dy = -1; dy <= 1; dy++) {
@@ -280,7 +276,8 @@
           imageData,
           palette.settings.numberOfColours,
           palette.settings.differenceOfColour,
-          palette.settings.Algorithm
+          palette.settings.Algorithm,
+          palette.settings.downsampleRate
         );
         palette.colours = colours;
       }
@@ -356,7 +353,6 @@
       imageFile = files[0];
     }
   }
-
   function applySettings() {
     if (!canvasEl || canvasWidth === 0 || canvasHeight === 0) {
       console.error("No image loaded to apply settings");
@@ -375,7 +371,8 @@
       imageData,
       palette.settings.numberOfColours,
       palette.settings.differenceOfColour,
-      palette.settings.Algorithm
+      palette.settings.Algorithm,
+      palette.settings.downsampleRate
     );
     palette.colours = colours;
     dispatch("paletteUpdated", { colours: palette.colours });
@@ -409,23 +406,71 @@
       console.error("No palette to save");
       return;
     }
-    const data = JSON.stringify(palette.colours);
+    // const data = JSON.stringify(Array.from(palette.colours.entries()));
+    const paletteObject = mapToObject(palette.colours);
+    const data = JSON.stringify(paletteObject, null, 2); // nicely formatted
+    console.log(data);
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "palette.json";
+    const name = imageFile
+      ? imageFile.name.length < 12
+        ? imageFile.name
+        : imageFile.name.slice(0, 11)
+      : "your";
+    a.download = name + "-palette.json";
     a.click();
     URL.revokeObjectURL(url);
   }
-  function saveImage() {
+  async function saveImage() {
+    // Convert canvas content to a Blob
+    const nameFile = imageFile?.name + "-gradient-mapped.png";
+    if (canvasEl) {
+      canvasEl.toBlob(async (blob) => {
+        if (!blob) {
+          console.error("Failed to create image blob.", "error");
+          return;
+        }
+        
+        // Check if Web Share API is available
+        if (navigator.share) {
+          try {
+            // Create a File object from the Blob
+            
+            const file = new File([blob], nameFile, {
+              type: "image/png",
+            });
+
+            // Use navigator.share to share the image
+            await navigator.share({
+              files: [file],
+              title: "Gradient Mapping",
+              text: "Check out my drawing from the web app!",
+            });
+            console.error("Image shared successfully!", "success");
+          } catch (error) {
+            // Handle user cancellation or other errors
+
+            console.error("Image sharing cancelled.", "error");
+            console.error("Error sharing image:", error);
+          }
+        } else {
+          // Fallback for browsers that do not support Web Share API (e.g., desktop)
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = nameFile;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a); // Clean up the temporary link
+          URL.revokeObjectURL(url);
+          console.log("Image downloaded successfully!", "success");
+        }
+      }, "image/png"); // Specify image format
+    }
     if (!canvasEl) {
       console.error("No canvas!");
-    } else {
-      const link = document.createElement("a");
-      link.download = imageFile?.name + "-mapped.png";
-      link.href = canvasEl.toDataURL("image/png");
-      link.click();
     }
   }
   //sorting palette. Need to add a UI Element with a little sorting icon
@@ -445,6 +490,13 @@
     ondragover={handleDragOver}
     aria-hidden="true"
   >
+    <div class="abs">
+      <PaletteExtractionOptions
+        on:applySettings={applySettings}
+        bind:settings={palette.settings}
+        bind:display={showPEO}
+      />
+    </div>
     {#if imageURL}
       <canvas
         bind:this={canvasEl}
@@ -465,85 +517,7 @@
       bind:this={inputElement}
     />
   </div>
-  <div class="paletteBox">
-    <div class="paletteOptions">
-      <button onclick={handleMixPalette}>Mix</button>
-      <button onclick={handleSortPalette}>Sort</button>
-      <button onclick={handleReversePalette}>Reverse</button>
-    </div>
-    <div class="palettePlusGradientBox">
-      <div class="paletteDisplay">
-        {palette.colours.size <= 0 ? "palette" : ""}
-        {#each palette.colours.keys() as colour, i}
-          <div class="colour">
-            <button
-              aria-label="colour copy"
-              style="background-color: {colour}; color: {getLuma(
-                hexToColour(colour)
-              ) < 0.3
-                ? 'white'
-                : 'black'}"
-              role="menuitem"
-              tabindex={i}
-              onclick={() => navigator.clipboard.writeText(colour)}
-              ><div></div></button
-            >
-          </div>
-        {/each}
-      </div>
-      <div class="gradientLine" bind:this={gradientLineElement}></div>
-    </div>
-  </div>
-  <div class="configBox">
-    <label for="algorithms">
-      Algo:
-      <select
-        name="Algorithm"
-        id="algorithms"
-        bind:value={palette.settings.Algorithm}
-      >
-        <option value="histogram">Histogram</option>
-        <option value="k-means">K-means</option>
-      </select>
-    </label>
-    <label for="paletteSize">
-      n:
-      <input
-        type="number"
-        name="paletteSize"
-        id="paletteSize"
-        min="2"
-        max="50"
-        bind:value={palette.settings.numberOfColours}
-      />
-    </label>
-    <label for="colourDifference">
-      diff:
-      <input
-        type="number"
-        name="colourdiff"
-        id="colourDifference"
-        min="2"
-        max="120"
-        bind:value={palette.settings.differenceOfColour}
-      />
-    </label>
-    <label for="downsampling">
-      reduce:
-      <select
-        name="Algorithm"
-        id="downsampling"
-        bind:value={palette.settings.downsampleRate}
-      >
-        <option value="1" selected>1x</option>
-        <option value="2">2x</option>
-        <option value="4">4x</option>
-        <option value="8">8x</option>
-        <option value="16">16x</option>
-      </select>
-    </label>
-    <button class="apply" onclick={applySettings}>Apply</button>
-  </div>
+  <PaletteBox bind:palette={palette} />
   <ApplyGMapOptions on:applyMap={handleApplyMap} />
 </div>
 
@@ -551,57 +525,37 @@
   /* * {
     outline: 1px solid #0009 !important;
   } */
-  .paletteBox {
+  .abs {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  .configBottom {
     flex: 2;
-    display: flex;
-    flex-direction: row;
-    outline: 3px solid green;
-  }
-  .paletteOptions button {
-    flex: 1;
-    outline: 1px solid black;
-    border: none;
-    border-radius: 0;
-    transition: box-shadow 0.3s;
-    font-size: 0.8em;
-    &:hover {
-      box-shadow: inset 0 0 2px #000;
-    }
-  }
-  .paletteOptions {
-    flex: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
   }
-  .palettePlusGradientBox {
-    display: flex;
-    flex-direction: column;
-    flex: 7;
-    outline: 1px solid red;
+  .rest {
+    flex: 2;
   }
-
   .apply {
     font-size: inherit;
-  }
-  .gradientLine {
-    height: 20%;
-    width: 100%;
-    background: #000;
-    outline: 1px solid #000;
+    flex: 1;
   }
   .configBox {
     flex: 1;
     display: flex;
-
     align-items: center;
-
-    padding: 0 0.5em;
-    margin-top: 1rem;
   }
-  .configBox label {
+  .configBox div {
+    height: 100%;
     flex: 1;
-    outline: 1px solid black;
     font-family: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .Options {
     flex: 1;
@@ -609,12 +563,19 @@
     flex-direction: row;
     justify-content: center;
     background-color: #c5c5c5;
-    outline: 1px solid black;
     gap: 0.25em;
     padding: 0.25em;
   }
-  .Options button {
+  .Options button,
+  input {
     flex: 1;
+    border: none;
+    appearance: none;
+    background-color: #e8e8e8;
+    transition: box-shadow 0.3s;
+    &:hover {
+      box-shadow: inset 0 0 0.2em #000;
+    }
   }
   button,
   input,
@@ -629,37 +590,10 @@
     height: 100%;
     width: 100%;
     text-overflow: clip;
-  }
-  .paletteDisplay {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    /* justify-content: center; */
-    align-items: center;
-    z-index: 20;
-    /* height: 10%; */
+    outline: 1px solid black;
     background-color: #c5c5c5;
-    outline: 1px solid black;
-    width: 100%;
+    box-shadow: 0 3px 10px #333;
   }
-  .colour {
-    box-sizing: border-box;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: none;
-    height: 100%;
-    outline: 1px solid black;
-    padding: none;
-  }
-  .colour button {
-    width: 100%;
-    height: 100%;
-    padding: none;
-    border: none;
-  }
-
   .containedImage {
     position: absolute;
     max-width: 100%;
@@ -693,7 +627,13 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    outline: 1px solid hsl(0, 0%, 40.5%);
+    /* outline: 1px solid hsl(0, 0%, 40.5%); */
+  }
+  button,
+  select,
+  input {
+    border: none;
+    appearance: none;
   }
 
   @keyframes fadeColorIn {
@@ -705,10 +645,14 @@
     }
   }
   canvas {
-    z-index: 20;
+    z-index: 6;
     position: absolute;
   }
   input {
-    z-index: 5;
+    border-radius: 0;
+    border: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
 </style>

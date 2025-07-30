@@ -40,7 +40,7 @@
   .middlebox {
     display: flex;
     flex-direction: column;
-    height: 70%;
+    height: 90%;
     width: 90%;
     /* max-height: 700px;
     max-width: 1000px; */
@@ -55,6 +55,7 @@
     justify-content: center;
     width: 100%;
     height: 100%;
+    font-family:Arial, Helvetica, sans-serif;
   }
 
   .IOContainer {
@@ -68,12 +69,17 @@
     width: 100%;
     height: 100%;
     max-width: 1600px;
+    min-height: 500px;
     outline: 3px solid #e9e9e9;
+  }
+  * {
+    font-family: inherit;
   }
 
   @media (max-width: 700px) {
     .IOContainer {
       flex-direction: column;
+      height: 200%;
     }
     .middlebox {
       height: 90%;

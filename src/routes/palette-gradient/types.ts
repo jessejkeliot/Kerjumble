@@ -7,7 +7,7 @@ export type paletteSettings = {
     numberOfColours: number;
     differenceOfColour: number;
     Algorithm: string;
-    downsampleRate?: string;
+    downsampleRate: number;
 };
 export type colour = {
   red: number;

@@ -1,44 +1,81 @@
 <script>
   import { createEventDispatcher } from "svelte";
 
-    let options = {
-        image: "this",
-        via: "brightness"
-    }
-    const dispatch = createEventDispatcher();
-    function sendApply() {
-        dispatch("applyMap", options); //will come through parent as event.detail
-    }
+  let options = $state({
+    image: "this",
+    via: "brightness",
+  });
+  let imageOpCounter = $state(0);
+  const imageOpCounterStates = ["this", "other"];
+  $effect(() => {
+    options.image = imageOpCounterStates[imageOpCounter];
+  });
+  const dispatch = createEventDispatcher();
+  function sendApply() {
+    dispatch("applyMap", options); //will come through parent as event.detail
+  }
 </script>
 
 <div class="options">
-  <div><button onclick={sendApply}>Map</button> this palette to</div>
+  <div class="choice">Map palette to</div>
   <div class="image choice">
-    <select name="pattern" id="pattern" bind:value={options.image}>
-      <option value="this">This Image</option>
-      <option value="other">Other Image</option>
-    </select>
+    <button
+      onclick={() =>
+        imageOpCounter === 1 ? (imageOpCounter = 0) : (imageOpCounter = 1)}
+      >{imageOpCounterStates[imageOpCounter]}</button
+    >
   </div>
+  <div class="choice">via</div>
   <div class="pattern choice">
-    <label for="pattern">Via</label>
     <select name="pattern" id="pattern" bind:value={options.via}>
       <option value="brightness">brightness</option>
-      <option value="similarity">similarity</option>
-      <option value="brightness similarity">brightness similarity</option>
       <option value="hue">hue</option>
+      <option value="edge hue">edge hue</option>
+      <option value="edge brightness">edge brightness</option>
       <option value="posterise">hue posterise</option>
       <option value="brightness posterise">brightness posterise</option>
     </select>
   </div>
+  <div><button onclick={sendApply} class="apply">Go</button></div>
 </div>
 
 <style>
   .options {
+    font-family: inherit;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.25em;
+    padding: 0.25em;
   }
-  .choice {
-    background-color: blanchedalmond;
+  .apply {
+    font-size: inherit;
+    flex: 1;
+  }
+  .options div {
+    height: 100%;
+    flex: 1;
+    background-color: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+  }
+  button,
+  select,
+  input {
+    border: none;
+    appearance: none;
+    border-radius: 0;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    font-size: inherit;
+    background-color: #e8e8e8;
+    transition: box-shadow;
+    &:hover {
+      box-shadow: inset 0 0 2px #000;
+    }
   }
 </style>
