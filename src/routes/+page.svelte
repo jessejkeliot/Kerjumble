@@ -46,6 +46,7 @@
         <LinkCard title={"Kerjumble"} link={"/kerjumble"}/>
 		<LinkCard title={"Conumble"} link={"https://jessejkeliot.github.io/conumble"}/>
 		<LinkCard title={"Arithmetic"} link={"/arithmetic"}/>
+    <LinkCard title={"Palette Mapper"} link={"/palette-gradient"}/>
 		<LinkCard title={"Github"} link={"https://github.com/jessejkeliot/"}/>
       </div>
     </div>
