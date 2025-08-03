@@ -3,7 +3,6 @@
 
   export let title: string;
   export let index: number = 0;
-  export let svg: string = "$lib/images/github.svg"; // default to a symbol id
   export let link: string = "/";
 </script>
 <div
@@ -13,9 +12,6 @@
   in:fade={{ duration: 300, delay: index * 200 }}
 >
   <a href={link}>{title}</a>
-  <svg viewBox="0 0 24 24" class="icon">
-    <use href={svg} />
-  </svg>
 </div>
 
 <style>
