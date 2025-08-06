@@ -8,8 +8,6 @@
   import MageSort from "~icons/mage/chart-up-fill";
   import {
     getPaletteColours,
-    fisherYates,
-    interpolateColor,
     getColourAt,
     hueSimilarity,
     getPixelIndex,
@@ -27,6 +25,8 @@
     calculateAvColour,
     divideColours,
     averageColours,
+    gradientFromPalette,
+    colourFromPalette,
   } from "./colourfunctions";
   import ApplyGMapOptions from "./ApplyGMapOptions.svelte";
 
@@ -196,29 +196,6 @@
     }
 
     context.putImageData(imageData, 0, 0);
-  }
-  function gradientFromPalette(value: number, palette: string[]): colour {
-    const n = palette.length;
-    if (n === 0) throw new Error("Palette must have at least one color");
-
-    if (value <= 0) return hexToColour(palette[0]);
-    if (value >= 1) return hexToColour(palette[n - 1]);
-
-    const scaled = value * (n - 1);
-    const index = Math.floor(scaled);
-    const t = scaled - index;
-
-    const c1 = hexToColour(palette[index]);
-    const c2 = hexToColour(palette[index + 1]);
-
-    return interpolateColor(c1, c2, t);
-  }
-  function colourFromPalette(value: number, palette: string[]): colour {
-    const n = palette.length;
-    if (value <= 0) return hexToColour(palette[0]);
-    if (value >= 1) return hexToColour(palette[n - 1]);
-    const chosen = palette[Math.floor(value * n)];
-    return hexToColour(chosen);
   }
   function gradientFromPaletteMap(palette: Map<string, number>) {}
   function sortPalette(

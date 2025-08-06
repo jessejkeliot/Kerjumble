@@ -278,14 +278,6 @@ export function brightnessSimilarity(c1: colour, c2: colour): number {
   const average2 = getLuma(c2);
   return Math.abs(average1 - average2);
 }
-
-export function colourFromPalette(value: number, palette: string[]): colour {
-  const n = palette.length;
-  if (value <= 0) return hexToColour(palette[0]);
-  if (value >= 1) return hexToColour(palette[n - 1]);
-  const chosen = palette[Math.floor(value * n)];
-  return hexToColour(chosen);
-}
 export function mapToObject(map: Map<string, number>): Record<string, number> {
   const obj: Record<string, number> = {};
   for (const [key, value] of map.entries()) {

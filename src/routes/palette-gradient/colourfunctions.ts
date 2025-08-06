@@ -1,4 +1,4 @@
-import { pixelateDownsampled } from "./functions";
+import { interpolateColor, pixelateDownsampled } from "./functions";
 import type { colour } from "./types";
 export function hexToColour(hex: string): colour {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -86,3 +86,27 @@ export function divideColours(c1: colour, c2: colour){
 export function averageColours(c: colour){
     return (c.red + c.green + c.blue) / (3);
 }
+
+export function gradientFromPalette(value: number, palette: string[]): colour {
+    const n = palette.length;
+    if (n === 0) throw new Error("Palette must have at least one color");
+
+    if (value <= 0) return hexToColour(palette[0]);
+    if (value >= 1) return hexToColour(palette[n - 1]);
+
+    const scaled = value * (n - 1);
+    const index = Math.floor(scaled);
+    const t = scaled - index;
+
+    const c1 = hexToColour(palette[index]);
+    const c2 = hexToColour(palette[index + 1]);
+
+    return interpolateColor(c1, c2, t);
+  }
+  export function colourFromPalette(value: number, palette: string[]): colour {
+    const n = palette.length;
+    if (value <= 0) return hexToColour(palette[0]);
+    if (value >= 1) return hexToColour(palette[n - 1]);
+    const chosen = palette[Math.floor(value * n)];
+    return hexToColour(chosen);
+  }
