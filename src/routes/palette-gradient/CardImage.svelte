@@ -6,14 +6,7 @@
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import MageSort from "~icons/mage/chart-up-fill";
-  import {
-    getPaletteColours,
-    getColourAt,
-    hueSimilarity,
-    getPixelIndex,
-    brightnessSimilarity,
-    mapToObject,
-  } from "./functions";
+  import { getPaletteColours, getColourAt, hueSimilarity, getPixelIndex, brightnessSimilarity, mapToObject } from "./functions";
   import type { colour, paletteSettings, paletteState } from "./types";
   import { sortBy } from "./sorts";
   import {
@@ -68,21 +61,21 @@
   function handleApplyMap(event: CustomEvent) {
     const options = event.detail;
     console.log("Received options: ", options);
-    if (canvasEl && canvasEl.height > 0 && canvasEl.width > 0) {
-      //is canvasEl real?
-      switch (options.image) {
-        case "this":
+    //is canvasEl real?
+    switch (options.image) {
+      case "this":
+        if (canvasEl && canvasEl.height > 0 && canvasEl.width > 0) {
           applyMap(Array.from(palette.colours.keys()), canvasEl, options.via);
-          break;
-        case "other":
-          dispatch("applyToOther", {
-            palette: Array.from(palette.colours.keys()),
-            via: options.via,
-          });
-          break;
-        default:
-          break;
-      }
+        }
+        break;
+      case "other":
+        dispatch("applyToOther", {
+          palette: Array.from(palette.colours.keys()),
+          via: options.via,
+        });
+        break;
+      default:
+        break;
     }
   }
   export function applyExternalMap(palette: string[], via: string) {
@@ -106,10 +99,10 @@
     console.log("Colorspace:", imageData.colorSpace);
 
     const originalData = new Uint8ClampedArray(data);
-    let totalAverage: colour = {red: 0, green: 0, blue:0};
+    let totalAverage: colour = { red: 0, green: 0, blue: 0 };
     if (via.includes("average")) {
       totalAverage = calculateAvColour(imageData, 1);
-      console.log("totalAverage",  totalAverage);
+      console.log("totalAverage", totalAverage);
     }
 
     for (let y = 1; y < height - 1; y++) {
@@ -146,12 +139,7 @@
             for (let dy = -1; dy <= 1; dy++) {
               for (let dx = -1; dx <= 1; dx++) {
                 if (dx === 0 && dy === 0) continue; // skip self
-                const neighbor = getColourAt(
-                  x + dx,
-                  y + dy,
-                  width,
-                  originalData
-                );
+                const neighbor = getColourAt(x + dx, y + dy, width, originalData);
                 sum1 += brightnessSimilarity(currentColour, neighbor);
                 count1++;
               }
@@ -168,12 +156,7 @@
             for (let dy = -1; dy <= 1; dy++) {
               for (let dx = -1; dx <= 1; dx++) {
                 if (dx === 0 && dy === 0) continue; // skip self
-                const neighbor = getColourAt(
-                  x + dx,
-                  y + dy,
-                  width,
-                  originalData
-                );
+                const neighbor = getColourAt(x + dx, y + dy, width, originalData);
                 sum += hueSimilarity(currentColour, neighbor);
                 count++;
               }
@@ -198,10 +181,7 @@
     context.putImageData(imageData, 0, 0);
   }
   function gradientFromPaletteMap(palette: Map<string, number>) {}
-  function sortPalette(
-    colours: Map<string, number>,
-    algorithm: string
-  ): Map<string, number> {
+  function sortPalette(colours: Map<string, number>, algorithm: string): Map<string, number> {
     switch (algorithm) {
       case "frequency":
         return new Map([...colours.entries()].sort((a, b) => b[1] - a[1]));
@@ -391,11 +371,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    const name = imageFile
-      ? imageFile.name.length < 12
-        ? imageFile.name
-        : imageFile.name.slice(0, 11)
-      : "your";
+    const name = imageFile ? (imageFile.name.length < 12 ? imageFile.name : imageFile.name.slice(0, 11)) : "your";
     a.download = name + "-palette.json";
     a.click();
     URL.revokeObjectURL(url);
@@ -409,12 +385,12 @@
           console.error("Failed to create image blob.", "error");
           return;
         }
-        
+
         // Check if Web Share API is available
         if (navigator.share) {
           try {
             // Create a File object from the Blob
-            
+
             const file = new File([blob], nameFile, {
               type: "image/png",
             });
@@ -460,41 +436,19 @@
     <button onclick={saveImage}>Save Image</button>
     <button onclick={savePalette}>Save Palette</button>
   </div>
-  <div
-    class="imageHolder input"
-    id="canvas{name}"
-    ondrop={handleDrop}
-    ondragover={handleDragOver}
-    aria-hidden="true"
-  >
+  <div class="imageHolder input" id="canvas{name}" ondrop={handleDrop} ondragover={handleDragOver} aria-hidden="true">
     <div class="abs">
-      <PaletteExtractionOptions
-        on:applySettings={applySettings}
-        bind:settings={palette.settings}
-        bind:display={showPEO}
-      />
+      <PaletteExtractionOptions on:applySettings={applySettings} bind:settings={palette.settings} bind:display={showPEO} />
     </div>
     {#if imageURL}
-      <canvas
-        bind:this={canvasEl}
-        width={canvasWidth}
-        height={canvasHeight}
-        class="containedImage"
-      ></canvas>
+      <canvas bind:this={canvasEl} width={canvasWidth} height={canvasHeight} class="containedImage"></canvas>
     {/if}
     <label for="paletteFileInput{name}">
       <MageImageAdd style="font-size: 3em" />
     </label>
-    <input
-      type="file"
-      id="paletteFileInput{name}"
-      accept="image/*"
-      hidden
-      onchange={handleFileInput}
-      bind:this={inputElement}
-    />
+    <input type="file" id="paletteFileInput{name}" accept="image/*" hidden onchange={handleFileInput} bind:this={inputElement} />
   </div>
-  <PaletteBox bind:palette={palette} />
+  <PaletteBox bind:palette />
   <ApplyGMapOptions on:applyMap={handleApplyMap} />
 </div>
 

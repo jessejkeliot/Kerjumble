@@ -3,23 +3,17 @@
   import { fisherYates, interpolateColor } from "./functions";
   import type { colour, paletteState } from "./types";
   import { sortBy } from "./sorts";
-  import {
-    getLuma,
-    getHue,
-    getLightness,
-    getSaturation,
-    hexToColour,
-  } from "./colourfunctions";
+  import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "./colourfunctions";
   import { preventDefault } from "svelte/legacy";
-  let { palette = $bindable() } = $props<{palette: paletteState}>();
-//   let palette = $props();
+  let { palette = $bindable() } = $props<{ palette: paletteState }>();
+  //   let palette = $props();
   const map = new Map<string, number>();
   const paletteSorts = ["frequency", "luminance", "saturation", "hue"];
   let paletteSortMethodCounter = $state(0);
   let paletteSortMethodName = $derived(paletteSorts[paletteSortMethodCounter]);
   let paletteMixedStatus = false;
   let paletteFile: File | null = $state(null);
-//   let brightnessOfMiddleColours = $derived(getLuma(hexToColour(palette.colours.keys()[palette.colours.size/2])))
+  //   let brightnessOfMiddleColours = $derived(getLuma(hexToColour(palette.colours.keys()[palette.colours.size/2])))
 
   let sortMethodDisplayFade = $state(false);
 
@@ -54,10 +48,7 @@
   function handleReversePalette() {
     palette.colours = new Map([...palette.colours.entries()].reverse());
   }
-  function sortPalette(
-    colours: Map<string, number>,
-    algorithm: string
-  ): Map<string, number> {
+  function sortPalette(colours: Map<string, number>, algorithm: string): Map<string, number> {
     sortMethodDisplayFade = true;
     setTimeout(() => {
       sortMethodDisplayFade = false;
@@ -133,9 +124,7 @@
           console.log("starting palette load");
           if (typeof reader.result == "string") {
             text = reader.result;
-            const colourMap = new Map<string, number>(
-              Object.entries(JSON.parse(text))
-            );
+            const colourMap = new Map<string, number>(Object.entries(JSON.parse(text)));
             palette.colours = colourMap;
             console.log("Successful");
           } else {
@@ -162,12 +151,7 @@
 </script>
 
 <div class="paletteBox">
-  <div
-    class="palettePlusGradientBox"
-    ondrop={handleDrop}
-    ondragover={handleDragOver}
-    role="region"
-  >
+  <div class="palettePlusGradientBox" ondrop={handleDrop} ondragover={handleDragOver} role="region">
     <div class="paletteDisplay">
       <div class="sortMethodDisplay {sortMethodDisplayFade}">
         {paletteSortMethodName}
@@ -177,15 +161,10 @@
         <div class="colour">
           <button
             aria-label="colour copy"
-            style="background-color: {colour}; color: {getLuma(
-              hexToColour(colour)
-            ) < 0.3
-              ? 'white'
-              : 'black'}"
+            style="background-color: {colour}; color: {getLuma(hexToColour(colour)) < 0.3 ? 'white' : 'black'}"
             role="menuitem"
             tabindex={i}
-            onclick={(event) => handleColourClick(event, colour)}
-            ><div></div></button
+            onclick={(event) => handleColourClick(event, colour)}><div></div></button
           >
         </div>
       {/each}
@@ -211,9 +190,13 @@
   .sortMethodDisplay.true {
     opacity: 1;
     transition: opacity 0.2s;
+    user-select: text;
+    z-index: 3;
   }
   .sortMethodDisplay.false {
     opacity: 0;
+    user-select: none;
+    z-index: 0;
   }
   .paletteBox {
     flex: 2;
@@ -265,6 +248,7 @@
   .colour {
     box-sizing: border-box;
     flex: 1;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
