@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import './style.css';
 
   let options = $state({
     image: "this",
@@ -67,12 +68,11 @@
   input {
     border: none;
     appearance: none;
-    border-radius: 0;
     height: 100%;
     width: 100%;
     text-align: center;
     font-size: inherit;
-    background-color: #e8e8e8;
+    background-color: var(--primary-color);
     transition: box-shadow;
     &:hover {
       box-shadow: inset 0 0 2px #000;

@@ -2,6 +2,7 @@
   import { createEventDispatcher, tick } from "svelte";
   import { fisherYates, interpolateColor } from "./functions";
   import type { colour, paletteState } from "./types";
+  import './style.css';
   import { sortBy } from "./sorts";
   import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "./colourfunctions";
   import { preventDefault } from "svelte/legacy";
@@ -223,11 +224,11 @@
   .gradientLine {
     flex: 1;
     width: 100%;
-    background: #000;
+    background: var(--background-color);
   }
   button {
     font-size: inherit;
-    background-color: #e8e8e8;
+    background-color: var(--primary-color);
     transition: box-shadow 0.2s;
     &:hover {
       box-shadow: inset 0 0 2px #000;
@@ -241,7 +242,7 @@
     align-items: center;
     z-index: 20;
     /* height: 10%; */
-    background-color: #c5c5c5;
+    background-color: var(--secondary-color);
     /* outline: 1px solid black; */
     width: 100%;
   }
@@ -255,6 +256,7 @@
     min-width: 0;
     height: 100%;
     /* outline: 1px solid black; */
+    border-radius: 0;
     padding: none;
   }
   .colour button {
@@ -262,5 +264,6 @@
     height: 100%;
     padding: none;
     border: none;
+    border-radius: 0;
   }
 </style>

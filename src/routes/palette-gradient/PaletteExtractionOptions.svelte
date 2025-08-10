@@ -21,7 +21,7 @@
 
 <div class="configBox {display}" class:available={display}>
   <div class="showhide">
-    <button onclick={() => (display = !display)}
+    <button onclick={() => (display = !display)} title="Toggle Palette Extraction Options"
       >{display ? "hide" : "show"}</button
     >
   </div>
@@ -81,7 +81,7 @@
 
 <style>
   .configBox.available {
-    background-color: #c5c5c5;
+    background-color: var(--secondary-color);
   }
   .showhide {
     width: 10%;
@@ -124,8 +124,7 @@
     padding: 0;
     appearance: none;
     border: none;
-    border-radius: 0;
-    background-color: #e8e8e8;
+    background-color: var(--primary-color);
     transition: box-shadow 0.2s;
     &:hover {
       box-shadow: inset 0 0 2px #000;
@@ -135,7 +134,6 @@
   button,
   select,
   input {
-    border-radius: 0;
     border: none;
     -webkit-appearance: none;
     -moz-appearance: none;

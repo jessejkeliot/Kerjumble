@@ -2,6 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import CardImage from "./CardImage.svelte";
+  import './style.css';
 
   // Image files and previews
   let cardARef: any;
@@ -17,8 +18,17 @@
     const { palette, via } = event.detail;
     cardARef?.applyExternalMap(palette, via);
   }
-</script>
+  let clientX = $state(0);
+  let clientY = $state(0);
 
+  
+  function handleMouseMove(e: MouseEvent){
+    clientX = e.clientX;
+    clientY = e.clientY;
+
+  }
+</script>
+<svelte:window on:mousemove={handleMouseMove}></svelte:window>
 <div class="whole">
   <!-- <div class="title"><h4>Ollets</h4></div> -->
   <div class="middlebox">
@@ -34,9 +44,6 @@
 <!-- <Number prefix={"$"}></Number> -->
 <!-- STYLES -->
 <style>
-  * {
-    /* outline: 1px solid #0009 !important; */
-  }
   .middlebox {
     display: flex;
     flex-direction: column;
@@ -70,10 +77,7 @@
     height: 100%;
     max-width: 1600px;
     min-height: 500px;
-    outline: 3px solid #e9e9e9;
-  }
-  * {
-    font-family: inherit;
+    outline: 3px solid var(--secondary-color);
   }
 
   @media (max-width: 700px) {

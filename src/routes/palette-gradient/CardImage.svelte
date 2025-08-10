@@ -1,10 +1,14 @@
 <script lang="ts">
   import PaletteExtractionOptions from "./PaletteExtractionOptions.svelte";
-
+  import "./style.css";
   import PaletteBox from "./PaletteBox.svelte";
 
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
+  import MageReset from "~icons/mage/reload-reverse";
+  import MageX from "~icons/mage/folder-cross";
+  import MageFileDownload from "~icons/mage/file-download";
+  import MageImageDownload from "~icons/mage/image-download";
   import MageSort from "~icons/mage/chart-up-fill";
   import { getPaletteColours, getColourAt, hueSimilarity, getPixelIndex, brightnessSimilarity, mapToObject } from "./functions";
   import type { colour, paletteSettings, paletteState } from "./types";
@@ -431,10 +435,13 @@
 
 <div class="data">
   <div class="Image Options">
-    <button onclick={clearImage}>Clear Image</button>
-    <button onclick={resetImage}>Reset Image</button>
-    <button onclick={saveImage}>Save Image</button>
-    <button onclick={savePalette}>Save Palette</button>
+    <div class="optionIconHolder">
+      <button onclick={clearImage} title="Remove Image"><MageX style="font-size: 1.2em" /></button>
+      <button onclick={resetImage} title="Reset Image"><MageReset style="font-size: 1.2em" /></button>
+    <button onclick={saveImage} title="Save Image"><MageImageDownload style="font-size: 1.2em" /></button>
+    <button onclick={savePalette} title="Save Palette"><MageFileDownload style="font-size: 1.2em" /></button>
+    </div>
+    <!-- <div class="optionIconHolder"></div> -->
   </div>
   <div class="imageHolder input" id="canvas{name}" ondrop={handleDrop} ondragover={handleDragOver} aria-hidden="true">
     <div class="abs">
@@ -462,38 +469,12 @@
     left: 0;
     width: 100%;
   }
-  .configBottom {
-    flex: 2;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  .rest {
-    flex: 2;
-  }
-  .apply {
-    font-size: inherit;
-    flex: 1;
-  }
-  .configBox {
-    flex: 1;
-    display: flex;
-    align-items: center;
-  }
-  .configBox div {
-    height: 100%;
-    flex: 1;
-    font-family: inherit;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
   .Options {
     flex: 1;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background-color: #c5c5c5;
+    background-color: var(--secondary-color);
     gap: 0.25em;
     padding: 0.25em;
   }
@@ -502,7 +483,7 @@
     flex: 1;
     border: none;
     appearance: none;
-    background-color: #e8e8e8;
+    background-color: var(--primary-color);
     transition: box-shadow 0.3s;
     &:hover {
       box-shadow: inset 0 0 0.2em #000;
@@ -513,6 +494,11 @@
   select {
     font-size: inherit;
   }
+  .Options button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .data {
     flex: 1;
     font-size: 1rem;
@@ -522,7 +508,7 @@
     width: 100%;
     text-overflow: clip;
     outline: 1px solid black;
-    background-color: #c5c5c5;
+    background-color: var(--secondary-color);
     box-shadow: 0 3px 10px #333;
   }
   .containedImage {
@@ -531,7 +517,12 @@
     max-height: 100%;
     object-fit: contain;
   }
-
+  .optionIconHolder{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap:0.25em;
+  }
   @media (max-width: 850px) {
     .imageHolder {
       width: 100%;
@@ -551,7 +542,7 @@
 
   .imageHolder {
     flex: 15;
-    background-color: #f9f9f9;
+    background-color: var(--background-color);
     box-shadow: inset 0 0 10px #0003;
     backdrop-filter: blur(8px);
     display: flex;
@@ -561,7 +552,6 @@
     /* outline: 1px solid hsl(0, 0%, 40.5%); */
   }
   button,
-  select,
   input {
     border: none;
     appearance: none;
@@ -580,7 +570,6 @@
     position: absolute;
   }
   input {
-    border-radius: 0;
     border: none;
     -webkit-appearance: none;
     -moz-appearance: none;
