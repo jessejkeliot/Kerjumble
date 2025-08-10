@@ -50,6 +50,11 @@
     gap: 0.25em;
     padding: 0.25em;
   }
+  @media (max-width: 480px) {
+    .options{
+      flex:2;
+    }
+  }
   .apply {
     font-size: inherit;
     flex: 1;

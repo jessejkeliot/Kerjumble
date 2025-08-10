@@ -54,8 +54,10 @@
     border-radius: 1rem;
     /* outline: 1px solid black; */
     align-items: center;
+
   }
   .whole {
+    font-size: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -87,6 +89,11 @@
     }
     .middlebox {
       height: 90%;
+    }
+  }
+  @media (max-width: 480px) {
+    .whole{
+      font-size: 15px;
     }
   }
 </style>

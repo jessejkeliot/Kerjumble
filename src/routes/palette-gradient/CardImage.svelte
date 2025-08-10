@@ -9,6 +9,7 @@
   import MageX from "~icons/mage/folder-cross";
   import MageFileDownload from "~icons/mage/file-download";
   import MageImageDownload from "~icons/mage/image-download";
+  import MageColorSwatch from "~icons/mage/color-swatch";
   import MageSort from "~icons/mage/chart-up-fill";
   import { getPaletteColours, getColourAt, hueSimilarity, getPixelIndex, brightnessSimilarity, mapToObject } from "./functions";
   import type { colour, paletteSettings, paletteState } from "./types";
@@ -436,17 +437,15 @@
 <div class="data">
   <div class="Image Options">
     <div class="optionIconHolder">
-      <button onclick={clearImage} title="Remove Image"><MageX style="font-size: 1.2em" /></button>
-      <button onclick={resetImage} title="Reset Image"><MageReset style="font-size: 1.2em" /></button>
-    <button onclick={saveImage} title="Save Image"><MageImageDownload style="font-size: 1.2em" /></button>
-    <button onclick={savePalette} title="Save Palette"><MageFileDownload style="font-size: 1.2em" /></button>
+      <button onclick={clearImage} title="Remove Image"><MageX style="font-size: 1.2rem" /></button>
+      <button onclick={resetImage} title="Reset Image"><MageReset style="font-size: 1.2rem" /></button>
+      <button onclick={saveImage} title="Save Image"><MageFileDownload style="font-size: 1.2rem" /></button>
+      <button onclick={savePalette} title="Save Palette"><MageColorSwatch style="font-size: 1.2rem" /></button>
     </div>
     <!-- <div class="optionIconHolder"></div> -->
   </div>
   <div class="imageHolder input" id="canvas{name}" ondrop={handleDrop} ondragover={handleDragOver} aria-hidden="true">
-    <div class="abs">
-      <PaletteExtractionOptions on:applySettings={applySettings} bind:settings={palette.settings} bind:display={showPEO} />
-    </div>
+    <PaletteExtractionOptions on:applySettings={applySettings} bind:settings={palette.settings} bind:display={showPEO} />
     {#if imageURL}
       <canvas bind:this={canvasEl} width={canvasWidth} height={canvasHeight} class="containedImage"></canvas>
     {/if}
@@ -463,12 +462,6 @@
   /* * {
     outline: 1px solid #0009 !important;
   } */
-  .abs {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
   .Options {
     flex: 1;
     display: flex;
@@ -517,11 +510,11 @@
     max-height: 100%;
     object-fit: contain;
   }
-  .optionIconHolder{
+  .optionIconHolder {
     flex: 1;
     display: flex;
     flex-direction: row;
-    gap:0.25em;
+    gap: 0.25em;
   }
   @media (max-width: 850px) {
     .imageHolder {
@@ -537,6 +530,12 @@
   @media (max-width: 480px) {
     .data {
       font-size: 0.6rem;
+    }
+    .Options {
+      flex: 2;
+    }
+    .abs {
+      height: 50%;
     }
   }
 

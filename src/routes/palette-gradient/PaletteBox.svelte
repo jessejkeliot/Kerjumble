@@ -204,6 +204,11 @@
     display: flex;
     flex-direction: row;
   }
+  @media (max-width: 480px) {
+    .paletteBox{
+      flex:3;
+    }
+  }
   .paletteOptions button {
     flex: 1;
     border: none;

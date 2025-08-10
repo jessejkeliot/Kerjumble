@@ -21,50 +21,26 @@
 
 <div class="configBox {display}" class:available={display}>
   <div class="showhide">
-    <button onclick={() => (display = !display)} title="Toggle Palette Extraction Options"
-      >{display ? "hide" : "show"}</button
-    >
+    <button onclick={() => (display = !display)} title="Toggle Palette Extraction Options">{display ? "hide" : "show"}</button>
   </div>
   {#if display}
     <div class="rest">
       <div>
-        <button
-          onclick={() =>
-            paletteAlgorithmCounter === 1
-              ? (paletteAlgorithmCounter = 0)
-              : (paletteAlgorithmCounter = 1)}
+        <button onclick={() => (paletteAlgorithmCounter === 1 ? (paletteAlgorithmCounter = 0) : (paletteAlgorithmCounter = 1))}
           >{paletteAlgorithms[paletteAlgorithmCounter]}</button
         >
       </div>
       <div>
         n=
-        <input
-          type="number"
-          name="paletteSize"
-          id="paletteSize"
-          min="2"
-          max="50"
-          bind:value={settings.numberOfColours}
-        />
+        <input type="number" name="paletteSize" id="paletteSize" min="2" max="50" bind:value={settings.numberOfColours} />
       </div>
       <div>
         diff=
-        <input
-          type="number"
-          name="colourdiff"
-          id="colourDifference"
-          min="2"
-          max="120"
-          bind:value={settings.differenceOfColour}
-        />
+        <input type="number" name="colourdiff" id="colourDifference" min="2" max="120" bind:value={settings.differenceOfColour} />
       </div>
       <div>
         dsample:
-        <select
-          name="Algorithm"
-          id="downsampling"
-          bind:value={settings.downsampleRate}
-        >
+        <select name="Algorithm" id="downsampling" bind:value={settings.downsampleRate}>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="4">4</option>
@@ -97,14 +73,25 @@
     flex: 1;
   }
   .configBox {
-    position: relative;
-    flex: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: content-box;
     display: flex;
     align-items: center;
     z-index: 25;
     gap: 0.25em;
     padding: 0.25em;
+    box-sizing: border-box;
     background-color: transparent;
+    /* outline: 1px solid green; */
+    height: clamp(15px, 7%, 30px);
+  }
+  @media (max-width: 480px) {
+    .configBox {
+      height: clamp(20px, 12%, 35px);
+    }
   }
   .configBox div {
     z-index: 8;
@@ -122,8 +109,12 @@
     width: 100%;
     margin: 0;
     padding: 0;
+    box-sizing: content-box;
     appearance: none;
     border: none;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
     background-color: var(--primary-color);
     transition: box-shadow 0.2s;
     &:hover {
