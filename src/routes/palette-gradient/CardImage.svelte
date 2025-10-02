@@ -151,8 +151,7 @@
             }
             const avgSim1 = sum1 / count1;
 
-            // Exponential scaling to weight high similarity more
-            const boosted1 = Math.pow(avgSim1, 1); // adjust exponent to tune effect
+            const boosted1 = Math.pow(avgSim1, 1.2);
             newColour = gradientFromPalette(boosted1, palette);
             break;
           case "edge hue":
@@ -168,8 +167,7 @@
             }
             const avgSim = sum / count;
 
-            // Exponential scaling to weight high similarity more
-            const boosted = Math.pow(avgSim, 1); // adjust exponent to tune effect
+            const boosted = Math.pow(avgSim, 1.2);
             newColour = gradientFromPalette(boosted, palette);
             break;
 
