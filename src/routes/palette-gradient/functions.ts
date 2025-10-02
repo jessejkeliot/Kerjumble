@@ -48,7 +48,6 @@ function histogramExtraction(
   pixelationLevel: number | undefined
 ): Map<string, number> {
   console.log("starting histogram extraction");
-  // Placeholder for histogram extraction logic
   const freqMap = new Map<string, number>();
   if (pixelationLevel && pixelationLevel > 1) {
     image = pixelateDownsampled(image, pixelationLevel);
