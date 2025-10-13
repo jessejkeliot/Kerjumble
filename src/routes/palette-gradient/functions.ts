@@ -15,11 +15,9 @@ export function getPaletteColours(
     console.error("Invalid or empty image data");
     return new Map<string, number>();
   }
-  // Placeholder for actual palette extraction logic
   const colours: string[] = [];
-  // histogram or k-means clustering logic would go here
+  // histogram or k-means clustering
   if (algorithm === "k-means") {
-    // Implement k-means clustering logic to extract colours
     // return kmeansClustering(image, numberOfColours);
   }
   if (algorithm === "histogram") {
@@ -50,7 +48,6 @@ function histogramExtraction(
   pixelationLevel: number | undefined
 ): Map<string, number> {
   console.log("starting histogram extraction");
-  // Placeholder for histogram extraction logic
   const freqMap = new Map<string, number>();
   if (pixelationLevel && pixelationLevel > 1) {
     image = pixelateDownsampled(image, pixelationLevel);

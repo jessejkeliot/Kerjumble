@@ -151,8 +151,7 @@
             }
             const avgSim1 = sum1 / count1;
 
-            // Exponential scaling to weight high similarity more
-            const boosted1 = Math.pow(avgSim1, 1); // adjust exponent to tune effect
+            const boosted1 = Math.pow(avgSim1, 1.2);
             newColour = gradientFromPalette(boosted1, palette);
             break;
           case "edge hue":
@@ -168,8 +167,7 @@
             }
             const avgSim = sum / count;
 
-            // Exponential scaling to weight high similarity more
-            const boosted = Math.pow(avgSim, 1); // adjust exponent to tune effect
+            const boosted = Math.pow(avgSim, 1.2);
             newColour = gradientFromPalette(boosted, palette);
             break;
 
@@ -206,16 +204,16 @@
   // Handle image loading and canvas drawing
   async function loadImageAndProcess(file: File) {
     const url = URL.createObjectURL(file);
-    imageURL = url; // Update state so the template can show the canvas
+    imageURL = url;
 
     const image = new Image();
 
     try {
-      // Wait for the image to load using a Promise
+      // Wait for the image to load
       await new Promise((resolve, reject) => {
         image.onload = resolve;
         image.onerror = reject;
-        image.src = url; // Start loading
+        image.src = url; 
       });
 
       if (!canvasEl) return;
@@ -228,7 +226,6 @@
       const context = canvasEl.getContext("2d", { willReadFrequently: true });
       if (!context) return;
 
-      // Ensure canvas is ready for drawing
       await new Promise(requestAnimationFrame);
 
       context.drawImage(image, 0, 0, w, h);
@@ -247,11 +244,8 @@
       console.error("Failed to load or process image", error);
       imageURL = null; // Clear the URL on error
     }
-    // We don't revoke the URL here because the <img> tag might still need it.
-    // The cleanup in $effect will handle it.
   }
   $effect(() => {
-    // This effect now ONLY reacts to changes in imageFile.
     if (imageFile) {
       loadImageAndProcess(imageFile);
     }
@@ -382,7 +376,7 @@
     URL.revokeObjectURL(url);
   }
   async function saveImage() {
-    // Convert canvas content to a Blob
+    // convert canvas content to a Blob
     const nameFile = imageFile?.name + "-gradient-mapped.png";
     if (canvasEl) {
       canvasEl.toBlob(async (blob) => {
@@ -391,16 +385,15 @@
           return;
         }
 
-        // Check if Web Share API is available
         if (navigator.share) {
           try {
-            // Create a File object from the Blob
+            // create a file object from the Blob
 
             const file = new File([blob], nameFile, {
               type: "image/png",
             });
 
-            // Use navigator.share to share the image
+            // use navigator.share to share the image
             await navigator.share({
               files: [file],
               title: "Gradient Mapping",
@@ -408,24 +401,23 @@
             });
             console.error("Image shared successfully!", "success");
           } catch (error) {
-            // Handle user cancellation or other errors
 
             console.error("Image sharing cancelled.", "error");
             console.error("Error sharing image:", error);
           }
         } else {
-          // Fallback for browsers that do not support Web Share API (e.g., desktop)
+          // Fallback
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
           a.download = nameFile;
           document.body.appendChild(a);
           a.click();
-          document.body.removeChild(a); // Clean up the temporary link
+          document.body.removeChild(a); //clean up
           URL.revokeObjectURL(url);
           console.log("Image downloaded successfully!", "success");
         }
-      }, "image/png"); // Specify image format
+      }, "image/png");
     }
     if (!canvasEl) {
       console.error("No canvas!");
