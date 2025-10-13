@@ -2,7 +2,7 @@
   import { createEventDispatcher, tick } from "svelte";
   import { fisherYates, interpolateColor } from "./functions";
   import type { colour, paletteState } from "./types";
-  import './style.css';
+  import "./style.css";
   import { sortBy } from "./sorts";
   import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "./colourfunctions";
   import { preventDefault } from "svelte/legacy";
@@ -17,6 +17,8 @@
   //   let brightnessOfMiddleColours = $derived(getLuma(hexToColour(palette.colours.keys()[palette.colours.size/2])))
 
   let sortMethodDisplayFade = $state(false);
+  let sortMethodDisplayTimer: ReturnType<typeof setTimeout> = setTimeout(()=> "", 0);
+  
 
   //could have a check if the settings have changed before applying
 
@@ -50,10 +52,13 @@
     palette.colours = new Map([...palette.colours.entries()].reverse());
   }
   function sortPalette(colours: Map<string, number>, algorithm: string): Map<string, number> {
-    sortMethodDisplayFade = true;
-    setTimeout(() => {
-      sortMethodDisplayFade = false;
-    }, 300);
+    if (sortMethodDisplayFade) {
+      clearTimeout(sortMethodDisplayTimer)
+    }
+      sortMethodDisplayFade = true;
+      sortMethodDisplayTimer = setTimeout(() => {
+        sortMethodDisplayFade = false;
+      }, 600);
     switch (algorithm) {
       case "frequency":
         return new Map([...colours.entries()].sort((a, b) => b[1] - a[1]));
@@ -165,7 +170,7 @@
             style="background-color: {colour}; color: {getLuma(hexToColour(colour)) < 0.3 ? 'white' : 'black'}"
             role="menuitem"
             tabindex={i}
-            onclick={(event) => handleColourClick(event, colour)}><div></div></button
+            onclick={(event) => handleColourClick(event, colour)}><div class="colourPreview">{colour}</div></button
           >
         </div>
       {/each}
@@ -183,6 +188,21 @@
   /* * {
     outline: 1px solid #0009 !important;
   } */
+  .colourPreview {
+    font-size: 0.6em;
+    opacity: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .colourPreview:hover {
+    overflow: visible;
+    opacity: 1;
+  }
   .sortMethodDisplay {
     position: absolute;
     opacity: 0;
@@ -205,8 +225,8 @@
     flex-direction: row;
   }
   @media (max-width: 480px) {
-    .paletteBox{
-      flex:3;
+    .paletteBox {
+      flex: 3;
     }
   }
   .paletteOptions button {

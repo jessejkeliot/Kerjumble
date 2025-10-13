@@ -80,7 +80,7 @@
     box-sizing: content-box;
     display: flex;
     align-items: center;
-    z-index: 25;
+    z-index: 22;
     gap: 0.25em;
     padding: 0.25em;
     box-sizing: border-box;
@@ -94,7 +94,7 @@
     }
   }
   .configBox div {
-    z-index: 8;
+    z-index: 26;
     height: 100%;
     font-family: inherit;
     display: flex;
@@ -116,6 +116,7 @@
     justify-content: center;
     align-items: center; */
     background-color: var(--primary-color);
+    opacity: 1;
     transition: box-shadow 0.2s;
     &:hover {
       box-shadow: inset 0 0 2px #000;
