@@ -188,6 +188,21 @@
   /* * {
     outline: 1px solid #0009 !important;
   } */
+  .colourPreview {
+    font-size: 0.6em;
+    opacity: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .colourPreview:hover {
+    overflow: visible;
+    opacity: 1;
+  }
   .sortMethodDisplay {
     position: absolute;
     opacity: 0;
