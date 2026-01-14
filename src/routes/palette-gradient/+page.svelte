@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
-  import CardImage from "./CardImage.svelte";
+  import CardImage from "./components/CardImage.svelte";
   import './style.css';
 
   // Image files and previews

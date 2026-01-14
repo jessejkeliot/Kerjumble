@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher, tick } from "svelte";
-  import { fisherYates, interpolateColor } from "./functions";
-  import type { colour, paletteState } from "./types";
+  import { fisherYates, interpolateColor } from "../functions";
+  import type { colour, paletteState } from "../types";
   import "./style.css";
-  import { sortBy } from "./sorts";
-  import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "./colourfunctions";
+  import { sortBy } from "../sorts";
+  import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "../colourfunctions";
   import { preventDefault } from "svelte/legacy";
   let { palette = $bindable() } = $props<{ palette: paletteState }>();
   //   let palette = $props();
