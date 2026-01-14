@@ -1,8 +1,8 @@
 <script lang="ts">
-  import "./style.css";
-  import type { localStats, Question } from "./types";
+  import "../style.css";
+  import type { localStats, Question } from "../types";
   import { createEventDispatcher } from "svelte";
-  import InformationContainer from "./informationContainer.svelte";
+  import InformationContainer from "../informationContainer.svelte";
   const dispatch = createEventDispatcher();
   export let questions: Question[];
   export let fetchedLocalStats: localStats | undefined;

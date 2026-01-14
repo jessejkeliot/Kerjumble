@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StatsPage from "./StatsPage.svelte";
+  import StatsPage from "./stats/StatsPage.svelte";
   import "./style.css";
   import type {
     Definition,
