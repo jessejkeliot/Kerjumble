@@ -1,5 +1,5 @@
 import { vector } from "@js-basics/vector";
-import type { colour, paletteSettings } from "./types";
+import type { colour, paletteSettings } from "../types/types";
 import { getLuma, hexToColour, RGBValuesToHex } from "./colourfunctions";
 function processFile(file: File): string {
   return URL.createObjectURL(file);

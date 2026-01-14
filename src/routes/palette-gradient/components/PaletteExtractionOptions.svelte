@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { paletteSettings, paletteState } from "../types";
+  import type { paletteSettings, paletteState } from "$lib/types/types";
   const map = new Map<string, number>();
   let { settings = $bindable(), display = $bindable() } = $props();
   const paletteAlgorithms = ["histogram", "k-means"];

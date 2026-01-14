@@ -1,5 +1,5 @@
 import { hexToColour } from "./colourfunctions";
-import type { colour } from "./types";
+import type { colour } from "../types/types";
 
 export function sortBy(
   colours: Map<string, number>,

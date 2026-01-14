@@ -11,9 +11,9 @@
   import MageImageDownload from "~icons/mage/image-download";
   import MageColorSwatch from "~icons/mage/color-swatch";
   import MageSort from "~icons/mage/chart-up-fill";
-  import { getPaletteColours, getColourAt, hueSimilarity, getPixelIndex, brightnessSimilarity, mapToObject } from "../functions";
-  import type { colour, paletteSettings, paletteState } from "../types";
-  import { sortBy } from "../sorts";
+  import { getPaletteColours, getColourAt, hueSimilarity, getPixelIndex, brightnessSimilarity, mapToObject } from "$lib/functions/functions";
+  import type { colour, paletteSettings, paletteState } from "$lib/types/types";
+  import { sortBy } from "$lib/functions/sorts";
   import {
     getLuma,
     getHue,
@@ -25,7 +25,7 @@
     averageColours,
     gradientFromPalette,
     colourFromPalette,
-  } from "../colourfunctions";
+  } from "../../../lib/functions/colourfunctions";
   import ApplyGMapOptions from "./ApplyGMapOptions.svelte";
 
   let { name } = $props();

@@ -1,5 +1,5 @@
-import { interpolateColor, pixelateDownsampled } from "./functions";
-import type { colour } from "./types";
+import { interpolateColor, pixelateDownsampled } from "$lib/functions/functions"
+import type { colour } from "../types/types";
 export function hexToColour(hex: string): colour {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
