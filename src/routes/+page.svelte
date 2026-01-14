@@ -40,7 +40,7 @@
   <div class="grid_container">
     <div class="content">
       <div class="title">
-        <h1>Jesse Eliot</h1>
+        <h1>Shiny Trinket</h1>
       </div>
       <div class="cards-container">
         <LinkCard title={"Kerjumble"} link={"/kerjumble"}/>

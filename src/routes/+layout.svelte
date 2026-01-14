@@ -27,6 +27,7 @@
 		/* width: max-content; */
 		background-color: var(--background-color);
 		height: 100dvh;
+		width: 100dvw;
 		/* width: auto; */
 		margin: 0;
 		padding: 0;
@@ -34,7 +35,7 @@
 	}
 
 	main {
-		outline: 2px solid rgb(72, 14, 14);
+		/* outline: 2px solid rgb(72, 14, 14); */
 		flex: 1;
 		display: flex;
 		flex-direction: column;
