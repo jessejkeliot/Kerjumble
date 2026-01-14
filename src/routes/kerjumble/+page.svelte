@@ -125,7 +125,7 @@
       health == 0
         ? playSound("click6_kerjumble.mp3", configurations.sound)
         : playSound("click9_kerjumble.mp3", configurations.sound);
-      if (health == 0) {
+      if (health === 0) {
         saveGameState(health, day, inputValue, won);
         finished();
       }
@@ -187,7 +187,8 @@
     } else {
       //add to the gamestate list and update the mean final health
       //go through games to see if already saved one today.
-      const alreadySaved = saves.games.some((g) => g.number === number);
+      const alreadySaved = saves.games.some((g) => g.number == number);
+      console.log(`Already Saved: ${alreadySaved}`);
       if (alreadySaved) return;
       if (gs_) {
         const newGsList: gameState[] = [...saves.games, gs_];

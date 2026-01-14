@@ -13,13 +13,23 @@
   export let inputValue: string;
   let shareButtonText = "Share";
 
+  let sending = false;
+
   //whether to show buttons
   function handleSendShare() {
     dispatch("shareButtonClicked");
     shareButtonText = "Copied!";
   }
   function handleSendEnter() {
+    if (sending) {
+      return
+    }
+    sending = true;
     dispatch("wordEntered", { word: inputValue });
+
+    setTimeout(() => {
+      sending = false;
+    }, 20);
   }
   onMount(() => {
     console.log("info mounted");
@@ -52,10 +62,11 @@
   type="text"
   maxlength="14"
   placeholder="guess"
+  enterkeyhint="enter"
   autocapitalize="off"
   spellcheck="false"
   autocomplete="off"
-  on:blur={handleSendEnter}
+  on:blur={handleSendEnter} 
 />
 {#if won}
   <div class="waveOverlay" aria-hidden="true">
