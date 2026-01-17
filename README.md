@@ -35,16 +35,16 @@ npm run dev
 1. ## Kerjumble
 
 Kerjumble is a daily game that tests your vocabulary and semantic skills. You are given a definition with its words shuffled and you must guess within five attempts, what the word being defined is. However, with each incorrect guess, the definition becomes less garbled.
-[![Kerjumble Game Screenshot](https://kerjumble.pages.dev/docs/assets/Screenshot_Kerjumble.png)](https://kerjumble.pages.dev/kerjumble)
+[![Kerjumble Game Screenshot](https://kerjumble.pages.dev/images/assets/Screenshot_Kerjumble.png)](https://kerjumble.pages.dev/kerjumble)
 
 2. ## Palette Gradient Mapper
 
 The Palette Gradient Mapper is a dual-purpose utility that allows you to extract dominant colours from images, but also then to apply those colours to images through the process of a gradient map. There are various options for what medium through which you would like to apply the gradient: brightness(most common), hue, saturation,
 
-[![Palette Mapper Screenshot]](https://kerjumble.pages.dev/docs/assets/Screenshot_PaletteMapper.png)(https://kerjumble.pages.dev/palette-gradient)
+[![Palette Mapper Screenshot](https://kerjumble.pages.dev/images/assets/Screenshot_PaletteMapper.png)](https://kerjumble.pages.dev/palette-gradient)
 
 3. ## Quick Define Lab
 
 Brief demo of the FreeDictionaryAPI, fetching definitions. Made for a university lab project.
 
-[![Quick Define Lab Screenshot]](https://kerjumble.pages.dev/docs/assets/Screenshot_QuickDefine.png)(https://kerjumble.pages.dev/quickdefinelab?word=screenshot)
+[![Quick Define Lab Screenshot](https://kerjumble.pages.dev/images/assets/Screenshot_QuickDefine.png)](https://kerjumble.pages.dev/quickdefinelab?word=screenshot)
