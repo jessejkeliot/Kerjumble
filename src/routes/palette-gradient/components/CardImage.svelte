@@ -2,6 +2,7 @@
   import PaletteExtractionOptions from "./PaletteExtractionOptions.svelte";
   import "./style.css";
   import PaletteBox from "./PaletteBox.svelte";
+  import { actionHistory } from "../shared.svelte";
 
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
@@ -180,8 +181,8 @@
         imageData.data[i + 2] = newColour.blue;
       }
     }
-
     context.putImageData(imageData, 0, 0);
+    actionHistory.save({type: "image", data: imageData});
   }
   function gradientFromPaletteMap(palette: Map<string, number>) {}
   function sortPalette(colours: Map<string, number>, algorithm: string): Map<string, number> {
@@ -229,8 +230,8 @@
       await new Promise(requestAnimationFrame);
 
       context.drawImage(image, 0, 0, w, h);
+      const imageData = context.getImageData(0, 0, w, h);
       if (palette.colours.size === 0) {
-        const imageData = context.getImageData(0, 0, w, h);
         const colours = getPaletteColours(
           imageData,
           palette.settings.numberOfColours,
@@ -240,6 +241,7 @@
         );
         palette.colours = colours;
       }
+      actionHistory.save({type: "image", data: imageData})
     } catch (error) {
       console.error("Failed to load or process image", error);
       imageURL = null; // Clear the URL on error
