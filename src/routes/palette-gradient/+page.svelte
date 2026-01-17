@@ -49,9 +49,10 @@
       }
       switch (action?.tabID) {
         case "A":
-          cardARef?.
+          cardARef?.applyAction(action)
           break;
-      
+        case "B":
+          cardBRef?.applyAction(action)
         default:
           break;
       }

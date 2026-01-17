@@ -2,11 +2,12 @@
   import { createEventDispatcher, tick } from "svelte";
   import { fisherYates, interpolateColor } from "$lib/functions/functions";
   import type { colour, paletteState } from "$lib/types/types";
-  import "./style.css";
+  import "../style.css";
   import { sortBy } from "$lib/functions/sorts";
   import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "../../../lib/functions/colourfunctions";
   import { preventDefault } from "svelte/legacy";
-  let { palette = $bindable() } = $props<{ palette: paletteState }>();
+    import { actionHistory } from "../shared.svelte";
+  let { palette = $bindable(), name} = $props<{ palette: paletteState, name:string}>();
   //   let palette = $props();
   const map = new Map<string, number>();
   const paletteSorts = ["frequency", "luminance", "saturation", "hue"];
@@ -36,6 +37,11 @@
       newMap.set(shuffled[i], palette.colours.get(shuffled[i])!);
     }
     palette.colours = newMap;
+    actionHistory.save({
+      type: "palette",
+      tabID: name,
+      data: newMap
+    })
   }
   function handleSortPalette() {
     if (!paletteMixedStatus) {

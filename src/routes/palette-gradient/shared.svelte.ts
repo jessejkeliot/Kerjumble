@@ -1,6 +1,6 @@
 type actionTypes = "palette" | "image";
 
-export type Action = { type: "palette"; data: string[], tabID: string} | { type: "image"; data: ImageData, tabID: string};
+export type Action = { type: "palette"; data: Map<string, number>, tabID: string} | { type: "image"; data: ImageData, tabID: string};
 
 type HistoryState = {
     stack: Action[];
@@ -37,12 +37,24 @@ export const actionHistory = $state({
         }
     },
     undo() {
+        console.log("undoing")
         if (this.index > -1) {
-            console.log("Can't undo");
-            return;
-        } else {
             this.index--;
+            console.log(this.stack[this.index])
             return this.stack[this.index] ?? null;
         }
+        else{
+            console.log("can't undo anymore");
+        }
     },
+    purgeImageActions(id: string){
+        this.stack.filter((x)=> {
+            x.tabID !== id && x.type == "image"
+        })
+    },
+    purgePaletteActions(id: string){
+        this.stack.filter((x)=> {
+            x.tabID !== id && x.type == "palette"
+        })
+    }
 });
