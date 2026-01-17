@@ -3,7 +3,7 @@
   import "./style.css";
   import PaletteBox from "./PaletteBox.svelte";
   import { actionHistory } from "../shared.svelte";
-
+  import type {Action} from "../shared.svelte"
   import { createEventDispatcher } from "svelte";
   import MageImageAdd from "~icons/mage/image-plus";
   import MageReset from "~icons/mage/reload-reverse";
@@ -30,6 +30,7 @@
   import ApplyGMapOptions from "./ApplyGMapOptions.svelte";
 
   let { name } = $props();
+  export const identifier = name;
   let showPEO = $state(false);
   let defaultSettings: paletteSettings = {
     numberOfColours: 5,
@@ -90,6 +91,25 @@
       return;
     }
     applyMap(palette, canvasEl, via);
+  }
+  export function applyAction(action: Action) {
+    if(action.type == "image"){
+      if(!canvasEl){
+        console.error("No canvas to put the image on")
+        return
+      }
+      loadFromImageData(action.data)
+    }
+    if(action.type == "palette"){
+      
+    }
+
+  }
+
+  function loadFromImageData(imageData: ImageData){
+    
+    const context = canvasEl?.getContext("2d")
+    context?.putImageData(imageData, 0, 0);
   }
   function applyMap(palette: string[], canvas: HTMLCanvasElement, via: string) {
     const context = canvas.getContext("2d");
@@ -182,7 +202,7 @@
       }
     }
     context.putImageData(imageData, 0, 0);
-    actionHistory.save({type: "image", data: imageData});
+    actionHistory.save({type: "image", data: imageData, tabID: name});
   }
   function gradientFromPaletteMap(palette: Map<string, number>) {}
   function sortPalette(colours: Map<string, number>, algorithm: string): Map<string, number> {
@@ -241,7 +261,7 @@
         );
         palette.colours = colours;
       }
-      actionHistory.save({type: "image", data: imageData})
+      actionHistory.save({type: "image", data: imageData, tabID: name})
     } catch (error) {
       console.error("Failed to load or process image", error);
       imageURL = null; // Clear the URL on error

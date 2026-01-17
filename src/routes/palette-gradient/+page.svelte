@@ -3,10 +3,15 @@
   import MageImageAdd from "~icons/mage/image-plus";
   import CardImage from "./components/CardImage.svelte";
   import './style.css';
+  import { actionHistory, type Action } from "./shared.svelte";
 
   // Image files and previews
-  let cardARef: any;
-  let cardBRef: any;
+  let cardARef: CardImage;
+  let cardBRef: CardImage;
+
+  const keystate = {
+    cmd: false
+  }
 
   function handleApplyToOtherA(event: CustomEvent) {
     const { palette, via } = event.detail;
@@ -25,10 +30,35 @@
   function handleMouseMove(e: MouseEvent){
     clientX = e.clientX;
     clientY = e.clientY;
-
+  }
+  function handleKeyPress(event: KeyboardEvent){
+    if (event.key === "Meta") {
+      keystate.cmd = true;
+    }
+    if (event.metaKey && event.key === "z") {
+      let action: Action | undefined = undefined;
+      //trigger the undo
+      //do we trigger the undo here and send the data down with an event? or should I do it in the component
+      //I think we should just do it here and then send it down. in an event?
+      if (event.shiftKey) {
+        //redo
+        action = actionHistory.redo();
+      }
+      else {
+        action = actionHistory.undo()
+      }
+      switch (action?.tabID) {
+        case "A":
+          cardARef?.
+          break;
+      
+        default:
+          break;
+      }
+    }
   }
 </script>
-<svelte:window on:mousemove={handleMouseMove}></svelte:window>
+<svelte:window on:mousemove={handleMouseMove} on:keydown={handleKeyPress}></svelte:window>
 <div class="whole">
   <!-- <div class="title"><h4>Ollets</h4></div> -->
   <div class="middlebox">
