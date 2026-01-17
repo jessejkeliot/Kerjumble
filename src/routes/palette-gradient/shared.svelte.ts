@@ -1,6 +1,6 @@
 type actionTypes = "palette" | "image";
 
-export type Action ={ type: "image"; data: ImageData | null, tabID: string};
+export type Action = { type: "image"; data: ImageData | null, tabID: string};
 
 type HistoryState = {
     stack: Action[];
