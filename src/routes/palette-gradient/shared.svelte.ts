@@ -1,6 +1,6 @@
 type actionTypes = "palette" | "image";
 
-export type Action = { type: "palette"; data: Map<string, number>, tabID: string} | { type: "image"; data: ImageData, tabID: string};
+export type Action ={ type: "image"; data: ImageData | null, tabID: string};
 
 type HistoryState = {
     stack: Action[];
@@ -11,50 +11,44 @@ export const actionHistory = $state({
     index: -1,
 
     save(newAction: Action) {
+        console.log(`ActionHistory: saving ${newAction.type} to stack`)
         // if we are in the middle of the stack and a new action is recorded we should clear the rest of the stack
-        if (this.index !== this.stack.length - 1) {
-            for (let index = this.stack.length - 1; index > this.index; index--) {
-                this.stack.pop();
-            }
-        }
+        
+        this.stack = [...this.stack.slice(0, this.index + 1), newAction]
 
-        this.stack.push(newAction);
 
-        if (this.stack.length > 4) {
+        if (this.stack.length > 5) {
             this.stack.shift();
         }
 
         this.index = this.stack.length - 1;
+        console.log(`New stack index = ${this.index}`)
     },
 
     redo() {
-        if (this.index === this.stack.length - 1) {
-            console.log("Can't redo");
-            return;
-        } else {
+        if (this.index < this.stack.length - 1) {
             this.index++;
             return this.stack[this.index]
+        } else {
+            console.log(`can't redo index = ${this.index}`);
         }
     },
     undo() {
-        console.log("undoing")
-        if (this.index > -1) {
+        if (this.index > 0) {
+            console.log(`undoing ${this.stack[this.index].type}`)
             this.index--;
-            console.log(this.stack[this.index])
-            return this.stack[this.index] ?? null;
+            console.log(`New stack index = ${this.index}`)
+            return this.stack[this.index];
         }
-        else{
-            console.log("can't undo anymore");
+        else if(this.index === 0){
+            console.log(`can't undo anymore this.index = ${this.index}`);
+            return this.stack[0]
         }
+        return undefined;
     },
     purgeImageActions(id: string){
-        this.stack.filter((x)=> {
+        this.stack = this.stack.filter((x)=> {
             x.tabID !== id && x.type == "image"
-        })
-    },
-    purgePaletteActions(id: string){
-        this.stack.filter((x)=> {
-            x.tabID !== id && x.type == "palette"
         })
     }
 });

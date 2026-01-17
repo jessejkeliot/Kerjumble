@@ -105,23 +105,23 @@
                 console.error("No canvas to put the image on");
                 return;
             }
-            loadFromImageData(action.data);
-        }
-        if (action.type == "palette") {
-            console.log("making palette what it last was")
-            palette.colours = action.data;
+            if (action.data === null) {
+                const ctx = canvasEl.getContext("2d");
+                ctx?.clearRect(0, 0, canvasWidth, canvasHeight);
+            } else {
+                loadFromImageData(action.data);
+            }
         }
     }
 
     function loadFromImageData(imageData: ImageData) {
         if (canvasEl) {
-          canvasEl.width = imageData.width;
-          canvasEl.height = imageData.height;
-          const context = canvasEl.getContext("2d");
+            canvasEl.width = imageData.width;
+            canvasEl.height = imageData.height;
+            const context = canvasEl.getContext("2d");
             context?.putImageData(imageData, 0, 0);
-        }
-        else {
-          console.log("No canvas to load the image data onto")
+        } else {
+            console.log("No canvas to load the image data onto");
         }
     }
     function applyMap(palette: string[], canvas: HTMLCanvasElement, via: string) {
@@ -313,7 +313,7 @@
         canvasWidth = 0;
         canvasHeight = 0;
 
-        actionHistory.purgeImageActions(name)
+        // actionHistory.purgeImageActions(name);
     }
 
     function handleDragOver(event: DragEvent) {
@@ -392,6 +392,7 @@
         image.onload = () => {
             console.log("Resetting image on canvas");
             context.drawImage(image, 0, 0);
+            actionHistory.save({ type: "image", data: context.getImageData(0, 0, canvasWidth, canvasHeight), tabID: name });
         };
     }
 
@@ -483,7 +484,7 @@
         </label>
         <input type="file" id="paletteFileInput{name}" accept="image/*" hidden onchange={handleFileInput} bind:this={inputElement} />
     </div>
-    <PaletteBox bind:palette {name}/>
+    <PaletteBox bind:palette {name} />
     <ApplyGMapOptions on:applyMap={handleApplyMap} />
 </div>
 

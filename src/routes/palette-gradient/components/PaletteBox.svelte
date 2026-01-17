@@ -37,11 +37,6 @@
       newMap.set(shuffled[i], palette.colours.get(shuffled[i])!);
     }
     palette.colours = newMap;
-    actionHistory.save({
-      type: "palette",
-      tabID: name,
-      data: newMap
-    })
   }
   function handleSortPalette() {
     if (!paletteMixedStatus) {
@@ -108,6 +103,7 @@
     const id = target.id;
     const files = event.dataTransfer?.files;
     loadFile(id, files);
+
   }
 
   function handleFileInput(event: Event) {
