@@ -6,6 +6,10 @@ type HistoryState = {
     stack: Action[];
 };
 
+
+//maybe in this history object we have a variable referencing what was last undone ( which canvas ) so if the other canvas is operated on,
+// we save its before state
+//and its after state
 export const actionHistory = $state({
     stack: [] as Action[],
     index: -1,
