@@ -15,3 +15,13 @@ export type colour = {
   blue: number;
   alpha?: number;
 };
+
+export type shaderConfig = {
+  name: string
+  webcam?: boolean;
+  keyboard?: boolean;
+  mouse?: boolean
+  uniforms: shaderUniform[];
+};
+
+type shaderUniform = "resolution" | "time" | "zoom" | "viewOffset" | "palette" | "mousePos";
