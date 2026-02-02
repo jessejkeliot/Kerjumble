@@ -2,7 +2,7 @@
   import { createEventDispatcher, tick } from "svelte";
   import { fisherYates, interpolateColor } from "$lib/functions/functions";
   import type { colour, paletteState } from "$lib/types/types";
-  import "./style.css";
+  import "../style.css";
   import { sortBy } from "$lib/functions/sorts";
   import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "../../../lib/functions/colourfunctions";
   import { preventDefault } from "svelte/legacy";

@@ -22,6 +22,7 @@
 		"@sveltejs/kit": "^2.21.4",
 		"@sveltejs/vite-plugin-svelte": "^5.1.1",
 		"@types/p5": "^1.7.6",
+		"@types/three": "^0.182.0",
 		"p5": "^2.0.4",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
@@ -31,7 +32,9 @@
 	},
 	"dependencies": {
 		"@js-basics/vector": "^2.2.5",
+		"@threlte/core": "^8.3.1",
 		"p5-svelte": "^3.1.2",
-		"prettier": "^3.5.3"
+		"prettier": "^3.5.3",
+		"three": "^0.182.0"
 	}
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import PaletteExtractionOptions from "./PaletteExtractionOptions.svelte";
-  import "./style.css";
+  import "../style.css";
   import PaletteBox from "./PaletteBox.svelte";
 
   import { createEventDispatcher } from "svelte";

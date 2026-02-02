@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import './style.css';
+  import '../style.css';
 
   let options = $state({
     image: "this",
