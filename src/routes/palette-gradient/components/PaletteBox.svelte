@@ -6,7 +6,8 @@
   import { sortBy } from "$lib/functions/sorts";
   import { getLuma, getHue, getLightness, getSaturation, hexToColour } from "../../../lib/functions/colourfunctions";
   import { preventDefault } from "svelte/legacy";
-  let { palette = $bindable() } = $props<{ palette: paletteState }>();
+    import { actionHistory } from "../shared.svelte";
+  let { palette = $bindable(), name} = $props<{ palette: paletteState, name:string}>();
   //   let palette = $props();
   const map = new Map<string, number>();
   const paletteSorts = ["frequency", "luminance", "saturation", "hue"];
@@ -102,6 +103,7 @@
     const id = target.id;
     const files = event.dataTransfer?.files;
     loadFile(id, files);
+
   }
 
   function handleFileInput(event: Event) {
