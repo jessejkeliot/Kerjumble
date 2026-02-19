@@ -1,7 +1,7 @@
 <script lang="ts">
   import { T, useTask } from "@threlte/core";
   import { VideoTexture } from "three";
-  import defaultVertexShader from "$lib/shaders/default.vert?raw";
+  import defaultVertexShader from "$lib/shaders/vertex/basic.vert?raw";
 
   let { shaderCode, config, width, height } = $props();
 
