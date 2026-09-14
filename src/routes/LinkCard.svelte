@@ -54,7 +54,6 @@
   }
   .card:hover {
     font-style: italic;
-    backdrop-filter: blur(12px);
   }
   @keyframes disappear {
     0% {

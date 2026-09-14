@@ -1,34 +1,18 @@
 <script lang="ts">
   import LinkCard from './LinkCard.svelte';
+  import SketchCanvas from '$lib/components/SketchCanvas.svelte';
+  import { sketches } from './sketches';
 
-  import type { coordinate } from "./types";
+  let currentSketchIndex = $state(0);
 
-  let n = 12;
-  let timing = 4400;
-  // document.getElementsByClassName("main")[0].setAttribute("--n", n.toString());
-  function itcc(index: number, gridsize: number): coordinate {
-    //index to coordinate;
-    const y = Math.floor(index / gridsize);
-    const x = index % gridsize;
-    return { x: x, y: y };
+  const currentSketch = $derived(sketches[currentSketchIndex]);
+
+  function nextSketch() {
+    currentSketchIndex = (currentSketchIndex + 1) % sketches.length;
   }
-  function dist(coordinate1: coordinate, coordinate2: coordinate): number {
-    const dist1 = coordinate1.x - coordinate2.x;
-    const dist2 = coordinate1.y - coordinate2.y;
-    return Math.sqrt(dist1 * dist1 + dist2 * dist2);
-  }
-  function pythagoras_Corner_Timing(i: number, n: number) {
-    return (
-      (dist(itcc(i, n), {
-        x: 0,
-        y: 0,
-      }) /
-        (dist({ x: 0, y: 0 }, { x: n, y: n }) / 2)) *
-      timing
-    );
-  }
-  function index_Timing(i: number, n: number) {
-    return ((itcc(i, n).x * itcc(i, n).y) / (n * n)) * timing;
+
+  function prevSketch() {
+    currentSketchIndex = (currentSketchIndex - 1 + sketches.length) % sketches.length;
   }
 </script>
 
@@ -36,82 +20,118 @@
   <title>Shiny Trinket</title>
   <meta name="description" content="Trinkets from Jesse" />
 </svelte:head>
+
 <div class="main">
   <div class="grid_container">
+    <div class="p5-bg">
+      <SketchCanvas sketch={currentSketch.sketch} />
+    </div>
+
     <div class="content">
       <div class="title">
         <h1>Shiny Trinket</h1>
       </div>
+
       <div class="cards-container">
-        <LinkCard title={"Kerjumble"} link={"/kerjumble"}/>
-		<LinkCard title={"Conumble"} link={"https://jessejkeliot.github.io/conumble"}/>
-		<LinkCard title={"Arithmetic"} link={"/arithmetic"}/>
-    <LinkCard title={"Palette Mapper"} link={"/palette-gradient"}/>
-		<LinkCard title={"Github"} link={"https://github.com/jessejkeliot/"}/>
+        <LinkCard title={"Kerjumble"} link={"/kerjumble"} index={0} />
+        <LinkCard title={"Conumble"} link={"https://jessejkeliot.github.io/conumble"} index={1} />
+        <LinkCard title={"Arithmetic"} link={"/arithmetic"} index={2} />
+        <LinkCard title={"Palette Mapper"} link={"/palette-gradient"} index={3} />
+        <LinkCard title={"Github"} link={"https://github.com/jessejkeliot/"} index={4} />
+      </div>
+
+      <div class="sketch-controls">
+        <button class="control-btn" onclick={prevSketch} aria-label="Previous sketch">
+          ‹
+        </button>
+        <button class="sketch-indicator" onclick={nextSketch} title="Click to cycle sketches">
+          <span>{currentSketch.title} ({currentSketchIndex + 1}/{sketches.length})</span>
+        </button>
+        <button class="control-btn" onclick={nextSketch} aria-label="Next sketch">
+          ›
+        </button>
       </div>
     </div>
-    {#each new Array(n * n) as item, i}
-      <div class="coin-wrapper">
-        <div
-          class="coin"
-          style="animation-delay: {pythagoras_Corner_Timing(
-            i,
-            n
-          )}ms; animation-duration: {timing}ms"
-        ></div>
-        <!-- <div
-          class="coin above"
-          style="animation-delay: {(dist(itcc(i, n), {
-            x: Math.floor(n / 2),
-            y: Math.floor(n / 2),
-          }) /
-            (dist({ x: 0, y: 0 }, { x: n, y: n }) / 2)) *
-            timing}ms; animation-duration: {timing}ms"
-        ></div> -->
-        <div
-          class="coin below"
-          style="animation-delay: {pythagoras_Corner_Timing(
-            i,
-            n
-          )}ms; animation-duration: {timing}ms"
-        ></div>
-      </div>
-    {/each}
   </div>
 </div>
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
-  .content {
-    z-index: 100;
-    position: absolute;
+
+  .main {
     display: flex;
-    flex-direction: row;
-    height: 90vmin;
-    aspect-ratio: 1/1;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
+    font-family: Helvetica, sans-serif;
+    font-weight: 700;
+    box-sizing: border-box;
+    padding: 1rem;
   }
+
+  .grid_container {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: min(90vw, 85vh, 600px);
+    height: auto;
+    margin: auto;
+    outline: 0.5rem solid #4f2673;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #111;
+  }
+
+  .p5-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .content {
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1rem 0.75rem 1rem;
+    box-sizing: border-box;
+    pointer-events: none;
+  }
+
+  .content > * {
+    pointer-events: auto;
+  }
+
   .title {
     color: #000;
     font-family: Helvetica;
     font-style: italic;
-    /* outline: 1px solid black; */
     display: flex;
     align-items: center;
-    flex: 1;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-bottom: 0.5rem;
   }
+
   .title h1 {
     color: #fff0;
     text-shadow: 0 0 20px #fff;
     padding: 0;
     margin: 0;
-    font-size: 6rem;
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
     animation: fadeColorIn 1.2s ease 1s forwards;
-	user-select: none;
+    user-select: none;
+    text-align: center;
   }
-  h1 {
-	padding: 0;
-	margin: 0;
-  }
+
   @keyframes fadeColorIn {
     from {
       color: #fff0;
@@ -120,161 +140,85 @@
       color: #fff9;
     }
   }
+
   .cards-container {
-    flex: 1;
-	display:flex;
-	flex-direction: column;
-	align-items: center;
-	overflow-y: scroll;
-	/* outline: 1px solid green; */
-  }
-  .card {
-	width: 80%;
-	height: 40px;
-	padding: 0.5rem;
-	margin: 0.5rem;
-	outline: 2px solid #fffa;
-	display: flex;
-	align-items: center;
-	justify-content: left;
-	font-family:Helvetica;
-	font-size: 1.5rem;
-	color: #FFFA;
-	border-radius: 0.5rem;
-	backdrop-filter: blur(0);
-	transition: backdrop-filter 0.3s ease;
-	animation: fadeColorIn 1.2s ease 2s forwards;
-	text-shadow: 0 0 5px #fff;
-	box-shadow: inset 0 0 10px;
-  }
-  .card:hover{
-	font-style: italic;
-	backdrop-filter: blur(5px);
-  }
-  .main {
-    --n: 12;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    font-family: Helvetica, sans-serif;
-    font-weight: 700;
-  }
-  .grid_container {
-    display: grid;
-    grid-template-columns: repeat(var(--n), 1fr);
-    aspect-ratio: 1 / 1;
-    width: 90vmin; /* scales with viewport */
-    height: auto;
-    gap: 0.5rem;
-    margin: auto;
-    background: linear-gradient(0.125turn, #888, #555);
-    padding: 0.5rem;
-    outline: 0.5rem solid #4f2673;
-  }
-  .coin-wrapper {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .coin-wrapper div {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-  .coin {
-    /* margin: 0.5rem; */
-    background: #888;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: max(10px, 1vw);
-    outline: 1px solid black;
-    outline: none;
-    /* box-shadow: inset 0 0 3px #111; */
-    animation: flip-diagonal cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-    user-select: none;
-    border-radius: 0;
-  }
-  .coin.above {
-    z-index: 2;
-    background: linear-gradient(hsl(200, 70%, 30%), hsl(200, 50%, 50%));
-    box-shadow: inset 0 0 10px hsl(200, 50%, 10%);
-    outline: none;
-    animation: disappear linear infinite;
-    border-radius: 0;
-  }
-  .coin.below {
-    position: relative;
-    z-index: 0;
-    background-color: #4f2673;
-    animation: flip-diagonal-back linear infinite;
-    width: 80%;
-    height: 80%;
-    outline: none;
-  }
-  @keyframes disappear {
-    0% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.7;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-  @keyframes flip-diagonal {
-    0% {
-      transform: rotate3d(-1, 1, 0, 0deg);
-    }
-    50% {
-      background: #555;
-      transform: rotate3d(-1, 1, 0, 50deg);
-    }
-    100% {
-      transform: rotate3d(-1, 1, 0, 0deg);
-    }
-  }
-  @keyframes flip-diagonal-back {
-    0% {
-      transform: rotate3d(-1, 1, 0, 0deg);
-    }
-    50% {
-      opacity: 0;
-      transform: rotate3d(-1, 1, 0, 180deg);
-    }
-    100% {
-      transform: rotate3d(-1, 1, 0, 0deg);
-    }
-  }
-  section {
-    background-image: repeating-radial-gradient(
-      rgb(150, 30, 72),
-      rgb(190, 10, 121)
-    );
-    font-family:
-      "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  }
-  .linkContainer {
-    background-color: #cbb5;
-    margin: 0.5rem 0;
-    padding: 0.7rem;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 5px;
-    font-size: 2rem;
-    backdrop-filter: blur(10px);
+    justify-content: center;
+    overflow-y: auto;
+    min-height: 0;
+    gap: 0.25rem;
   }
-  a {
-    color: black;
-    font-style: italic;
+
+  .sketch-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    margin-top: 0.5rem;
+  }
+
+  .control-btn {
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .control-btn:hover {
+    background: rgba(79, 38, 115, 0.7);
+    border-color: rgba(255, 255, 255, 0.7);
+    transform: scale(1.1);
+  }
+
+  .sketch-indicator {
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+    font-weight: 500;
+    gap: 0.4rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sketch-indicator:hover {
+    background: rgba(79, 38, 115, 0.7);
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .count {
+    opacity: 0.65;
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 600px) {
+    .content {
+      padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+    }
+    .title h1 {
+      font-size: clamp(1.8rem, 6.5vw, 3rem);
+    }
   }
 </style>

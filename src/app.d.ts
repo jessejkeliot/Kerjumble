@@ -11,4 +11,10 @@ declare global {
 }
 import 'unplugin-icons/types/svelte'
 
+declare module '*?raw' {
+	const content: string;
+	export default content;
+}
+
 export {};
+

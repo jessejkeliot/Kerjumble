@@ -1,8 +1,19 @@
 <script lang="ts">
-    	import P5 from "p5-svelte";
-	    import type p5 from "p5"; // ✅ import the type
-
-	const sketch = (p: p5) => {}
+	import SketchCanvas from "$lib/components/SketchCanvas.svelte";
+	import { organiclinesSketch } from "./organiclinesSketch";
 </script>
 
-<P5 {sketch} />
+<div class="sketch-wrapper">
+	<SketchCanvas sketch={organiclinesSketch} />
+</div>
+
+<style>
+	.sketch-wrapper {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+	}
+</style>
