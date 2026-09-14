@@ -134,7 +134,7 @@ const leopardTheme: theme = {
 }
 
 
-export const themes : theme[] = [classicTheme, partyTheme, emeraldTheme, nileTheme, meanTheme];
+export const themes : theme[] = [classicTheme, partyTheme, emeraldTheme, nileTheme, meanTheme, leopardTheme];
 
 export function setTheme(t: theme){ //NOW make this correspond to the things.
   console.log("Setting theme to ",  t.name, t);

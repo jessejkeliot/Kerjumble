@@ -144,6 +144,7 @@
     outline: none;
     width: 100%;
     transition: font-weight 0.2s ease;
+    border-radius: 0;
     /* border-bottom: 0.2rem solid black; */
     /* animation: blink 1s ease infinite; */
   }

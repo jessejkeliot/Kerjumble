@@ -19,16 +19,16 @@ export const sketches: SketchItem[] = [
 		sketch: fireSketch
 	},
 	{
-		id: "fire-blustered",
-		title: "Fire Blustered",
-		route: "/sketches/fire-blustered",
-		sketch: fireBlusteredSketch
-	},
-	{
 		id: "wavemaker",
 		title: "Wavemaker",
 		route: "/sketches/wavemaker",
 		sketch: wavemakerSketch
+	},
+	{
+		id: "fire-blustered",
+		title: "Fire Blustered",
+		route: "/sketches/fire-blustered",
+		sketch: fireBlusteredSketch
 	},
 	{
 		id: "organiclines",

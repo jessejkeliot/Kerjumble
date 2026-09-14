@@ -88,12 +88,12 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .home-link:hover {
+  /* .home-link:hover {
     color: #fff;
     background: rgba(79, 38, 115, 0.6);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateX(-2px);
-  }
+  } */
 
   .home-arrow {
     font-size: 1.1rem;
@@ -157,7 +157,7 @@
     transition: all 0.2s ease;
   }
 
-  .nav-link:hover {
+  /* .nav-link:hover {
     color: #fff;
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
@@ -166,7 +166,7 @@
     text-shadow: 0 0 5px #fff;
     box-shadow: inset 0 0 10px rgba(79, 38, 115, 0.4);
     transform: translateX(3px);
-  }
+  } */
 
   .nav-link:hover .dot {
     background: #fff;
@@ -180,7 +180,6 @@
     font-style: italic;
     font-weight: 600;
     text-shadow: 0 0 8px #fff;
-    box-shadow: inset 0 0 12px rgba(79, 38, 115, 0.8), 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .nav-link.active .dot {
@@ -189,7 +188,6 @@
     transform: scale(1.3);
   }
 
-  @media (max-width: 768px) {
     .sidebar {
       width: 100%;
       height: auto;
@@ -230,5 +228,4 @@
       font-size: 0.85rem;
       white-space: nowrap;
     }
-  }
 </style>
