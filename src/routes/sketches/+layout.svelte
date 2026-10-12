@@ -24,7 +24,7 @@
 <style>
   .sketches-layout {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     width: 100vw;
     height: 100vh;
     background: #000;
@@ -43,5 +43,11 @@
     align-items: center;
     justify-content: center;
     background: #0d0b14;
+  }
+
+  @media (max-width: 768px) {
+    .sketches-layout {
+      flex-direction: column;
+    }
   }
 </style>

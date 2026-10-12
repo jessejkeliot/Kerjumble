@@ -58,39 +58,48 @@
 <style>
   .configBox.available {
     background-color: var(--secondary-color);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   .showhide {
-    width: 10%;
+    width: clamp(55px, 14%, 75px);
   }
   .rest {
     flex: 7;
+    display: flex;
+    gap: 0.35em;
   }
   .rest div {
-    width: 100%;
+    flex: 1;
+    color: var(--text-color);
+    font-size: 0.9em;
+    gap: 0.2em;
+    user-select: none;
   }
   .get {
     font-size: inherit;
-    flex: 1;
+    width: clamp(45px, 10%, 65px);
   }
   .configBox {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    box-sizing: content-box;
     display: flex;
     align-items: center;
     z-index: 22;
-    gap: 0.25em;
-    padding: 0.25em;
+    gap: 0.35em;
+    padding: 0.35em;
     box-sizing: border-box;
-    background-color: transparent;
-    /* outline: 1px solid green; */
-    height: clamp(15px, 7%, 30px);
+    background: rgba(40, 40, 40, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    height: clamp(24px, 8%, 38px);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
   }
   @media (max-width: 480px) {
     .configBox {
-      height: clamp(20px, 12%, 35px);
+      height: clamp(28px, 13%, 42px);
     }
   }
   .configBox div {
@@ -98,46 +107,60 @@
     height: 100%;
     font-family: inherit;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
   }
   button,
   input,
   select {
     font-size: inherit;
+    font-weight: 500;
     height: 100%;
     width: 100%;
     margin: 0;
-    padding: 0;
-    box-sizing: content-box;
+    padding: 0.2em 0.4em;
+    box-sizing: border-box;
     appearance: none;
-    border: none;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
-    background-color: var(--primary-color);
-    opacity: 1;
-    transition: box-shadow 0.2s;
-    &:hover {
-      box-shadow: inset 0 0 2px #000;
-    }
-  }
-
-  button,
-  select,
-  input {
-    border: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.45em;
+    color: var(--text-color);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 65%),
+                var(--primary-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   }
-
-  @keyframes fadeColorIn {
-    from {
-      color: #0000;
-    }
-    to {
-      color: #0009;
-    }
+  button:hover,
+  select:hover {
+    filter: brightness(1.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  button:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  input {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.05) 100%),
+                var(--primary-color);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+    cursor: text;
+    text-align: center;
+  }
+  input:focus,
+  select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.15);
+  }
+  select {
+    text-align-last: center;
+  }
+  select option {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
   }
 </style>

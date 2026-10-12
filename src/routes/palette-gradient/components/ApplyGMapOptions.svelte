@@ -47,40 +47,77 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.25em;
-    padding: 0.25em;
+    gap: 0.35em;
+    padding: 0.35em;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--secondary-color);
   }
   @media (max-width: 480px) {
-    .options{
-      flex:2;
+    .options {
+      flex: 2;
     }
   }
   .apply {
     font-size: inherit;
     flex: 1;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   .options div {
     height: 100%;
     flex: 1;
-    background-color: none;
+    background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1em;
+    font-size: 0.95em;
+    color: var(--text-color);
+  }
+  .choice {
+    font-weight: 500;
+    opacity: 0.9;
+    user-select: none;
   }
   button,
   select,
   input {
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     height: 100%;
     width: 100%;
     text-align: center;
     font-size: inherit;
-    background-color: var(--primary-color);
-    transition: box-shadow;
-    &:hover {
-      box-shadow: inset 0 0 2px #000;
-    }
+    font-weight: 500;
+    color: var(--text-color);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 65%),
+                var(--primary-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-radius: 0.45em;
+    padding: 0.25em 0.5em;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  button:hover,
+  select:hover {
+    filter: brightness(1.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  button:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  select {
+    cursor: pointer;
+    text-align-last: center;
+    padding-right: 0.7em;
+    padding-left: 0.7em;
+  }
+  select option {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
   }
 </style>

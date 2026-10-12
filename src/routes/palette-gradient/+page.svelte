@@ -30,32 +30,46 @@
         clientX = e.clientX;
         clientY = e.clientY;
     }
+    export function performUndo() {
+        const action = actionHistory.undo();
+        if (action) {
+            applyActionToCard(action);
+            console.log(`Applying ${action.type} undo to ${action.tabID}`);
+        }
+    }
+
+    export function performRedo() {
+        const action = actionHistory.redo();
+        if (action) {
+            applyActionToCard(action);
+            console.log(`Applying ${action.type} redo to ${action.tabID}`);
+        }
+    }
+
+    function applyActionToCard(action: Action) {
+        switch (action.tabID) {
+            case "A":
+                cardARef?.applyAction(action);
+                break;
+            case "B":
+                cardBRef?.applyAction(action);
+                break;
+            default:
+                break;
+        }
+    }
+
     function handleKeyPress(event: KeyboardEvent) {
         if (event.key === "Meta") {
             keystate.cmd = true;
         }
-        if (event.metaKey && event.key === "z") {
-            let action: Action | undefined = undefined;
-            //trigger the undo
-            //do we trigger the undo here and send the data down with an event? or should I do it in the component
-            //I think we should just do it here and then send it down. in an event?
+        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
+            event.preventDefault();
             if (event.shiftKey) {
-                //redo
-                action = actionHistory.redo();
+                performRedo();
             } else {
-                action = actionHistory.undo();
+                performUndo();
             }
-            switch (action?.tabID) {
-                case "A":
-                    cardARef?.applyAction(action);
-                    break;
-                case "B":
-                    cardBRef?.applyAction(action);
-                default:
-                    break;
-            }
-            
-            if(action) console.log(`Applying ${action?.type} undo to ${action?.tabID}`);
         }
     }
 </script>
@@ -66,9 +80,9 @@
     <div class="middlebox">
         <div class="IOContainer">
             <!-- Palette Drop Zone -->
-            <CardImage bind:this={cardARef} name="A" on:applyToOther={handleApplyToOtherA}></CardImage>
+            <CardImage bind:this={cardARef} name="A" on:applyToOther={handleApplyToOtherA} on:undo={performUndo} on:redo={performRedo}></CardImage>
             <!-- Canvas Drop Zone -->
-            <CardImage bind:this={cardBRef} name="B" on:applyToOther={handleApplyToOtherB}></CardImage>
+            <CardImage bind:this={cardBRef} name="B" on:applyToOther={handleApplyToOtherB} on:undo={performUndo} on:redo={performRedo}></CardImage>
         </div>
     </div>
 </div>
@@ -105,21 +119,26 @@
         align-items: center;
         justify-content: center;
         padding: 1rem;
-        gap: 1em;
+        gap: 1.25em;
         width: 100%;
         height: 100%;
         max-width: 1600px;
         min-height: 500px;
-        outline: 3px solid var(--secondary-color);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 1rem;
+        background: rgba(20, 20, 20, 0.4);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     @media (max-width: 700px) {
         .IOContainer {
             flex-direction: column;
-            height: 200%;
+            height: auto;
+            min-height: 100%;
+            padding: 0.75rem;
         }
         .middlebox {
-            height: 90%;
+            height: 95%;
         }
     }
     @media (max-width: 480px) {

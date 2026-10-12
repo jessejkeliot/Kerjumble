@@ -48,14 +48,17 @@ export const wavemakerSketch = (p: p5) => {
             for (let y = 0; y <= p.height; y += step) {
                 const angle = xAngle * (x / p.width) + yAngle * (y / p.height);
                 const radius = step * 0.65;
-                const myX = x + radius * p.cos(2 * p.PI * t + angle);
-                const myY = y + radius * p.sin(2 * p.PI * t + angle);
+                let myX = x + radius * p.cos(2 * p.PI * t + angle);
+                let myY = y + radius * p.sin(2 * p.PI * t + angle);
                 
                 const pythag = Math.sqrt(p.pow((myX - currentX), 2) + p.pow((myY - currentY), 2));
+                const lerpPower = p.map(pythag, 0, maxD, 0.25, 0);
+                myX = p.lerp(myX, currentX, lerpPower);
+                myY = p.lerp(myY, currentY, lerpPower);
                 
                 // 2. Invert mapping: 0 distance = 255 (bright), maxD = 30 (dim baseline)
                 const alpha = p.map(pythag, 0, maxD, 255, 0);
-                const strokeW = p.map(pythag, 0, maxD, 4, 55);
+                const strokeW = p.map(pythag, 0, maxD, 1, 55);
 
                 // 3. Apply stroke with alpha channel
                 p.stroke(237, 34, 93, alpha); // #ed225d in RGB + dynamic alpha

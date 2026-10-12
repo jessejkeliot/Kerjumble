@@ -225,41 +225,64 @@
     flex: 2;
     display: flex;
     flex-direction: row;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 0.35em;
+    padding: 0.35em;
+    background-color: var(--secondary-color);
   }
   @media (max-width: 480px) {
     .paletteBox {
       flex: 3;
     }
   }
-  .paletteOptions button {
-    flex: 1;
-    border: none;
-    border-radius: 0;
-    font-size: 0.8em;
-  }
   .paletteOptions {
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 0.25em;
+  }
+  .paletteOptions button {
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.45em;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: var(--text-color);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 65%),
+                var(--primary-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .paletteOptions button:hover {
+    filter: brightness(1.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .paletteOptions button:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
   .palettePlusGradientBox {
     display: flex;
     flex-direction: column;
     flex: 7;
+    border-radius: 0.5em;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 
   .gradientLine {
     flex: 1;
     width: 100%;
     background: var(--background-color);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
   button {
     font-size: inherit;
-    background-color: var(--primary-color);
-    transition: box-shadow 0.2s;
-    &:hover {
-      box-shadow: inset 0 0 2px #000;
-    }
   }
   .paletteDisplay {
     flex: 2;

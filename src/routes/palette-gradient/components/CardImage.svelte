@@ -12,6 +12,9 @@
     import MageImageDownload from "~icons/mage/image-download";
     import MageColorSwatch from "~icons/mage/color-swatch";
     import MageSort from "~icons/mage/chart-up-fill";
+    import MdiUndo from "~icons/mdi/undo";
+    import MdiRedo from "~icons/mdi/redo";
+    import MdiBlur from "~icons/mdi/blur";
     import {
         getPaletteColours,
         getColourAt,
@@ -461,7 +464,46 @@
             console.error("No canvas!");
         }
     }
-    //sorting palette. Need to add a UI Element with a little sorting icon
+
+    let blurAmount: number = $state(4);
+    let showBlurControls: boolean = $state(false);
+
+    function applyBlur(radius: number = blurAmount) {
+        if (!canvasEl || canvasWidth === 0 || canvasHeight === 0) {
+            console.error("No canvas to apply blur to");
+            return;
+        }
+        const context = canvasEl.getContext("2d", { willReadFrequently: true });
+        if (!context) return;
+
+        const r = Math.max(0, Math.round(radius));
+        if (r === 0) return;
+
+        // Draw onto a temporary canvas using canvas 2D filter for hardware-accelerated blur
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvasWidth;
+        tempCanvas.height = canvasHeight;
+        const tempCtx = tempCanvas.getContext("2d");
+        if (!tempCtx) return;
+
+        tempCtx.filter = `blur(${r}px)`;
+        tempCtx.drawImage(canvasEl, 0, 0);
+
+        // Put blurred image back
+        context.clearRect(0, 0, canvasWidth, canvasHeight);
+        context.drawImage(tempCanvas, 0, 0);
+
+        const newImageData = context.getImageData(0, 0, canvasWidth, canvasHeight);
+        actionHistory.save({ type: "image", data: newImageData, tabID: name });
+    }
+
+    function handleUndoClick() {
+        dispatch("undo");
+    }
+
+    function handleRedoClick() {
+        dispatch("redo");
+    }
 </script>
 
 <div class="data">
@@ -471,9 +513,21 @@
             <button onclick={resetImage} title="Reset Image"><MageReset style="font-size: 1.2rem" /></button>
             <button onclick={saveImage} title="Save Image"><MageFileDownload style="font-size: 1.2rem" /></button>
             <button onclick={savePalette} title="Save Palette"><MageColorSwatch style="font-size: 1.2rem" /></button>
+            <button onclick={() => (showBlurControls = !showBlurControls)} class:active-tool={showBlurControls} title="Toggle Blur Tool"><MdiBlur style="font-size: 1.2rem" /></button>
+            <div class="historyDivider"></div>
+            <button onclick={handleUndoClick} title="Undo (Cmd/Ctrl+Z)" disabled={!actionHistory.canUndo()} class="historyBtn"><MdiUndo style="font-size: 1.2rem" /></button>
+            <button onclick={handleRedoClick} title="Redo (Cmd/Ctrl+Shift+Z)" disabled={!actionHistory.canRedo()} class="historyBtn"><MdiRedo style="font-size: 1.2rem" /></button>
         </div>
-        <!-- <div class="optionIconHolder"></div> -->
     </div>
+    {#if showBlurControls}
+        <div class="blurBar">
+            <span class="blurLabel">Blur:</span>
+            <input type="range" min="1" max="40" bind:value={blurAmount} class="blurSlider" />
+            <input type="number" min="1" max="100" bind:value={blurAmount} class="blurNumber" />
+            <span class="blurUnit">px</span>
+            <button onclick={() => applyBlur(blurAmount)} class="blurApplyBtn" disabled={!canvasEl || canvasWidth === 0}>Apply</button>
+        </div>
+    {/if}
     <div class="imageHolder input" id="canvas{name}" ondrop={handleDrop} ondragover={handleDragOver} aria-hidden="true">
         <PaletteExtractionOptions on:applySettings={applySettings} bind:settings={palette.settings} bind:display={showPEO} />
         {#if imageURL}
@@ -498,19 +552,31 @@
         flex-direction: row;
         justify-content: center;
         background-color: var(--secondary-color);
-        gap: 0.25em;
-        padding: 0.25em;
+        gap: 0.35em;
+        padding: 0.35em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     .Options button,
     input {
         flex: 1;
-        border: none;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         appearance: none;
-        background-color: var(--primary-color);
-        transition: box-shadow 0.3s;
-        &:hover {
-            box-shadow: inset 0 0 0.2em #000;
-        }
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 65%),
+                    var(--primary-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        border-radius: 0.45em;
+    }
+    .Options button:hover {
+        filter: brightness(1.15);
+        border-color: rgba(255, 255, 255, 0.28);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    .Options button:active {
+        transform: translateY(1px);
+        filter: brightness(0.95);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     button,
     input,
@@ -521,6 +587,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0.35em 0.5em;
     }
     .data {
         flex: 1;
@@ -530,9 +597,11 @@
         height: 100%;
         width: 100%;
         text-overflow: clip;
-        outline: 1px solid black;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        overflow: hidden;
         background-color: var(--secondary-color);
-        box-shadow: 0 3px 10px #333;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
     }
     .containedImage {
         position: absolute;
@@ -544,7 +613,88 @@
         flex: 1;
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 0.25em;
+    }
+    .historyDivider {
+        width: 1px;
+        height: 65%;
+        background: rgba(255, 255, 255, 0.15);
+        margin: 0 0.15em;
+    }
+    .active-tool {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 100%),
+                    var(--primary-color) !important;
+        border-color: rgba(255, 255, 255, 0.45) !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35), 0 0 8px rgba(255, 255, 255, 0.2) !important;
+    }
+    .historyBtn:disabled,
+    .Options button:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        filter: grayscale(0.8);
+        box-shadow: none;
+    }
+    .blurBar {
+        display: flex;
+        align-items: center;
+        gap: 0.45em;
+        padding: 0.35em 0.6em;
+        background: rgba(30, 30, 30, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9em;
+        color: var(--text-color);
+        z-index: 10;
+    }
+    .blurLabel {
+        font-weight: 600;
+        opacity: 0.9;
+        font-size: 0.9em;
+    }
+    .blurSlider {
+        flex: 1;
+        max-width: 160px;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        outline: none;
+        cursor: pointer;
+    }
+    .blurNumber {
+        width: 48px;
+        text-align: center;
+        padding: 0.2em 0.3em;
+        border-radius: 0.35em;
+        background: rgba(20, 20, 20, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-color);
+        font-size: 0.9em;
+    }
+    .blurUnit {
+        opacity: 0.75;
+        font-size: 0.85em;
+    }
+    .blurApplyBtn {
+        padding: 0.25em 0.75em;
+        font-size: 0.85em;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 0.4em;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 65%),
+                    var(--primary-color);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--text-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: filter 0.15s ease, transform 0.12s ease;
+    }
+    .blurApplyBtn:hover:not(:disabled) {
+        filter: brightness(1.2);
+    }
+    .blurApplyBtn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
     }
     @media (max-width: 850px) {
         .imageHolder {
@@ -572,13 +722,35 @@
     .imageHolder {
         flex: 15;
         background-color: var(--background-color);
-        box-shadow: inset 0 0 10px #0003;
+        box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.45);
         backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        /* outline: 1px solid hsl(0, 0%, 40.5%); */
+        position: relative;
+    }
+    .imageHolder label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85em;
+        border-radius: 50%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 100%),
+                    rgba(255, 255, 255, 0.05);
+        border: 1px dashed rgba(255, 255, 255, 0.28);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        transition: transform 0.18s ease, border-color 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+    }
+    .imageHolder label:hover {
+        transform: scale(1.08);
+        filter: brightness(1.2);
+        border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .imageHolder label:active {
+        transform: scale(0.98);
     }
     button,
     input {

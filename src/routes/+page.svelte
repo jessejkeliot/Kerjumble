@@ -66,6 +66,7 @@
     min-height: 100vh;
     width: 100%;
     font-family: Helvetica, sans-serif;
+    background-color:#141414;
     font-weight: 700;
     box-sizing: border-box;
     padding: 1rem;

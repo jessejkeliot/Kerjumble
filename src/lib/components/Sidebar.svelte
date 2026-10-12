@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { goto } from "$app/navigation";
 
   let {
     header = "Sketches",
@@ -12,6 +13,13 @@
   } = $props();
 
   const currentPath = $derived(page.url.pathname);
+
+  function handleSelectChange(e: Event) {
+    const target = e.target as HTMLSelectElement;
+    if (target && target.value) {
+      goto(target.value);
+    }
+  }
 </script>
 
 <aside class="sidebar">
@@ -22,6 +30,15 @@
     <a href={rootroute} class="title-link">
       <h1 class="header-title">{header}</h1>
     </a>
+  </div>
+
+  <!-- Mobile Dropdown Selector -->
+  <div class="mobile-select-wrapper">
+    <select onchange={handleSelectChange} value={currentPath} aria-label="Select sketch">
+      {#each elements as example (example.route)}
+        <option value={example.route}>{example.title}</option>
+      {/each}
+    </select>
   </div>
 
   <nav class="sidebar-nav">
@@ -188,44 +205,71 @@
     transform: scale(1.3);
   }
 
+  .mobile-select-wrapper {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
     .sidebar {
       width: 100%;
       height: auto;
       border-right: none;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 1rem;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 0.75rem;
     }
 
     .sidebar-header {
       flex-direction: row;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
       padding-bottom: 0;
       border-bottom: none;
       margin-bottom: 0;
     }
 
     .header-title {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
     }
 
+    /* Hide the horizontal scroll list on mobile and show the dropdown */
     .sidebar-nav {
-      overflow-x: auto;
+      display: none;
+    }
+
+    .mobile-select-wrapper {
+      display: flex;
+      align-items: center;
       flex: 1;
+      max-width: 220px;
     }
 
-    ul {
-      flex-direction: row;
-      gap: 0.35rem;
-    }
-
-    .nav-link {
-      padding: 0.4rem 0.65rem;
+    .mobile-select-wrapper select {
+      width: 100%;
       font-size: 0.85rem;
-      white-space: nowrap;
+      font-weight: 500;
+      padding: 0.4em 0.8em;
+      border-radius: 0.5em;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%),
+                  rgba(79, 38, 115, 0.7);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      text-align: center;
+      text-align-last: center;
+      backdrop-filter: blur(8px);
     }
+
+    .mobile-select-wrapper select option {
+      background: #181224;
+      color: #fff;
+    }
+  }
 </style>
